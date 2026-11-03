@@ -22,7 +22,7 @@ a[aria-label="访问 Aragakey 个人主页"]::after {
 }
 .workbook-header-logo {
   object-fit: contain;
-  mix-blend-mode: multiply;
+  filter: brightness(0);
 }
 [data-role="footer-item"] { position: relative; }
 [data-role="footer-item"]::after {
