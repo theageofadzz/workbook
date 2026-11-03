@@ -1,74 +1,45 @@
 # theageofadzz
 
-作品集 / 我的设计工程师职业生涯
+设计与工程作品集，记录界面、交互、动效，以及把想法做成真实体验的过程。
 
-**在线预览：<https://theageofadzz.github.io/workbook/>**
+[![在线预览](https://img.shields.io/badge/在线预览-GitHub%20Pages-2F6FEB?style=for-the-badge&logo=githubpages&logoColor=white)](https://theageofadzz.github.io/workbook/)
+[![GitHub 主页](https://img.shields.io/badge/GitHub-theageofadzz-181717?style=for-the-badge&logo=github)](https://github.com/theageofadzz)
+[![项目仓库](https://img.shields.io/badge/项目仓库-workbook-444444?style=for-the-badge&logo=github)](https://github.com/theageofadzz/workbook)
 
-按照 [设计垂点](https://wxad.design/abc/) 的公开页面复刻和适配的个人网站版本。
-保留原站的纸张颗粒背景、响应式排版、圆形动态封面、文章目录、悬浮导航、
-交互实验、作品瀑布流及 React / Next.js 动画运行时。
+**快捷导航：** [网站设计](#网站设计) · [代表项目](#代表项目) · [作品浏览](#作品浏览) · [内容与署名](#内容与署名)
 
-## 页面
+## 网站设计
 
-- 文章首页及全部公开文章内页。
-- Crafts / CSS Generatives 作品墙，共 59 个原站示例项目。
-- theageofadzz 关于页、404 页面。
-- 手机与桌面布局、文章锚点目录、页面间跳转。
+- **克制的视觉基调**：黑色品牌标识搭配浅灰纸感背景，以细腻颗粒、柔和阴影和充足留白构建安静的阅读氛围。
+- **清晰的内容层级**：首页以宽松的文章列表呈现作品，动态封面和简洁标题帮助快速浏览；文章页围绕正文、目录与演示内容组织阅读节奏。
+- **轻量的交互表达**：固定在页面底部的圆形快捷导航提供首页、作品和个人主页入口；悬停提示与细微动效让操作保持直观。
+- **适配不同屏幕**：桌面端强调内容的横向呼吸感，移动端调整标题、封面和导航位置，让长文与作品卡片都易于阅读。
+- **作品墙**：CSS Generatives 页面以图像网格呈现 59 个创作练习，覆盖图案、字体、色彩、形状和动态实验。
 
-## 本地预览
+## 代表项目
 
-```sh
-npm ci
-npm run dev
-```
+### 交互与体验
 
-打开 <http://127.0.0.1:4173/workbook/>。可以用 `PORT=4174 npm run dev` 指定其他端口。
-预览服务按照线上相同的 `/workbook` 子路径提供页面。
+- [微广 12 周年活动记录](https://theageofadzz.github.io/workbook/wxad12/)：围绕个性化文字重组与时钟转盘，梳理周年 H5 中的视觉概念和交互节奏。
+- [制作有趣的界面：朋友圈广告年度评选 2025](https://theageofadzz.github.io/workbook/making-fun-interfaces/)：从入场、投票到结果公布，记录如何用速度、碰撞和节奏为评选体验增加活力。
+- [转盘交互动画](https://theageofadzz.github.io/workbook/carousel/)：通过可操作的转盘体验，拆解拖动、惯性、停靠和回弹带来的感受差异。
+- [一类叫作“跳跃”的 UI 动效](https://theageofadzz.github.io/workbook/springen/)：总结输入框、头像、折叠面板等组件在状态切换时连贯、舒适的动效表达。
+- [一类叫作“发芽”的 UI 组件](https://theageofadzz.github.io/workbook/spross/)：围绕气泡提示、对话框、抽屉和全局提醒，探索浮层组件之间一致的行为与反馈。
 
-## 结构与维护
+### 设计系统与创作
 
-| 位置 | 用途 |
-| --- | --- |
-| `docs/` | 可直接发布的完整静态站点，包括文章、运行时代码、字体与图片 |
-| `site.config.json` | 站点名称、简介、部署路径、GitHub 地址 |
-| `src/workbook.css` | 品牌标识、导航提示、关于页样式 |
-| `src/workbook.js` | 品牌适配、GitHub 与关于页导航、无障碍标签 |
-| `tools/serve.mjs` | 无需额外服务器依赖的本地预览 |
-| `tools/check.mjs` | 页面覆盖与本地链接、资源完整性检查 |
-| `tools/sync.mjs` | 获取公开参考页面及依赖，生成本地快照 |
-| `tools/build.mjs` | 重写部署路径、生成路由数据与发布目录 |
-| `tools/optimize.mjs` | 将适合压缩的 GIF 转为动画 WebP，检查尺寸及播放时长 |
+- [回顾：制作微信广告设计语言 AD UI](https://theageofadzz.github.io/workbook/adui/)：记录设计语言从字体与动效规范，到组件体验和团队协作方式的实践。
+- [回顾：制作微信广告官网](https://theageofadzz.github.io/workbook/wxad/)：回顾官网及案例内容的设计与建设，呈现一个长期迭代的网站项目。
+- [制作流畅界面](https://theageofadzz.github.io/workbook/making-fluid-interfaces/)：结合实际项目，讨论如何让界面动效自然、清楚，并服务于操作本身。
+- [小 p：一次关于 AI 的交互实验](https://theageofadzz.github.io/workbook/small-p/)：通过从协作角色到桌面体验的不同尝试，探索 AI 产品可以如何与人一起创作。
+- [我的 CSS 生成艺术世界](https://theageofadzz.github.io/workbook/generative/)：分享从随机与秩序、视觉限制和创作乐趣出发的生成艺术探索。
 
-修改 `src/` 后运行 `npm run build`，再运行 `npm run check`。
-仓库已经包含发布产物，普通构建和部署不需要访问参考网站。
-运行 `npm run sync` 可获取并重建参考站快照；加 `-- --refresh` 可以忽略本地缓存。
-快照构建会自动优化动图；首次迁移时节省约 223 MiB，同时保留帧尺寸及播放时长。
+## 作品浏览
 
-这是对原站公开静态产物的适配，包含运行所需的已编译代码，不是原站的未公开开发源码。
-主要字体与图片已经本地化；视频和第三方 iframe 示例继续通过各自原有地址播放，
-因此这些内容的可用性仍取决于原服务。
+- [文章首页](https://theageofadzz.github.io/workbook/)：浏览设计记录、项目回顾与交互实验。
+- [Crafts 作品墙](https://theageofadzz.github.io/workbook/crafts/)：查看 CSS 生成艺术与视觉创作。
+- [关于 theageofadzz](https://theageofadzz.github.io/workbook/about/)：了解这个作品集。
 
-## GitHub Pages
+## 内容与署名
 
-在仓库 **Settings → Pages** 中设置：
-
-- Source: **Deploy from a branch**
-- Branch: **main**
-- Folder: **/docs**
-
-`docs/.nojekyll` 确保 `_next` 目录正常发布。提交并推送到 `main` 后，
-GitHub 会自动更新在线站点，无需服务器、密钥或额外的 CI 工作流。
-
-```sh
-npm run check
-git add .
-git commit -m "Update theageofadzz branding"
-git push origin main
-```
-
-## 来源与署名
-
-视觉、原示例文章和作品来自 [设计垂点 / Aragakey.](https://wxad.design/abc/)。
-本版本保留示例作者署名，不将原作者的经历和作品冒充为站点所有者的原创。
-文章、字体、图片、视频和其他第三方内容的权利属于各自权利人。
-正式替换为个人作品时，请一并更新作品标题、经历、正文、图片和外部链接。
+作品集中的文章、项目展示与创作练习按页面署名呈现；相关内容和素材版权归原作者及各自权利人所有。
