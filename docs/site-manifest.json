@@ -1,0 +1,167 @@
+{
+  "title": "Workbook",
+  "source": "https://wxad.design/abc",
+  "capturedAt": "2026-11-03T07:45:09.986Z",
+  "basePath": "/workbook",
+  "pages": [
+    {
+      "route": "/",
+      "title": "Workbook",
+      "file": "index.html"
+    },
+    {
+      "route": "/crafts",
+      "title": "Workbook",
+      "file": "crafts/index.html"
+    },
+    {
+      "route": "/wxad12",
+      "title": "微广 12 周年活动记录 · Workbook",
+      "file": "wxad12/index.html"
+    },
+    {
+      "route": "/interactive-design-in-ai",
+      "title": "使用 AI 制作交互动画的建议 · Workbook",
+      "file": "interactive-design-in-ai/index.html"
+    },
+    {
+      "route": "/small-p",
+      "title": "小 p: 一次关于 AI 的交互实验 · Workbook",
+      "file": "small-p/index.html"
+    },
+    {
+      "route": "/making-fun-interfaces",
+      "title": "制作有趣的界面：朋友圈广告年度评选 2025 · Workbook",
+      "file": "making-fun-interfaces/index.html"
+    },
+    {
+      "route": "/figma-make",
+      "title": "Figma Make 的使用建议与更多 AI 的思考 · Workbook",
+      "file": "figma-make/index.html"
+    },
+    {
+      "route": "/springen2",
+      "title": "让我们继续“跳跃” · Workbook",
+      "file": "springen2/index.html"
+    },
+    {
+      "route": "/wxad11",
+      "title": "玩一点微广 11 周年的 Demo · Workbook",
+      "file": "wxad11/index.html"
+    },
+    {
+      "route": "/svg-liquid-glass",
+      "title": "使用 SVG 模拟 Apple Liquid Glass · Workbook",
+      "file": "svg-liquid-glass/index.html"
+    },
+    {
+      "route": "/quality-of-ui",
+      "title": "用户界面的品质 · Workbook",
+      "file": "quality-of-ui/index.html"
+    },
+    {
+      "route": "/spross",
+      "title": "一类叫作“发芽”的 UI 组件 · Workbook",
+      "file": "spross/index.html"
+    },
+    {
+      "route": "/springen",
+      "title": "一类叫作“跳跃”的 UI 动效 · Workbook",
+      "file": "springen/index.html"
+    },
+    {
+      "route": "/making-fluid-interfaces",
+      "title": "制作流畅界面 · Workbook",
+      "file": "making-fluid-interfaces/index.html"
+    },
+    {
+      "route": "/deng",
+      "title": "做 UI 的开发 · Workbook",
+      "file": "deng/index.html"
+    },
+    {
+      "route": "/drawer",
+      "title": "关于 Drawer 组件的发散 · Workbook",
+      "file": "drawer/index.html"
+    },
+    {
+      "route": "/shadcn",
+      "title": "关于 shadcn/ui 的思考与启发 · Workbook",
+      "file": "shadcn/index.html"
+    },
+    {
+      "route": "/scroll-mock",
+      "title": "如何依靠 transform 模拟 iOS 原生滚动体验 · Workbook",
+      "file": "scroll-mock/index.html"
+    },
+    {
+      "route": "/designing-depth",
+      "title": "交互动画的层级设计 · Workbook",
+      "file": "designing-depth/index.html"
+    },
+    {
+      "route": "/bm",
+      "title": "回顾: 制作朋友圈广告年度评选 · Workbook",
+      "file": "bm/index.html"
+    },
+    {
+      "route": "/wxad",
+      "title": "回顾: 制作微信广告官网 · Workbook",
+      "file": "wxad/index.html"
+    },
+    {
+      "route": "/adui",
+      "title": "回顾: 制作微信广告设计语言 AD UI · Workbook",
+      "file": "adui/index.html"
+    },
+    {
+      "route": "/circular-text",
+      "title": "画出完美的文字圆形环绕 UI · Workbook",
+      "file": "circular-text/index.html"
+    },
+    {
+      "route": "/conic-gradient",
+      "title": "用 motion/react 实现优雅的 conic-gradient 旋转动画 · Workbook",
+      "file": "conic-gradient/index.html"
+    },
+    {
+      "route": "/functional-motion",
+      "title": "Functional Motion: UI 组件库的动效设计细节 · Workbook",
+      "file": "functional-motion/index.html"
+    },
+    {
+      "route": "/generative",
+      "title": "我的 CSS 生成艺术世界 · Workbook",
+      "file": "generative/index.html"
+    },
+    {
+      "route": "/likes",
+      "title": "制作点赞与投票动画 · Workbook",
+      "file": "likes/index.html"
+    },
+    {
+      "route": "/trail",
+      "title": "用 react-spring 设计有“惯性”的交互动画 · Workbook",
+      "file": "trail/index.html"
+    },
+    {
+      "route": "/carousel",
+      "title": "转盘交互动画: 以关键参数，细化我们的感受 · Workbook",
+      "file": "carousel/index.html"
+    },
+    {
+      "route": "/2023",
+      "title": "2023: 面对自我的提问与面对自我的回答 · Workbook",
+      "file": "2023/index.html"
+    },
+    {
+      "route": "/font-family",
+      "title": "我们认真地想了想 font-family · Workbook",
+      "file": "font-family/index.html"
+    }
+  ],
+  "localFiles": 437,
+  "localBytes": 430095890,
+  "externalMedia": "Original videos and third-party iframe demos remain hosted at their original URLs.",
+  "unavailableAssets": []
+}

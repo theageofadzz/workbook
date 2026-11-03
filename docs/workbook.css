@@ -1,0 +1,68 @@
+[data-workbook-signature],
+a[aria-label="访问 Aragakey 个人主页"] {
+  display: inline-flex;
+  flex-direction: column;
+  width: 132px;
+  color: #282828;
+  text-decoration: none;
+}
+[data-workbook-signature] > svg,
+a[aria-label="访问 Aragakey 个人主页"] > svg { display: none; }
+[data-workbook-signature]::before,
+a[aria-label="访问 Aragakey 个人主页"]::before {
+  content: "Workbook.";
+  font: italic 29px/1.2 Georgia, "Times New Roman", serif;
+  border-bottom: 1px solid #777;
+}
+[data-workbook-signature]::after,
+a[aria-label="访问 Aragakey 个人主页"]::after {
+  content: "Design & Engineering";
+  margin-top: 5px;
+  font: italic 9px/1.3 Georgia, "Times New Roman", serif;
+}
+[data-role="footer-item"] { position: relative; }
+[data-role="footer-item"]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 15px);
+  transform: translateX(-50%) translateY(4px);
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #333;
+  color: #fff;
+  font: 11px/1.4 system-ui, sans-serif;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms, transform 140ms;
+}
+[data-role="footer-item"]:hover::after,
+[data-role="footer-item"]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset: 5px; }
+.workbook-about {
+  margin: 0;
+  min-height: 100svh;
+  background: #f3f3f3;
+  color: #272727;
+  font: 15px/1.9 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+.workbook-about main { max-width: 640px; margin: 0 auto; padding: 64px 24px 120px; }
+.workbook-about .eyebrow { margin-top: 90px; color: #777; font: 11px/1.5 monospace; }
+.workbook-about h1 { margin: 12px 0 20px; font: italic 64px/1.1 Georgia, serif; }
+.workbook-about .lead { color: #777; margin-bottom: 48px; }
+.workbook-about h2 { font-size: 18px; margin-top: 36px; }
+.workbook-about a { color: inherit; text-underline-offset: 4px; }
+.workbook-about .back { color: #777; font-size: 13px; text-decoration: none; }
+.workbook-about hr { border: 0; border-top: 1px solid #d8d8d8; }
+@media (max-width: 500px) {
+  .workbook-about h1 { font-size: 48px; }
+  [data-role="footer-item"]::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  [data-role="footer-item"]::after { transition: none; }
+}

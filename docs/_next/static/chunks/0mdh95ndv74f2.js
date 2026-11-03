@@ -1,0 +1,1 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,58685,(o,t,i)=>{let _="/crafts/CraftFooter";(window.__NEXT_P=window.__NEXT_P||[]).push([_,()=>o.r(22859)]),t.hot&&t.hot.dispose(function(){window.__NEXT_P.push([_])})}]);

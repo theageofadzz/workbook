@@ -1,0 +1,137 @@
+import { mkdir, readFile, writeFile, copyFile, rm } from "node:fs/promises";
+import { dirname, join, resolve } from "node:path";
+import { parse, serialize } from "parse5";
+
+const root = resolve(import.meta.dirname, "..");
+const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
+const source = new URL(config.source);
+const base = config.basePath;
+const cache = join(root, ".cache", "reference");
+const out = join(root, "docs");
+let manifest;
+try {
+  manifest = JSON.parse(await readFile(join(cache, "manifest.json"), "utf8"));
+} catch {
+  // Checked-in docs are a complete, ready-to-publish static build.
+  await accessBuild();
+  for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
+  await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
+  console.log("Using the checked-in static build. Run npm run sync to refresh the reference snapshot.");
+  process.exit(0);
+}
+const mapping = new Map(manifest.files.map(file => [file.url, `${base}/${file.local}`]));
+const replacements = [...mapping].filter(([url]) => !url.startsWith(config.source)).sort((a, b) => b[0].length - a[0].length);
+
+async function accessBuild() {
+  await readFile(join(out, "index.html"));
+  await readFile(join(out, "site-manifest.json"));
+}
+
+function rewrite(value) {
+  const remoteMedia = [];
+  const sourcePattern = config.source.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  value = value.replace(new RegExp(`${sourcePattern}/[^\\s"'<>\\\\\`]+\\.(?:mp4|webm|mov|mp3|wav|ogg)(?![a-zA-Z0-9.])`, "g"), url => {
+    remoteMedia.push(url);
+    return `__WORKBOOK_REMOTE_MEDIA_${remoteMedia.length - 1}__`;
+  });
+  for (const [url, local] of replacements) value = value.replaceAll(url, local);
+  value = value.replaceAll(config.source, base);
+  value = value.replace(/\/abc(?=\/|["'`\\?#]|$)/g, base);
+  value = value.replaceAll('"设计垂点"', JSON.stringify(config.title));
+  value = value.replaceAll('"过设计点 A，作业务目标 BC 的思考辅助垂线。"', JSON.stringify(config.subtitle));
+  value = value.replaceAll('"它们的交点即设计垂点。"', '""');
+  value = value.replace(/__WORKBOOK_REMOTE_MEDIA_(\d+)__/g, (_, index) => remoteMedia[Number(index)]);
+  return value;
+}
+
+function walk(node, callback) {
+  callback(node);
+  for (const child of node.childNodes || []) walk(child, callback);
+}
+
+function nextData(document) {
+  let result;
+  walk(document, node => {
+    if (node.tagName === "script" && node.attrs?.some(a => a.name === "id" && a.value === "__NEXT_DATA__")) result = node;
+  });
+  return result;
+}
+
+function normalizeCrafts(data) {
+  for (const item of data.props?.pageProps?.dataSource || []) {
+    for (const key of ["posterUrl", "imageUrl", "videoUrl"]) {
+      if (item[key] && !item[key].startsWith("http") && !item[key].startsWith("/")) {
+        const url = new URL(item[key], `${config.source}/`).href;
+        item[key] = mapping.get(url) || url;
+      }
+    }
+  }
+}
+
+await mkdir(out, { recursive: true });
+const pages = [];
+for (const record of manifest.files) {
+  const input = join(cache, record.local);
+  if (record.kind === "page") {
+    const route = new URL(record.url).pathname.slice(source.pathname.length).replace(/\/$/, "") || "/";
+    const output = join(out, route === "/" ? "index.html" : `${route.slice(1)}/index.html`);
+    let html = await readFile(input, "utf8");
+    const document = parse(html);
+    walk(document, node => {
+      if (node.nodeName !== "#text") return;
+      if (node.value === "设计垂点") node.value = config.title;
+      if (node.value === "过设计点 A，作业务目标 BC 的思考辅助垂线。") node.value = config.subtitle;
+      if (node.value === "它们的交点即设计垂点。") node.value = "";
+    });
+    const script = nextData(document);
+    const data = JSON.parse(script.childNodes.map(node => node.value || "").join(""));
+    normalizeCrafts(data);
+    script.childNodes[0].value = JSON.stringify(data).replaceAll("<", "\\u003c");
+    html = rewrite(serialize(document));
+    html = html.replace(/(<title[^>]*>)(.*?)(<\/title>)/, (_, open, title, close) => `${open}${title === "设计垂点" || title === config.title ? config.title : `${title} · ${config.title}`}${close}`);
+    html = html.replace(/(<meta name="description" content=")[^"]*"/, `$1${config.subtitle}"`);
+    html = html.replace("</head>", `<link rel="stylesheet" href="${base}/workbook.css"><script src="${base}/workbook.js" defer></script><meta name="theme-color" content="#f3f3f3"></head>`);
+    await mkdir(dirname(output), { recursive: true });
+    await writeFile(output, html);
+    const transformed = parse(html);
+    const json = JSON.parse(nextData(transformed).childNodes.map(node => node.value || "").join(""));
+    if (json.gsp) {
+      const path = join(out, "_next", "data", json.buildId, `${route === "/" ? "index" : route.slice(1)}.json`);
+      await mkdir(dirname(path), { recursive: true });
+      await writeFile(path, JSON.stringify(json.props));
+    }
+    pages.push({ route, title: html.match(/<title[^>]*>(.*?)<\/title>/)?.[1] || config.title, file: output.slice(out.length + 1) });
+  } else {
+    if (record.originalLocal) await rm(join(out, record.originalLocal), { force: true });
+    const output = join(out, record.local);
+    await mkdir(dirname(output), { recursive: true });
+    if (/\.(?:js|css|json|svg)$/i.test(record.local)) {
+      await writeFile(output, rewrite(await readFile(input, "utf8")));
+    } else {
+      await copyFile(input, output);
+    }
+  }
+}
+
+for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
+await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
+await writeFile(join(out, ".nojekyll"), "");
+await writeFile(join(out, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${config.url}/sitemap.xml\n`);
+await writeFile(join(out, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...pages.map(p => p.route), "/about"].map(route => `<url><loc>${config.url}${route === "/" ? "/" : `${route}/`}</loc></url>`).join("")}</urlset>`);
+await writeFile(join(out, "site-manifest.json"), JSON.stringify({
+  title: config.title,
+  source: config.source,
+  capturedAt: manifest.capturedAt,
+  basePath: base,
+  pages,
+  localFiles: manifest.files.length,
+  localBytes: manifest.files.reduce((sum, file) => sum + file.bytes, 0),
+  externalMedia: manifest.externalMedia,
+  unavailableAssets: manifest.failures
+}, null, 2));
+await mkdir(join(out, "about"), { recursive: true });
+await writeFile(join(out, "about", "index.html"), `<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>关于 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css"></head>
+<body class="workbook-about"><main><a class="back" href="${base}/">← 返回作品集</a><p class="eyebrow">DESIGN &amp; ENGINEERING</p><h1>Workbook.</h1><p class="lead">${config.subtitle}</p><hr><h2>关于这个网站</h2><p>这里收集关于界面、交互、动效与设计工程的探索。</p><p>此版本按照「设计垂点」的公开页面复刻视觉与交互，部署于 Workbook。示例文章、作品及其原作者署名予以保留，内容版权归各自权利人所有。</p><p><a href="${config.source}/" target="_blank" rel="noreferrer">设计参考：设计垂点 / Aragakey. ↗</a></p><p><a href="${config.repository}" target="_blank" rel="noreferrer">GitHub 仓库 ↗</a></p></main></body></html>`);
+await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · Workbook</title><link rel="stylesheet" href="${base}/workbook.css"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
+console.log(`Built ${pages.length + 1} pages for ${config.url}/`);

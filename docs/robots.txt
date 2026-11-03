@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://theageofadzz.github.io/workbook/sitemap.xml
