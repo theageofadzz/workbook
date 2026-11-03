@@ -10,7 +10,7 @@ a[aria-label="访问 Aragakey 个人主页"] {
 a[aria-label="访问 Aragakey 个人主页"] > svg { display: none; }
 [data-workbook-signature]::before,
 a[aria-label="访问 Aragakey 个人主页"]::before {
-  content: "Workbook.";
+  content: attr(data-brand);
   font: italic 29px/1.2 Georgia, "Times New Roman", serif;
   border-bottom: 1px solid #777;
 }
@@ -19,6 +19,10 @@ a[aria-label="访问 Aragakey 个人主页"]::after {
   content: "Design & Engineering";
   margin-top: 5px;
   font: italic 9px/1.3 Georgia, "Times New Roman", serif;
+}
+.workbook-header-logo {
+  object-fit: contain;
+  mix-blend-mode: multiply;
 }
 [data-role="footer-item"] { position: relative; }
 [data-role="footer-item"]::after {

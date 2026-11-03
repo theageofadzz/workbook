@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 
 const root = resolve(import.meta.dirname, "..", "docs");
 const manifest = JSON.parse(await readFile(join(root, "site-manifest.json"), "utf8"));
+const config = JSON.parse(await readFile(join(root, "config.json"), "utf8"));
 let checked = 0;
 const missing = new Set();
 for (const page of manifest.pages) {
@@ -37,6 +38,13 @@ for (const page of manifest.pages) {
 }
 assert.equal(missing.size, 0, `Missing local resources:\n${[...missing].join("\n")}`);
 assert(checked >= 30, "Expected all article pages and the crafts page");
+assert.equal(config.title, "theageofadzz", "Expected the site to use the personal brand");
+assert.equal(config.repository, "https://github.com/theageofadzz/workbook");
+assert(
+  await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('const profile = "https://github.com/theageofadzz"')),
+  "Expected the footer GitHub link to point to the profile"
+);
 await access(join(root, ".nojekyll"));
 await access(join(root, "about", "index.html"));
+await access(join(root, "assets", "intensea-logo.png"));
 console.log(`Validated ${checked} pages, their local links and assets, and the GitHub Pages configuration.`);

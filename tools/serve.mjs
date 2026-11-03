@@ -26,4 +26,4 @@ const server = createServer(async (request, response) => {
     response.end(await readFile(join(root, "404.html"), "utf8").catch(() => "Not found"));
   }
 });
-server.listen(port, "127.0.0.1", () => console.log(`Workbook preview: http://127.0.0.1:${port}${config.basePath}/`));
+server.listen(port, "127.0.0.1", () => console.log(`${config.title} preview: http://127.0.0.1:${port}${config.basePath}/`));

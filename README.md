@@ -1,4 +1,4 @@
-# Workbook
+# theageofadzz
 
 作品集 / 我的设计工程师职业生涯
 
@@ -12,7 +12,7 @@
 
 - 文章首页及全部公开文章内页。
 - Crafts / CSS Generatives 作品墙，共 59 个原站示例项目。
-- Workbook 关于页、404 页面。
+- theageofadzz 关于页、404 页面。
 - 手机与桌面布局、文章锚点目录、页面间跳转。
 
 ## 本地预览
@@ -31,7 +31,7 @@ npm run dev
 | --- | --- |
 | `docs/` | 可直接发布的完整静态站点，包括文章、运行时代码、字体与图片 |
 | `site.config.json` | 站点名称、简介、部署路径、GitHub 地址 |
-| `src/workbook.css` | Workbook 标识、导航提示、关于页样式 |
+| `src/workbook.css` | 品牌标识、导航提示、关于页样式 |
 | `src/workbook.js` | 品牌适配、GitHub 与关于页导航、无障碍标签 |
 | `tools/serve.mjs` | 无需额外服务器依赖的本地预览 |
 | `tools/check.mjs` | 页面覆盖与本地链接、资源完整性检查 |
@@ -62,7 +62,7 @@ GitHub 会自动更新在线站点，无需服务器、密钥或额外的 CI 工
 ```sh
 npm run check
 git add .
-git commit -m "Update Workbook"
+git commit -m "Update theageofadzz branding"
 git push origin main
 ```
 

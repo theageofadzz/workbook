@@ -15,6 +15,8 @@ try {
   // Checked-in docs are a complete, ready-to-publish static build.
   await accessBuild();
   for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
+  await mkdir(join(out, "assets"), { recursive: true });
+  await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
   console.log("Using the checked-in static build. Run npm run sync to refresh the reference snapshot.");
   process.exit(0);
@@ -114,6 +116,8 @@ for (const record of manifest.files) {
 }
 
 for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
+await mkdir(join(out, "assets"), { recursive: true });
+await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
 await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
 await writeFile(join(out, ".nojekyll"), "");
 await writeFile(join(out, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${config.url}/sitemap.xml\n`);
@@ -132,6 +136,6 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
 await mkdir(join(out, "about"), { recursive: true });
 await writeFile(join(out, "about", "index.html"), `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>关于 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css"></head>
-<body class="workbook-about"><main><a class="back" href="${base}/">← 返回作品集</a><p class="eyebrow">DESIGN &amp; ENGINEERING</p><h1>Workbook.</h1><p class="lead">${config.subtitle}</p><hr><h2>关于这个网站</h2><p>这里收集关于界面、交互、动效与设计工程的探索。</p><p>此版本按照「设计垂点」的公开页面复刻视觉与交互，部署于 Workbook。示例文章、作品及其原作者署名予以保留，内容版权归各自权利人所有。</p><p><a href="${config.source}/" target="_blank" rel="noreferrer">设计参考：设计垂点 / Aragakey. ↗</a></p><p><a href="${config.repository}" target="_blank" rel="noreferrer">GitHub 仓库 ↗</a></p></main></body></html>`);
-await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · Workbook</title><link rel="stylesheet" href="${base}/workbook.css"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
+<body class="workbook-about"><main><a class="back" href="${base}/">← 返回作品集</a><p class="eyebrow">DESIGN &amp; ENGINEERING</p><h1>${config.title}.</h1><p class="lead">${config.subtitle}</p><hr><h2>关于这个网站</h2><p>这里收集关于界面、交互、动效与设计工程的探索。</p><p>此版本按照「设计垂点」的公开页面复刻视觉与交互，部署于 ${config.title}。示例文章、作品及其原作者署名予以保留，内容版权归各自权利人所有。</p><p><a href="${config.source}/" target="_blank" rel="noreferrer">设计参考：设计垂点 / Aragakey. ↗</a></p><p><a href="${config.repository}" target="_blank" rel="noreferrer">GitHub 仓库 ↗</a></p></main></body></html>`);
+await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);

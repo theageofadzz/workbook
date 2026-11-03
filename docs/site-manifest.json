@@ -1,162 +1,162 @@
 {
-  "title": "Workbook",
+  "title": "theageofadzz",
   "source": "https://wxad.design/abc",
   "capturedAt": "2026-11-03T07:45:09.986Z",
   "basePath": "/workbook",
   "pages": [
     {
       "route": "/",
-      "title": "Workbook",
+      "title": "theageofadzz",
       "file": "index.html"
     },
     {
       "route": "/crafts",
-      "title": "Workbook",
+      "title": "theageofadzz",
       "file": "crafts/index.html"
     },
     {
       "route": "/wxad12",
-      "title": "微广 12 周年活动记录 · Workbook",
+      "title": "微广 12 周年活动记录 · theageofadzz",
       "file": "wxad12/index.html"
     },
     {
       "route": "/interactive-design-in-ai",
-      "title": "使用 AI 制作交互动画的建议 · Workbook",
+      "title": "使用 AI 制作交互动画的建议 · theageofadzz",
       "file": "interactive-design-in-ai/index.html"
     },
     {
       "route": "/small-p",
-      "title": "小 p: 一次关于 AI 的交互实验 · Workbook",
+      "title": "小 p: 一次关于 AI 的交互实验 · theageofadzz",
       "file": "small-p/index.html"
     },
     {
       "route": "/making-fun-interfaces",
-      "title": "制作有趣的界面：朋友圈广告年度评选 2025 · Workbook",
+      "title": "制作有趣的界面：朋友圈广告年度评选 2025 · theageofadzz",
       "file": "making-fun-interfaces/index.html"
     },
     {
       "route": "/figma-make",
-      "title": "Figma Make 的使用建议与更多 AI 的思考 · Workbook",
+      "title": "Figma Make 的使用建议与更多 AI 的思考 · theageofadzz",
       "file": "figma-make/index.html"
     },
     {
       "route": "/springen2",
-      "title": "让我们继续“跳跃” · Workbook",
+      "title": "让我们继续“跳跃” · theageofadzz",
       "file": "springen2/index.html"
     },
     {
       "route": "/wxad11",
-      "title": "玩一点微广 11 周年的 Demo · Workbook",
+      "title": "玩一点微广 11 周年的 Demo · theageofadzz",
       "file": "wxad11/index.html"
     },
     {
       "route": "/svg-liquid-glass",
-      "title": "使用 SVG 模拟 Apple Liquid Glass · Workbook",
+      "title": "使用 SVG 模拟 Apple Liquid Glass · theageofadzz",
       "file": "svg-liquid-glass/index.html"
     },
     {
       "route": "/quality-of-ui",
-      "title": "用户界面的品质 · Workbook",
+      "title": "用户界面的品质 · theageofadzz",
       "file": "quality-of-ui/index.html"
     },
     {
       "route": "/spross",
-      "title": "一类叫作“发芽”的 UI 组件 · Workbook",
+      "title": "一类叫作“发芽”的 UI 组件 · theageofadzz",
       "file": "spross/index.html"
     },
     {
       "route": "/springen",
-      "title": "一类叫作“跳跃”的 UI 动效 · Workbook",
+      "title": "一类叫作“跳跃”的 UI 动效 · theageofadzz",
       "file": "springen/index.html"
     },
     {
       "route": "/making-fluid-interfaces",
-      "title": "制作流畅界面 · Workbook",
+      "title": "制作流畅界面 · theageofadzz",
       "file": "making-fluid-interfaces/index.html"
     },
     {
       "route": "/deng",
-      "title": "做 UI 的开发 · Workbook",
+      "title": "做 UI 的开发 · theageofadzz",
       "file": "deng/index.html"
     },
     {
       "route": "/drawer",
-      "title": "关于 Drawer 组件的发散 · Workbook",
+      "title": "关于 Drawer 组件的发散 · theageofadzz",
       "file": "drawer/index.html"
     },
     {
       "route": "/shadcn",
-      "title": "关于 shadcn/ui 的思考与启发 · Workbook",
+      "title": "关于 shadcn/ui 的思考与启发 · theageofadzz",
       "file": "shadcn/index.html"
     },
     {
       "route": "/scroll-mock",
-      "title": "如何依靠 transform 模拟 iOS 原生滚动体验 · Workbook",
+      "title": "如何依靠 transform 模拟 iOS 原生滚动体验 · theageofadzz",
       "file": "scroll-mock/index.html"
     },
     {
       "route": "/designing-depth",
-      "title": "交互动画的层级设计 · Workbook",
+      "title": "交互动画的层级设计 · theageofadzz",
       "file": "designing-depth/index.html"
     },
     {
       "route": "/bm",
-      "title": "回顾: 制作朋友圈广告年度评选 · Workbook",
+      "title": "回顾: 制作朋友圈广告年度评选 · theageofadzz",
       "file": "bm/index.html"
     },
     {
       "route": "/wxad",
-      "title": "回顾: 制作微信广告官网 · Workbook",
+      "title": "回顾: 制作微信广告官网 · theageofadzz",
       "file": "wxad/index.html"
     },
     {
       "route": "/adui",
-      "title": "回顾: 制作微信广告设计语言 AD UI · Workbook",
+      "title": "回顾: 制作微信广告设计语言 AD UI · theageofadzz",
       "file": "adui/index.html"
     },
     {
       "route": "/circular-text",
-      "title": "画出完美的文字圆形环绕 UI · Workbook",
+      "title": "画出完美的文字圆形环绕 UI · theageofadzz",
       "file": "circular-text/index.html"
     },
     {
       "route": "/conic-gradient",
-      "title": "用 motion/react 实现优雅的 conic-gradient 旋转动画 · Workbook",
+      "title": "用 motion/react 实现优雅的 conic-gradient 旋转动画 · theageofadzz",
       "file": "conic-gradient/index.html"
     },
     {
       "route": "/functional-motion",
-      "title": "Functional Motion: UI 组件库的动效设计细节 · Workbook",
+      "title": "Functional Motion: UI 组件库的动效设计细节 · theageofadzz",
       "file": "functional-motion/index.html"
     },
     {
       "route": "/generative",
-      "title": "我的 CSS 生成艺术世界 · Workbook",
+      "title": "我的 CSS 生成艺术世界 · theageofadzz",
       "file": "generative/index.html"
     },
     {
       "route": "/likes",
-      "title": "制作点赞与投票动画 · Workbook",
+      "title": "制作点赞与投票动画 · theageofadzz",
       "file": "likes/index.html"
     },
     {
       "route": "/trail",
-      "title": "用 react-spring 设计有“惯性”的交互动画 · Workbook",
+      "title": "用 react-spring 设计有“惯性”的交互动画 · theageofadzz",
       "file": "trail/index.html"
     },
     {
       "route": "/carousel",
-      "title": "转盘交互动画: 以关键参数，细化我们的感受 · Workbook",
+      "title": "转盘交互动画: 以关键参数，细化我们的感受 · theageofadzz",
       "file": "carousel/index.html"
     },
     {
       "route": "/2023",
-      "title": "2023: 面对自我的提问与面对自我的回答 · Workbook",
+      "title": "2023: 面对自我的提问与面对自我的回答 · theageofadzz",
       "file": "2023/index.html"
     },
     {
       "route": "/font-family",
-      "title": "我们认真地想了想 font-family · Workbook",
+      "title": "我们认真地想了想 font-family · theageofadzz",
       "file": "font-family/index.html"
     }
   ],
