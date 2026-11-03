@@ -1,12 +1,22 @@
-# theageofadzz
-
-设计与工程作品集，记录界面、交互、动效，以及把想法做成真实体验的过程。
-
-[![在线预览](https://img.shields.io/badge/在线预览-GitHub%20Pages-2F6FEB?style=for-the-badge&logo=githubpages&logoColor=white)](https://theageofadzz.github.io/workbook/)
-[![GitHub 主页](https://img.shields.io/badge/GitHub-theageofadzz-181717?style=for-the-badge&logo=github)](https://github.com/theageofadzz)
-[![项目仓库](https://img.shields.io/badge/项目仓库-workbook-444444?style=for-the-badge&logo=github)](https://github.com/theageofadzz/workbook)
-
-**快捷导航：** [网站设计](#网站设计) · [代表项目](#代表项目) · [作品浏览](#作品浏览) · [内容与署名](#内容与署名)
+<div align="center">
+  <img src="docs/assets/intensea-favicon.png" width="64" height="64" alt="Intensea 标识">
+  <h1>theageofadzz</h1>
+  <p><strong>设计与工程作品集</strong></p>
+  <p>记录界面、交互与动效，以及把想法做成真实体验的过程。</p>
+  <p>
+    <a href="https://theageofadzz.github.io/workbook/"><img src="https://img.shields.io/badge/在线预览-GitHub%20Pages-2F6FEB?style=flat&logo=githubpages&logoColor=white" alt="在线预览"></a>
+    <a href="https://github.com/theageofadzz/workbook"><img src="https://img.shields.io/github/stars/theageofadzz/workbook?style=flat&label=Stars" alt="GitHub Stars"></a>
+    <a href="https://github.com/theageofadzz/workbook/forks"><img src="https://img.shields.io/github/forks/theageofadzz/workbook?style=flat&label=Forks" alt="GitHub Forks"></a>
+    <a href="https://github.com/theageofadzz/workbook/commits/main"><img src="https://img.shields.io/github/last-commit/theageofadzz/workbook?style=flat&label=Last%20update" alt="最近更新"></a>
+  </p>
+  <p>
+    <a href="https://theageofadzz.github.io/workbook/">作品集首页</a>
+    · <a href="https://github.com/theageofadzz">GitHub 主页</a>
+    · <a href="#网站设计">网站设计</a>
+    · <a href="#代表项目">代表项目</a>
+    · <a href="#作品浏览">快捷入口</a>
+  </p>
+</div>
 
 ## 网站设计
 
