@@ -15,7 +15,7 @@
       if (subtitle) subtitle.textContent = config.subtitle;
       const brandGroup = heading.parentElement;
       const mark = brandGroup?.previousElementSibling;
-      if (mark?.tagName === "SVG") {
+      if (mark?.tagName.toLowerCase() === "svg") {
         const logo = document.createElement("img");
         logo.src = `${base}/assets/intensea-logo.png`;
         logo.alt = "";

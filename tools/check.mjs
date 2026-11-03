@@ -44,6 +44,10 @@ assert(
   await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('const profile = "https://github.com/theageofadzz"')),
   "Expected the footer GitHub link to point to the profile"
 );
+assert(
+  await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('mark?.tagName.toLowerCase() === "svg"')),
+  "Expected the header SVG mark to be replaced by the personal logo"
+);
 await access(join(root, ".nojekyll"));
 await access(join(root, "about", "index.html"));
 await access(join(root, "assets", "intensea-logo.png"));
