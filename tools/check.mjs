@@ -39,6 +39,7 @@ for (const page of manifest.pages) {
 assert.equal(missing.size, 0, `Missing local resources:\n${[...missing].join("\n")}`);
 assert(checked >= 30, "Expected all article pages and the crafts page");
 assert.equal(config.title, "theageofadzz", "Expected the site to use the personal brand");
+assert.equal(config.browserTitle, "workbook of theageofadzz", "Expected the browser tab to use the requested title");
 assert.equal(config.repository, "https://github.com/theageofadzz/workbook");
 assert(
   await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('const profile = "https://github.com/theageofadzz"')),
@@ -47,7 +48,43 @@ assert(
 await access(join(root, ".nojekyll"));
 await access(join(root, "about", "index.html"));
 await access(join(root, "assets", "intensea-logo.png"));
+await access(join(root, "assets", "intensea-favicon.png"));
+const favicon = await readFile(join(root, "assets", "intensea-favicon.png"));
+assert.equal(favicon.readUInt32BE(16), 64, "Expected a 64px favicon");
+assert.equal(favicon.readUInt32BE(20), 64, "Expected a square favicon");
+assert(
+  await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('config.browserTitle || "workbook of theageofadzz"')),
+  "Expected client-side navigation to keep the requested browser title"
+);
 const home = await readFile(join(root, "index.html"), "utf8");
+assert.match(home, /<title[^>]*>workbook of theageofadzz<\/title>/);
+assert.match(home, /href="\/workbook\/assets\/intensea-favicon\.png\?v=[a-f0-9]{8}"/);
+assert(!home.includes("49695834240a-abc-favicon.svg"), "Expected the reference triangle favicon to be removed");
+const brandedChunks = (await readdir(join(root, "_next", "static", "chunks"))).filter(file =>
+  /-workbook-[a-f0-9]{8}\.js$/.test(file)
+);
+const brandedChunkSources = await Promise.all(brandedChunks.map(file => readFile(join(root, "_next", "static", "chunks", file), "utf8")));
+assert(
+  brandedChunkSources.some(source => source.includes("intensea-favicon.png?v=")),
+  "Expected client-side navigation to keep the custom favicon"
+);
+assert(
+  brandedChunkSources.some(source => source.includes('title",{children:"workbook of theageofadzz"')),
+  "Expected client-side navigation to keep the requested browser title"
+);
+for (const page of [...manifest.pages.map(page => page.file), "about/index.html", "404.html"]) {
+  const document = parse(await readFile(join(root, page), "utf8"));
+  let title = "";
+  let icon;
+  function inspect(node) {
+    if (node.tagName === "title") title = node.childNodes.map(child => child.value || "").join("");
+    if (node.tagName === "link" && node.attrs?.some(attr => attr.name === "rel" && attr.value === "icon")) icon = node.attrs.find(attr => attr.name === "href")?.value;
+    for (const child of node.childNodes || []) inspect(child);
+  }
+  inspect(document);
+  assert.equal(title, "workbook of theageofadzz", `Unexpected browser title in ${page}`);
+  assert.match(icon || "", /^\/workbook\/assets\/intensea-favicon\.png\?v=[a-f0-9]{8}$/, `Unexpected favicon in ${page}`);
+}
 const homepage = parse(home);
 let headerLogo;
 function findHeaderLogo(node) {

@@ -2,6 +2,7 @@ import { mkdir, readFile, readdir, writeFile, copyFile, rm } from "node:fs/promi
 import { dirname, join, resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { parse, parseFragment, serialize } from "parse5";
+import sharp from "sharp";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
@@ -17,8 +18,22 @@ const cache = join(root, ".cache", "reference");
 const out = join(root, "docs");
 const logoVersion = await assetVersion("assets/intensea-logo.png");
 const logoSrc = `${base}/assets/intensea-logo.png?v=${logoVersion}`;
+const faviconSrc = `${base}/assets/intensea-favicon.png?v=${logoVersion}`;
+const browserTitle = config.browserTitle || config.title;
 const headerClasses = "relative w-12 h-12 74:top-[0.15rem] 74:mr-2 74:w-10 74:h-10 opacity-80";
 const logoClasses = `${headerClasses} workbook-header-logo`;
+
+async function writeFavicon() {
+  const logo = join(root, "src", "assets", "intensea-logo.png");
+  const alpha = await sharp(logo).extractChannel(3).resize(56, 34, { fit: "fill" }).png().toBuffer();
+  const silhouette = await sharp({
+    create: { width: 56, height: 34, channels: 3, background: "#000" }
+  }).joinChannel(alpha).png().toBuffer();
+  const favicon = await sharp({
+    create: { width: 64, height: 64, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } }
+  }).composite([{ input: silhouette, left: 4, top: 15 }]).png().toBuffer();
+  await writeFile(join(out, "assets", "intensea-favicon.png"), favicon);
+}
 
 async function brandClientHeader() {
   const chunks = join(out, "_next", "static", "chunks");
@@ -29,14 +44,25 @@ async function brandClientHeader() {
     if (!file.endsWith(".js") || file.includes("-workbook-")) continue;
     const path = join(chunks, file);
     const source = await readFile(path, "utf8");
-    if (!component.test(source)) continue;
-    const branded = source.replace(component, (_, factory) =>
+    let branded = source.replace(component, (_, factory) =>
       `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(logoClasses)}})`
     );
+    branded = branded.replace(
+      /href:"[^"]*abc-favicon\.svg",type:"image\/svg\+xml"/,
+      `href:${JSON.stringify(faviconSrc)},type:"image/png"`
+    );
+    branded = branded.replace(
+      /(\(0,\w+\.jsx\)\("title",\{children:)("theageofadzz"|et\.title)(\}\))/,
+      (_, open, _title, close) => `${open}${JSON.stringify(browserTitle)}${close}`
+    );
+    const alreadyBranded = source.includes(`src:${JSON.stringify(logoSrc)}`)
+      || source.includes(`href:${JSON.stringify(faviconSrc)}`)
+      || source.includes(`title",{children:${JSON.stringify(browserTitle)}`);
+    if (branded === source && !alreadyBranded) continue;
     const version = createHash("sha256").update(branded).digest("hex").slice(0, 8);
     const stem = file.slice(0, -3);
     const name = `${stem}-workbook-${version}.js`;
-    await writeFile(path, branded);
+    if (source !== branded) await writeFile(path, branded);
     await writeFile(join(chunks, name), branded);
     const escaped = stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     renamed.push([new RegExp(`${escaped}(?:-workbook-[a-f0-9]{8})?\\.js`, "g"), name]);
@@ -56,7 +82,16 @@ async function refreshRuntimeLinks(files) {
   for (const file of files) {
     const path = join(out, file);
     const document = parse(await readFile(path, "utf8"));
+    let hasIcon = false;
     walk(document, node => {
+      if (node.tagName === "title") {
+        node.childNodes = [{ nodeName: "#text", value: browserTitle, parentNode: node }];
+      }
+      if (node.tagName === "link" && node.attrs?.some(attr => attr.name === "rel" && attr.value.split(/\s+/).includes("icon"))) {
+        hasIcon = true;
+        node.attrs = node.attrs.filter(attr => !["href", "type"].includes(attr.name));
+        node.attrs.push({ name: "href", value: faviconSrc }, { name: "type", value: "image/png" });
+      }
       if (node.tagName === "h1") {
         const group = node.parentNode;
         const siblings = group.parentNode?.childNodes || [];
@@ -76,6 +111,13 @@ async function refreshRuntimeLinks(files) {
         }
       }
     });
+    if (!hasIcon) {
+      let head;
+      walk(document, node => { if (node.tagName === "head") head = node; });
+      const icon = parseFragment(`<link rel="icon" href="${faviconSrc}" type="image/png">`).childNodes[0];
+      icon.parentNode = head;
+      head.childNodes.push(icon);
+    }
     await writeFile(path, serialize(document));
   }
 }
@@ -89,6 +131,7 @@ try {
   for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
+  await writeFavicon();
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
@@ -193,6 +236,7 @@ for (const record of manifest.files) {
 for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
 await mkdir(join(out, "assets"), { recursive: true });
 await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
+await writeFavicon();
 await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
 await writeFile(join(out, ".nojekyll"), "");
 await writeFile(join(out, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: ${config.url}/sitemap.xml\n`);
