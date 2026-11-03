@@ -44,14 +44,28 @@ assert(
   await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('const profile = "https://github.com/theageofadzz"')),
   "Expected the footer GitHub link to point to the profile"
 );
-assert(
-  await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('mark?.tagName.toLowerCase() === "svg"')),
-  "Expected the header SVG mark to be replaced by the personal logo"
-);
 await access(join(root, ".nojekyll"));
 await access(join(root, "about", "index.html"));
 await access(join(root, "assets", "intensea-logo.png"));
 const home = await readFile(join(root, "index.html"), "utf8");
+const homepage = parse(home);
+let headerLogo;
+function findHeaderLogo(node) {
+  if (node.tagName === "h1") {
+    const group = node.parentNode;
+    const siblings = group.parentNode?.childNodes || [];
+    headerLogo = siblings.slice(0, siblings.indexOf(group)).findLast(sibling => sibling.tagName);
+  }
+  for (const child of node.childNodes || []) findHeaderLogo(child);
+}
+findHeaderLogo(homepage);
+assert.equal(headerLogo?.tagName, "img", "Expected the personal logo in the static homepage, without JavaScript");
+assert.match(
+  headerLogo.attrs.find(attr => attr.name === "src")?.value || "",
+  /^\/workbook\/assets\/intensea-logo\.png\?v=[a-f0-9]{8}$/,
+  "Expected a versioned personal logo image"
+);
+assert.match(home, /_next\/static\/chunks\/[^"]+-workbook-[a-f0-9]{8}\.js/, "Expected the branded client header to have a new asset URL");
 assert.match(home, /href="\/workbook\/workbook\.css\?v=[a-f0-9]{8}"/, "Expected versioned site styles");
 assert.match(home, /src="\/workbook\/workbook\.js\?v=[a-f0-9]{8}"/, "Expected a cache-busted branding script");
 console.log(`Validated ${checked} pages, their local links and assets, and the GitHub Pages configuration.`);

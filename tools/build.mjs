@@ -1,7 +1,7 @@
-import { mkdir, readFile, writeFile, copyFile, rm } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile, copyFile, rm } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { createHash } from "node:crypto";
-import { parse, serialize } from "parse5";
+import { parse, parseFragment, serialize } from "parse5";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
@@ -15,12 +15,58 @@ const source = new URL(config.source);
 const base = config.basePath;
 const cache = join(root, ".cache", "reference");
 const out = join(root, "docs");
+const logoVersion = await assetVersion("assets/intensea-logo.png");
+const logoSrc = `${base}/assets/intensea-logo.png?v=${logoVersion}`;
+const headerClasses = "relative w-12 h-12 74:top-[0.15rem] 74:mr-2 74:w-10 74:h-10 opacity-80";
+const logoClasses = `${headerClasses} workbook-header-logo`;
+
+async function brandClientHeader() {
+  const chunks = join(out, "_next", "static", "chunks");
+  const renamed = [];
+  // Keep React's header consistent with the static HTML during hydration.
+  const component = /(\(0,\w+\.jsx\))\((?:\w+\.f|"img"),\{(?:src:"[^"]*",alt:"","aria-hidden":!0,)?className:"relative w-12 h-12 74:top-\[0\.15rem\] 74:mr-2 74:w-10 74:h-10 opacity-80(?: workbook-header-logo)?"\}\)/;
+  for (const file of await readdir(chunks)) {
+    if (!file.endsWith(".js") || file.includes("-workbook-")) continue;
+    const path = join(chunks, file);
+    const source = await readFile(path, "utf8");
+    if (!component.test(source)) continue;
+    const branded = source.replace(component, (_, factory) =>
+      `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(logoClasses)}})`
+    );
+    const version = createHash("sha256").update(branded).digest("hex").slice(0, 8);
+    const stem = file.slice(0, -3);
+    const name = `${stem}-workbook-${version}.js`;
+    await writeFile(path, branded);
+    await writeFile(join(chunks, name), branded);
+    const escaped = stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    renamed.push([new RegExp(`${escaped}(?:-workbook-[a-f0-9]{8})?\\.js`, "g"), name]);
+  }
+  if (!renamed.length) throw new Error("Could not locate the client header to apply the personal logo.");
+  for (const file of await readdir(out, { recursive: true })) {
+    if (!/\.(?:html|js|json)$/.test(file)) continue;
+    const path = join(out, file);
+    const source = await readFile(path, "utf8");
+    let branded = source;
+    for (const [pattern, name] of renamed) branded = branded.replace(pattern, name);
+    if (source !== branded) await writeFile(path, branded);
+  }
+}
 
 async function refreshRuntimeLinks(files) {
   for (const file of files) {
     const path = join(out, file);
     const document = parse(await readFile(path, "utf8"));
     walk(document, node => {
+      if (node.tagName === "h1") {
+        const group = node.parentNode;
+        const siblings = group.parentNode?.childNodes || [];
+        const mark = siblings.slice(0, siblings.indexOf(group)).findLast(sibling => sibling.tagName);
+        if (mark?.attrs?.some(attr => attr.name === "class" && /lucide-pyramid|workbook-header-logo/.test(attr.value))) {
+          const logo = parseFragment(`<img src="${logoSrc}" alt="" aria-hidden="true" class="${logoClasses}">`).childNodes[0];
+          logo.parentNode = group.parentNode;
+          siblings.splice(siblings.indexOf(mark), 1, logo);
+        }
+      }
       for (const attr of node.attrs || []) {
         if (attr.name === "href" && /\/workbook\.css(?:\?|$)/.test(attr.value)) {
           attr.value = `${base}/workbook.css?v=${cssVersion}`;
@@ -44,6 +90,7 @@ try {
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
+  await brandClientHeader();
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
   console.log("Using the checked-in static build. Run npm run sync to refresh the reference snapshot.");
@@ -166,4 +213,6 @@ await writeFile(join(out, "about", "index.html"), `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>关于 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head>
 <body class="workbook-about"><main><a class="back" href="${base}/">← 返回作品集</a><p class="eyebrow">DESIGN &amp; ENGINEERING</p><h1>${config.title}.</h1><p class="lead">${config.subtitle}</p><hr><h2>关于这个网站</h2><p>这里收集关于界面、交互、动效与设计工程的探索。</p><p>此版本按照「设计垂点」的公开页面复刻视觉与交互，部署于 ${config.title}。示例文章、作品及其原作者署名予以保留，内容版权归各自权利人所有。</p><p><a href="${config.source}/" target="_blank" rel="noreferrer">设计参考：设计垂点 / Aragakey. ↗</a></p><p><a href="${config.repository}" target="_blank" rel="noreferrer">GitHub 仓库 ↗</a></p></main></body></html>`);
 await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
+await brandClientHeader();
+await refreshRuntimeLinks([...pages.map(page => page.file), "about/index.html", "404.html"]);
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);

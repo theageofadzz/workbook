@@ -10,9 +10,9 @@
       ["设计垂点", "Workbook", config.title].includes(node.textContent.trim())
     );
     if (heading) {
-      heading.textContent = config.title;
+      if (heading.textContent !== config.title) heading.textContent = config.title;
       const subtitle = heading.nextElementSibling;
-      if (subtitle) subtitle.textContent = config.subtitle;
+      if (subtitle && subtitle.textContent.trim() !== config.subtitle) subtitle.textContent = config.subtitle;
       const brandGroup = heading.parentElement;
       const mark = brandGroup?.previousElementSibling;
       if (mark?.tagName.toLowerCase() === "svg") {
@@ -78,6 +78,6 @@
       applyBrand();
     }).catch(() => {});
   }
-  if (document.readyState === "complete") setTimeout(start, 100);
-  else window.addEventListener("load", () => setTimeout(start, 100), { once: true });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
+  else start();
 })();
