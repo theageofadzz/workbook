@@ -1,13 +1,39 @@
 import { mkdir, readFile, writeFile, copyFile, rm } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
+import { createHash } from "node:crypto";
 import { parse, serialize } from "parse5";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
+const assetVersion = async file => createHash("sha256")
+  .update(await readFile(join(root, "src", file)))
+  .digest("hex")
+  .slice(0, 8);
+const cssVersion = await assetVersion("workbook.css");
+const jsVersion = await assetVersion("workbook.js");
 const source = new URL(config.source);
 const base = config.basePath;
 const cache = join(root, ".cache", "reference");
 const out = join(root, "docs");
+
+async function refreshRuntimeLinks(files) {
+  for (const file of files) {
+    const path = join(out, file);
+    const document = parse(await readFile(path, "utf8"));
+    walk(document, node => {
+      for (const attr of node.attrs || []) {
+        if (attr.name === "href" && /\/workbook\.css(?:\?|$)/.test(attr.value)) {
+          attr.value = `${base}/workbook.css?v=${cssVersion}`;
+        }
+        if (attr.name === "src" && /\/workbook\.js(?:\?|$)/.test(attr.value)) {
+          attr.value = `${base}/workbook.js?v=${jsVersion}`;
+        }
+      }
+    });
+    await writeFile(path, serialize(document));
+  }
+}
+
 let manifest;
 try {
   manifest = JSON.parse(await readFile(join(cache, "manifest.json"), "utf8"));
@@ -17,6 +43,8 @@ try {
   for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
+  const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
+  await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
   console.log("Using the checked-in static build. Run npm run sync to refresh the reference snapshot.");
   process.exit(0);
@@ -92,7 +120,7 @@ for (const record of manifest.files) {
     html = rewrite(serialize(document));
     html = html.replace(/(<title[^>]*>)(.*?)(<\/title>)/, (_, open, title, close) => `${open}${title === "设计垂点" || title === config.title ? config.title : `${title} · ${config.title}`}${close}`);
     html = html.replace(/(<meta name="description" content=")[^"]*"/, `$1${config.subtitle}"`);
-    html = html.replace("</head>", `<link rel="stylesheet" href="${base}/workbook.css"><script src="${base}/workbook.js" defer></script><meta name="theme-color" content="#f3f3f3"></head>`);
+    html = html.replace("</head>", `<link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"><script src="${base}/workbook.js?v=${jsVersion}" defer></script><meta name="theme-color" content="#f3f3f3"></head>`);
     await mkdir(dirname(output), { recursive: true });
     await writeFile(output, html);
     const transformed = parse(html);
@@ -135,7 +163,7 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
 }, null, 2));
 await mkdir(join(out, "about"), { recursive: true });
 await writeFile(join(out, "about", "index.html"), `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>关于 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>关于 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head>
 <body class="workbook-about"><main><a class="back" href="${base}/">← 返回作品集</a><p class="eyebrow">DESIGN &amp; ENGINEERING</p><h1>${config.title}.</h1><p class="lead">${config.subtitle}</p><hr><h2>关于这个网站</h2><p>这里收集关于界面、交互、动效与设计工程的探索。</p><p>此版本按照「设计垂点」的公开页面复刻视觉与交互，部署于 ${config.title}。示例文章、作品及其原作者署名予以保留，内容版权归各自权利人所有。</p><p><a href="${config.source}/" target="_blank" rel="noreferrer">设计参考：设计垂点 / Aragakey. ↗</a></p><p><a href="${config.repository}" target="_blank" rel="noreferrer">GitHub 仓库 ↗</a></p></main></body></html>`);
-await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
+await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);

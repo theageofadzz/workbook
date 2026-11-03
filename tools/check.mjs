@@ -51,4 +51,7 @@ assert(
 await access(join(root, ".nojekyll"));
 await access(join(root, "about", "index.html"));
 await access(join(root, "assets", "intensea-logo.png"));
+const home = await readFile(join(root, "index.html"), "utf8");
+assert.match(home, /href="\/workbook\/workbook\.css\?v=[a-f0-9]{8}"/, "Expected versioned site styles");
+assert.match(home, /src="\/workbook\/workbook\.js\?v=[a-f0-9]{8}"/, "Expected a cache-busted branding script");
 console.log(`Validated ${checked} pages, their local links and assets, and the GitHub Pages configuration.`);
