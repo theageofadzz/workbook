@@ -20,6 +20,7 @@ const logoVersion = await assetVersion("assets/intensea-logo.png");
 const logoSrc = `${base}/assets/intensea-logo.png?v=${logoVersion}`;
 const faviconSrc = `${base}/assets/intensea-favicon.png?v=${logoVersion}`;
 const browserTitle = config.browserTitle || config.title;
+const headerTitle = config.headerTitle || config.title;
 const headerClasses = "relative w-12 h-12 74:top-[0.15rem] 74:mr-2 74:w-10 74:h-10 opacity-80";
 const logoClasses = `${headerClasses} workbook-header-logo`;
 const homeLogoClasses = "size-1/2 workbook-home-logo";
@@ -41,6 +42,7 @@ async function brandClientHeader() {
   const renamed = [];
   // Keep React's branding consistent with the static HTML during hydration.
   const component = /(\(0,\w+\.jsx\))\((?:\w+\.f|"img"),\{(?:src:"[^"]*",alt:"","aria-hidden":!0,)?className:"relative w-12 h-12 74:top-\[0\.15rem\] 74:mr-2 74:w-10 74:h-10 opacity-80(?: workbook-header-logo)?"\}\)/;
+  const headerTitleComponent = /(\(0,\w+\.jsx\)\("h1",\{className:"relative -left-px font-\[Weixin\][^"]*",children:)"[^"]*"(\}\))/;
   const homeComponent = /(\(0,\w+\.jsx\))\((?:\w+\.f,\{width:void 0,height:void 0,className:"size-1\/2 text-neutral-600"|"img",\{src:"[^"]*",alt:"","aria-hidden":!0,className:"size-1\/2 workbook-home-logo")\}\)/;
   for (const file of await readdir(chunks)) {
     if (!file.endsWith(".js") || file.includes("-workbook-")) continue;
@@ -48,6 +50,9 @@ async function brandClientHeader() {
     const source = await readFile(path, "utf8");
     let branded = source.replace(component, (_, factory) =>
       `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(logoClasses)}})`
+    );
+    branded = branded.replace(headerTitleComponent, (_, open, close) =>
+      `${open}${JSON.stringify(headerTitle)}${close}`
     );
     if (source.includes('"data-role":"footer-item"')) {
       branded = branded.replace(homeComponent, (_, factory) =>
@@ -104,6 +109,7 @@ async function refreshRuntimeLinks(files) {
         const siblings = group.parentNode?.childNodes || [];
         const mark = siblings.slice(0, siblings.indexOf(group)).findLast(sibling => sibling.tagName);
         if (mark?.attrs?.some(attr => attr.name === "class" && /lucide-pyramid|workbook-header-logo/.test(attr.value))) {
+          node.childNodes = [{ nodeName: "#text", value: headerTitle, parentNode: node }];
           const logo = parseFragment(`<img src="${logoSrc}" alt="" aria-hidden="true" class="${logoClasses}">`).childNodes[0];
           logo.parentNode = group.parentNode;
           siblings.splice(siblings.indexOf(mark), 1, logo);

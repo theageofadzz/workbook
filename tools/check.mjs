@@ -39,6 +39,7 @@ for (const page of manifest.pages) {
 assert.equal(missing.size, 0, `Missing local resources:\n${[...missing].join("\n")}`);
 assert(checked >= 30, "Expected all article pages and the crafts page");
 assert.equal(config.title, "theageofadzz", "Expected the site to use the personal brand");
+assert.equal(config.headerTitle, "奥兹时代", "Expected the requested Chinese header name");
 assert.equal(config.browserTitle, "workbook of theageofadzz", "Expected the browser tab to use the requested title");
 assert.equal(config.repository, "https://github.com/theageofadzz/workbook");
 assert(
@@ -106,8 +107,10 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
 }
 const homepage = parse(home);
 let headerLogo;
+let headerTitle;
 function findHeaderLogo(node) {
   if (node.tagName === "h1") {
+    headerTitle = node;
     const group = node.parentNode;
     const siblings = group.parentNode?.childNodes || [];
     headerLogo = siblings.slice(0, siblings.indexOf(group)).findLast(sibling => sibling.tagName);
@@ -115,6 +118,12 @@ function findHeaderLogo(node) {
   for (const child of node.childNodes || []) findHeaderLogo(child);
 }
 findHeaderLogo(homepage);
+assert.equal(headerTitle?.childNodes.map(child => child.value || "").join(""), "奥兹时代", "Expected the Chinese header name before JavaScript loads");
+assert(headerTitle.attrs.some(attr => attr.name === "class" && attr.value.includes("font-[Weixin]")), "Expected the original Chinese header font");
+assert(
+  brandedChunkSources.some(source => /"h1",\{className:"relative -left-px font-\[Weixin\][^"]*",children:"奥兹时代"/.test(source)),
+  "Expected React to keep the Chinese header name and original font during hydration"
+);
 assert.equal(headerLogo?.tagName, "img", "Expected the personal logo in the static homepage, without JavaScript");
 assert.match(
   headerLogo.attrs.find(attr => attr.name === "src")?.value || "",
