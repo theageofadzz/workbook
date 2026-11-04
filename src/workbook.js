@@ -46,6 +46,17 @@
       if (!labels[index]) return;
       anchor.dataset.tooltip = labels[index];
       if (anchor.getAttribute("aria-label") !== labels[index]) anchor.setAttribute("aria-label", labels[index]);
+      if (index === 0) {
+        const mark = anchor.querySelector("svg.lucide-pyramid");
+        if (mark) {
+          const logo = document.createElement("img");
+          logo.src = faviconHref.replace("intensea-favicon.png", "intensea-logo.png");
+          logo.alt = "";
+          logo.setAttribute("aria-hidden", "true");
+          logo.className = "size-1/2 workbook-home-logo";
+          mark.replaceWith(logo);
+        }
+      }
       if (index === 2 && anchor.href !== profile) {
         anchor.href = profile;
         anchor.rel = "noreferrer";

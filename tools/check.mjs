@@ -72,18 +72,37 @@ assert(
   brandedChunkSources.some(source => source.includes('title",{children:"workbook of theageofadzz"')),
   "Expected client-side navigation to keep the requested browser title"
 );
+assert(
+  brandedChunkSources.some(source => source.includes('"data-role":"footer-item"') && source.includes('className:"size-1/2 workbook-home-logo"')),
+  "Expected the React navigation to render the personal home logo during hydration"
+);
 for (const page of [...manifest.pages.map(page => page.file), "about/index.html", "404.html"]) {
   const document = parse(await readFile(join(root, page), "utf8"));
   let title = "";
   let icon;
-  function inspect(node) {
+  let homeLink;
+  let homeLogo;
+  let homeTriangle = false;
+  function inspect(node, inHomeLink = false) {
     if (node.tagName === "title") title = node.childNodes.map(child => child.value || "").join("");
     if (node.tagName === "link" && node.attrs?.some(attr => attr.name === "rel" && attr.value === "icon")) icon = node.attrs.find(attr => attr.name === "href")?.value;
-    for (const child of node.childNodes || []) inspect(child);
+    if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")
+      && node.attrs.some(attr => attr.name === "href" && attr.value.replace(/\/$/, "") === manifest.basePath)) {
+      homeLink = node;
+      inHomeLink = true;
+    }
+    if (inHomeLink && node.tagName === "img") homeLogo = node;
+    if (inHomeLink && node.tagName === "svg") homeTriangle = true;
+    for (const child of node.childNodes || []) inspect(child, inHomeLink);
   }
   inspect(document);
   assert.equal(title, "workbook of theageofadzz", `Unexpected browser title in ${page}`);
   assert.match(icon || "", /^\/workbook\/assets\/intensea-favicon\.png\?v=[a-f0-9]{8}$/, `Unexpected favicon in ${page}`);
+  if (homeLink) {
+    assert.equal(homeLogo?.tagName, "img", `Expected the personal home logo in ${page}, without JavaScript`);
+    assert.match(homeLogo.attrs.find(attr => attr.name === "src")?.value || "", /^\/workbook\/assets\/intensea-logo\.png\?v=[a-f0-9]{8}$/, `Unexpected home logo in ${page}`);
+    assert.equal(homeTriangle, false, `Expected the triangle home icon to be removed from ${page}`);
+  }
 }
 const homepage = parse(home);
 let headerLogo;

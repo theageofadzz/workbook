@@ -22,6 +22,7 @@ const faviconSrc = `${base}/assets/intensea-favicon.png?v=${logoVersion}`;
 const browserTitle = config.browserTitle || config.title;
 const headerClasses = "relative w-12 h-12 74:top-[0.15rem] 74:mr-2 74:w-10 74:h-10 opacity-80";
 const logoClasses = `${headerClasses} workbook-header-logo`;
+const homeLogoClasses = "size-1/2 workbook-home-logo";
 
 async function writeFavicon() {
   const logo = join(root, "src", "assets", "intensea-logo.png");
@@ -38,8 +39,9 @@ async function writeFavicon() {
 async function brandClientHeader() {
   const chunks = join(out, "_next", "static", "chunks");
   const renamed = [];
-  // Keep React's header consistent with the static HTML during hydration.
+  // Keep React's branding consistent with the static HTML during hydration.
   const component = /(\(0,\w+\.jsx\))\((?:\w+\.f|"img"),\{(?:src:"[^"]*",alt:"","aria-hidden":!0,)?className:"relative w-12 h-12 74:top-\[0\.15rem\] 74:mr-2 74:w-10 74:h-10 opacity-80(?: workbook-header-logo)?"\}\)/;
+  const homeComponent = /(\(0,\w+\.jsx\))\((?:\w+\.f,\{width:void 0,height:void 0,className:"size-1\/2 text-neutral-600"|"img",\{src:"[^"]*",alt:"","aria-hidden":!0,className:"size-1\/2 workbook-home-logo")\}\)/;
   for (const file of await readdir(chunks)) {
     if (!file.endsWith(".js") || file.includes("-workbook-")) continue;
     const path = join(chunks, file);
@@ -47,6 +49,11 @@ async function brandClientHeader() {
     let branded = source.replace(component, (_, factory) =>
       `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(logoClasses)}})`
     );
+    if (source.includes('"data-role":"footer-item"')) {
+      branded = branded.replace(homeComponent, (_, factory) =>
+        `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(homeLogoClasses)}})`
+      );
+    }
     branded = branded.replace(
       /href:"[^"]*abc-favicon\.svg",type:"image\/svg\+xml"/,
       `href:${JSON.stringify(faviconSrc)},type:"image/png"`
@@ -101,6 +108,17 @@ async function refreshRuntimeLinks(files) {
           logo.parentNode = group.parentNode;
           siblings.splice(siblings.indexOf(mark), 1, logo);
         }
+      }
+      if (node.tagName === "a"
+        && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")
+        && node.attrs.some(attr => attr.name === "href" && attr.value.replace(/\/$/, "") === base)) {
+        walk(node, mark => {
+          if (!mark.attrs?.some(attr => attr.name === "class" && /lucide-pyramid|workbook-home-logo/.test(attr.value))) return;
+          const logo = parseFragment(`<img src="${logoSrc}" alt="" aria-hidden="true" class="${homeLogoClasses}">`).childNodes[0];
+          logo.parentNode = mark.parentNode;
+          const siblings = mark.parentNode.childNodes;
+          siblings.splice(siblings.indexOf(mark), 1, logo);
+        });
       }
       for (const attr of node.attrs || []) {
         if (attr.name === "href" && /\/workbook\.css(?:\?|$)/.test(attr.value)) {
