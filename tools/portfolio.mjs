@@ -95,7 +95,7 @@ export async function personalizePortfolio({ root, out, base }) {
   await writeFile(join(out, "assets", "intensea-golden-ratio.svg"), logoStudy);
   await copyFile(join(root, "src", "assets", "hokusai-great-wave.png"), join(out, "assets", "hokusai-great-wave.png"));
   await copyFile(join(root, "src", "assets", "the-age-of-adz.png"), join(out, "assets", "the-age-of-adz.png"));
-  for (const file of ["icon-browse-grid.webp", "icon-browse-first.webp"]) {
+  for (const file of ["icon-browse-grid.webp", "icon-browse-first.webp", "cicada-avatar.webp"]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
   const frontmatter = JSON.parse(await readFile(join(contentRoot, "portfolio-design.json"), "utf8"));

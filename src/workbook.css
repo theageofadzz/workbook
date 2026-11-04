@@ -312,8 +312,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   .icon-browser-motion { animation: none; }
   .icon-browser-cursor, .icon-browser-veil, .icon-browser-selection, .icon-browser-preview { display: none; }
 }
-.intensea-wave-reference, .portfolio-album-reference { width: 100%; max-width: 680px; margin: 32px auto; }
-.intensea-wave-reference > img, .portfolio-album-reference > img { display: block; width: 330px; max-width: 100%; height: auto; margin: 0 auto; }
+.intensea-wave-reference, .portfolio-album-reference, .portfolio-cicada-reference { width: 100%; max-width: 680px; margin: 32px auto; }
+.intensea-wave-reference > img, .portfolio-album-reference > img, .portfolio-cicada-reference > img { display: block; width: 330px; max-width: 100%; height: auto; margin: 0 auto; }
 .intensea-wave-reference > figcaption, .portfolio-album-reference > figcaption {
   display: flex;
   justify-content: center;
