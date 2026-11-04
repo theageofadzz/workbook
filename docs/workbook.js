@@ -6,6 +6,43 @@
   let config = { title: "theageofadzz", headerTitle: "奥兹时代", browserTitle: "workbook of theageofadzz", subtitle: "作品集 / 我的设计工程师职业生涯" };
   let fullBranding = document.readyState === "complete";
   const githubIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="size-1/2 text-neutral-600" aria-hidden="true"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.8A5.3 5.3 0 0 0 18.7 5a5 5 0 0 0-.1-3.6S17.4 1 15 2.8a13.4 13.4 0 0 0-6 0C6.6 1 5.4 1.4 5.4 1.4A5 5 0 0 0 5.3 5a5.3 5.3 0 0 0-1.5 3.7c0 5.3 3.1 6.5 6.1 6.8A3.4 3.4 0 0 0 9 18.1V22"/></svg>';
+  const initializedDrawings = new WeakSet();
+  const startedDrawings = new WeakSet();
+  const drawingViewport = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      const figure = entry.target;
+      if (!figure.isConnected) {
+        drawingViewport.unobserve(figure);
+        continue;
+      }
+      if (entry.isIntersecting && !startedDrawings.has(figure)) {
+        figure.getAnimations({ subtree: true }).forEach(animation => { animation.currentTime = 0; });
+        startedDrawings.add(figure);
+      }
+      figure.classList.toggle("is-visible", entry.isIntersecting);
+    }
+  }, { threshold: .15 });
+
+  function initializeLogoDrawings() {
+    document.querySelectorAll(".intensea-logo-study").forEach(figure => {
+      if (initializedDrawings.has(figure)) return;
+      initializedDrawings.add(figure);
+      figure.classList.add("is-initialized");
+      const toggle = figure.querySelector("[data-logo-toggle]");
+      const syncToggle = paused => {
+        figure.classList.toggle("is-paused", paused);
+        toggle.setAttribute("aria-pressed", String(paused));
+        toggle.setAttribute("aria-label", paused ? "继续绘制动画" : "暂停绘制动画");
+        toggle.title = paused ? "继续绘制动画" : "暂停绘制动画";
+      };
+      toggle.addEventListener("click", () => syncToggle(!figure.classList.contains("is-paused")));
+      figure.querySelector("[data-logo-replay]").addEventListener("click", () => {
+        figure.getAnimations({ subtree: true }).forEach(animation => { animation.currentTime = 0; });
+        syncToggle(false);
+      });
+      drawingViewport.observe(figure);
+    });
+  }
 
   function applyBrand() {
     const icon = document.querySelector('link[rel~="icon"]');
@@ -30,6 +67,7 @@
       }
     }
     if (!fullBranding) return;
+    initializeLogoDrawings();
     document.title = config.browserTitle || "workbook of theageofadzz";
     document.querySelectorAll("h2 a").forEach(anchor => {
       if (anchor.textContent === "设计垂点") anchor.textContent = config.title;

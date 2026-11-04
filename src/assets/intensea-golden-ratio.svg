@@ -1,62 +1,167 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="0 0 960 960" fill="none">
-  <title>Intensea Logo 黄金比例研究</title>
-  <desc>保留 Intensea 原始轮廓，以圆形、切线和半径按黄金比例递进的辅助圆，研究曲线、负空间与方形落点。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" class="intensea-study-svg" width="960" height="960" viewBox="0 0 960 960" fill="none" role="img" aria-labelledby="intensea-study-title intensea-study-desc">
+  <title id="intensea-study-title">Intensea Logo 绘制过程</title>
+  <desc id="intensea-study-desc">居中的 Intensea 标识，从辅助轴线、黄金比例圆组和圆弧开始，逐步描绘轮廓并填充成完整标识。</desc>
   <defs>
-    <path id="intensea-mark" d="M2 72A70 70 0 0 1 72 2H122V23A49 49 0 0 0 73 72H52A70 70 0 0 1 72 23A49 49 0 0 0 23 72ZM101 51H122V72H101Z"/>
+    <path id="intensea-study-mark" d="M2 72A70 70 0 0 1 72 2H122V23A49 49 0 0 0 73 72H52A70 70 0 0 1 72 23A49 49 0 0 0 23 72Z"/>
+    <path id="intensea-study-dot" d="M101 51H122V72H101Z"/>
   </defs>
+  <style>
+    .intensea-study-svg .study-line {
+      fill: none;
+      stroke: #858585;
+      stroke-width: .85;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      opacity: .65;
+    }
+    .intensea-study-svg .study-motion {
+      animation-duration: 16s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+    }
+    .intensea-study-svg .study-axes { stroke: #b0b0b0; animation-name: intensea-draw-axes; }
+    .intensea-study-svg .study-frame { stroke: #999; animation-name: intensea-draw-frame; }
+    .intensea-study-svg .study-circle { animation-name: intensea-draw-circle; }
+    .intensea-study-svg .study-phi { stroke: #aaa; animation-name: intensea-draw-phi; }
+    .intensea-study-svg .study-arc { stroke: #656565; animation-name: intensea-draw-arc; }
+    .intensea-study-svg .study-outline {
+      stroke: #333;
+      stroke-width: .45;
+      animation-name: intensea-draw-outline;
+    }
+    .intensea-study-svg .study-dot-outline { animation-name: intensea-draw-dot; }
+    .intensea-study-svg .study-fill { fill: #242424; animation-name: intensea-fill-mark; }
+    .intensea-study-svg .study-label { animation-name: intensea-show-label; }
+    .intensea-study-svg .study-phase { opacity: 0; }
+    .intensea-study-svg .study-phase-1 { animation-name: intensea-phase-one; }
+    .intensea-study-svg .study-phase-2 { animation-name: intensea-phase-two; }
+    .intensea-study-svg .study-phase-3 { animation-name: intensea-phase-three; }
+    .intensea-study-svg .study-phase-4 { animation-name: intensea-phase-four; }
+    @keyframes intensea-draw-axes {
+      0% { stroke-dashoffset: 1; opacity: .4; }
+      10%, 75% { stroke-dashoffset: 0; opacity: .55; }
+      87%, 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes intensea-draw-frame {
+      0%, 5% { stroke-dashoffset: 1; opacity: 0; }
+      6% { opacity: .65; }
+      20%, 75% { stroke-dashoffset: 0; opacity: .65; }
+      87%, 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes intensea-draw-circle {
+      0%, 12% { stroke-dashoffset: 1; opacity: 0; }
+      13% { opacity: .65; }
+      32%, 75% { stroke-dashoffset: 0; opacity: .65; }
+      87%, 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes intensea-draw-phi {
+      0%, 21% { stroke-dashoffset: 1; opacity: 0; }
+      22% { opacity: .55; }
+      40%, 75% { stroke-dashoffset: 0; opacity: .55; }
+      87%, 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes intensea-draw-arc {
+      0%, 30% { stroke-dashoffset: 1; opacity: 0; }
+      31% { opacity: .75; }
+      48%, 75% { stroke-dashoffset: 0; opacity: .75; }
+      87%, 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes intensea-draw-outline {
+      0%, 42% { stroke-dashoffset: 1; opacity: 0; }
+      43% { opacity: .9; }
+      63%, 77% { stroke-dashoffset: 0; opacity: .9; }
+      87%, 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes intensea-draw-dot {
+      0%, 54% { stroke-dashoffset: 1; opacity: 0; }
+      55% { opacity: .9; }
+      63%, 77% { stroke-dashoffset: 0; opacity: .9; }
+      87%, 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes intensea-fill-mark {
+      0%, 60% { opacity: 0; }
+      70%, 76% { opacity: .28; }
+      84%, 96% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes intensea-show-label {
+      0%, 16% { opacity: 0; }
+      24%, 75% { opacity: .8; }
+      87%, 100% { opacity: 0; }
+    }
+    @keyframes intensea-phase-one {
+      0%, 1%, 24% { opacity: 1; }
+      28%, 100% { opacity: 0; }
+    }
+    @keyframes intensea-phase-two {
+      0%, 24% { opacity: 0; }
+      28%, 47% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    @keyframes intensea-phase-three {
+      0%, 47% { opacity: 0; }
+      51%, 73% { opacity: 1; }
+      77%, 100% { opacity: 0; }
+    }
+    @keyframes intensea-phase-four {
+      0%, 73% { opacity: 0; }
+      77%, 96% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .intensea-study-svg .study-motion { animation: none; }
+      .intensea-study-svg .study-phase { opacity: 0; }
+      .intensea-study-svg .study-phase-4 { opacity: 1; }
+      .intensea-study-svg .study-fill { opacity: .28; }
+    }
+  </style>
   <rect width="960" height="960" fill="#fafafa"/>
 
-  <g fill="#404040" font-family="Arial, Helvetica, sans-serif" font-size="13">
-    <text x="52" y="61">INTENSEA</text>
-    <text x="52" y="82" fill="#858585" font-size="10">LOGO / GEOMETRIC STUDY</text>
-    <text x="908" y="61" text-anchor="end">GOLDEN RATIO</text>
-    <text x="908" y="82" text-anchor="end" fill="#858585" font-size="10">1 : 1.618 : 2.618</text>
+  <g fill="#262626" font-family="Arial, Helvetica, sans-serif">
+    <g transform="translate(76 76) scale(.3)">
+      <use href="#intensea-study-mark"/>
+      <use href="#intensea-study-dot"/>
+    </g>
+    <text x="125" y="96" font-size="17" font-weight="600">intensea</text>
+    <text x="884" y="95" text-anchor="end" font-size="10" fill="#888">FORM STUDY / 01</text>
   </g>
 
-  <use href="#intensea-mark" transform="translate(176 307) scale(3.2)" fill="#000" opacity=".23"/>
-
-  <!-- The large circles follow the existing arcs; the smaller radii form a phi series. -->
-  <g stroke="#8c8c8c" stroke-width=".85">
-    <circle cx="406.4" cy="537.4" r="224"/>
-    <circle cx="566.4" cy="537.4" r="224"/>
-    <circle cx="406.4" cy="537.4" r="156.8"/>
-    <circle cx="566.4" cy="537.4" r="156.8"/>
-  </g>
-  <g stroke="#9b9b9b" stroke-width=".75">
-    <circle cx="406.4" cy="537.4" r="138.44"/>
-    <circle cx="566.4" cy="537.4" r="85.56"/>
-    <circle cx="532.8" cy="503.8" r="52.88"/>
-    <circle cx="532.8" cy="503.8" r="32.68"/>
-  </g>
-
-  <g stroke="#b0b0b0" stroke-width=".7">
-    <path d="M151 313.4H818M151 380.6H818M151 537.4H818"/>
-    <path d="M182.4 286V795M406.4 286V795M566.4 286V795"/>
-    <path d="M499.2 449.4V568M575 470.2H480"/>
-  </g>
-  <g stroke="#737373" stroke-width=".75">
-    <path d="M398.4 537.4H414.4M406.4 529.4V545.4"/>
-    <path d="M558.4 537.4H574.4M566.4 529.4V545.4"/>
-    <path d="M526.8 503.8H538.8M532.8 497.8V509.8"/>
+  <!-- The mark's bounds are x=312..648 and y=382..578, centered on (480, 480). -->
+  <g>
+    <path class="study-line study-motion study-axes" pathLength="1" d="M244 480H716"/>
+    <path class="study-line study-motion study-axes" pathLength="1" d="M480 252V708"/>
+    <path class="study-line study-motion study-frame" pathLength="1" d="M312 382H648V578H312Z"/>
+    <path class="study-line study-motion study-frame" pathLength="1" d="M312 382L648 578M648 382L312 578"/>
+    <path class="study-line study-motion study-frame" pathLength="1" d="M312 440.8H648M370.8 382V578M508 382V578M589.2 382V578"/>
+    <circle class="study-line study-motion study-circle" pathLength="1" cx="480" cy="480" r="194.494"/>
+    <circle class="study-line study-motion study-phi" pathLength="1" cx="480" cy="480" r="120.204"/>
+    <circle class="study-line study-motion study-phi" pathLength="1" cx="480" cy="480" r="74.29"/>
+    <path class="study-line study-motion study-arc" pathLength="1" d="M312 578A196 196 0 0 1 508 382"/>
+    <path class="study-line study-motion study-arc" pathLength="1" d="M452 578A196 196 0 0 1 648 382"/>
+    <path class="study-line study-motion study-arc" pathLength="1" d="M370.8 578A137.2 137.2 0 0 1 508 440.8"/>
+    <path class="study-line study-motion study-arc" pathLength="1" d="M510.8 578A137.2 137.2 0 0 1 648 440.8"/>
+    <path class="study-line study-motion study-frame" pathLength="1" d="M312 350H648M312 345V355M648 345V355M286 382V578M281 382H291M281 578H291M674 382V440.8M669 382H679M669 440.8H679"/>
   </g>
 
-  <g stroke="#a3a3a3" stroke-width=".75">
-    <path d="M182.4 257H406.4M182.4 251V263M406.4 251V263"/>
-    <path d="M406.4 257H544.84M544.84 251V263"/>
-    <path d="M544.84 257H630.4M630.4 251V263"/>
-    <path d="M641.4 700.5L713 793H811"/>
-  </g>
-  <g fill="#737373" font-family="Arial, Helvetica, sans-serif" font-size="11">
-    <text x="294.4" y="243" text-anchor="middle">R</text>
-    <text x="475.62" y="243" text-anchor="middle">R / &#966;</text>
-    <text x="587.62" y="243" text-anchor="middle">R / &#966;&#178;</text>
-    <text x="811" y="814" text-anchor="end">&#966; = (1 + &#8730;5) / 2</text>
+  <g transform="translate(306.4 376.4) scale(2.8)">
+    <use class="study-motion study-fill" href="#intensea-study-mark"/>
+    <use class="study-motion study-fill" href="#intensea-study-dot"/>
+    <path class="study-line study-motion study-outline" pathLength="1" d="M2 72A70 70 0 0 1 72 2H122V23A49 49 0 0 0 73 72H52A70 70 0 0 1 72 23A49 49 0 0 0 23 72Z"/>
+    <path class="study-line study-motion study-outline study-dot-outline" pathLength="1" d="M101 51H122V72H101Z"/>
   </g>
 
-  <path d="M52 872H908" stroke="#dedede" stroke-width=".75"/>
-  <g fill="#858585" font-family="Arial, Helvetica, sans-serif" font-size="10">
-    <text x="52" y="903">CURVE / SPACE / BALANCE</text>
-    <text x="52" y="923">A PROPORTION STUDY OF THE ORIGINAL MARK</text>
+  <g class="study-motion study-label" fill="#888" font-family="Arial, Helvetica, sans-serif" font-size="10">
+    <text x="480" y="337" text-anchor="middle">A</text>
+    <text x="270" y="484" text-anchor="middle">B</text>
+    <text x="690" y="414">C</text>
+    <text x="480" y="728" text-anchor="middle">R : R / &#966; : R / &#966;&#178;</text>
   </g>
-  <use href="#intensea-mark" transform="translate(860 895) scale(.3871)" fill="#000" opacity=".85"/>
+  <g fill="#888" font-family="Arial, Helvetica, sans-serif" font-size="11" text-anchor="middle">
+    <text class="study-motion study-phase study-phase-1" x="480" y="864">01 / GRID</text>
+    <text class="study-motion study-phase study-phase-2" x="480" y="864">02 / CURVES</text>
+    <text class="study-motion study-phase study-phase-3" x="480" y="864">03 / OUTLINE</text>
+    <text class="study-motion study-phase study-phase-4" x="480" y="864">04 / INTENSEA</text>
+  </g>
 </svg>

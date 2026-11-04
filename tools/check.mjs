@@ -85,7 +85,7 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
   let homeLogo;
   let homeTriangle = false;
   function inspect(node, inHomeLink = false) {
-    if (node.tagName === "title") title = node.childNodes.map(child => child.value || "").join("");
+    if (node.tagName === "title" && node.parentNode?.tagName === "head") title = node.childNodes.map(child => child.value || "").join("");
     if (node.tagName === "link" && node.attrs?.some(attr => attr.name === "rel" && attr.value === "icon")) icon = node.attrs.find(attr => attr.name === "href")?.value;
     if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")
       && node.attrs.some(attr => attr.name === "href" && attr.value.replace(/\/$/, "") === manifest.basePath)) {

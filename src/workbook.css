@@ -212,7 +212,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .portfolio-essay-cover { margin: 48px 0 72px; }
 .portfolio-essay-cover .portfolio-cover { max-width: 440px; margin: auto; }
 .intensea-logo-study { width: 100%; max-width: 680px; margin: 40px auto 32px; }
-.intensea-logo-study > img { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+.intensea-logo-study > svg { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+.intensea-logo-study.is-initialized:not(.is-visible) .study-motion,
+.intensea-logo-study.is-paused .study-motion { animation-play-state: paused; }
 .intensea-logo-study > figcaption {
   display: flex;
   justify-content: space-between;
@@ -223,6 +225,27 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   font: 11px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
 }
 .intensea-logo-study > figcaption > span:first-child { font-family: monospace; }
+.intensea-study-actions, .intensea-study-controls { display: flex; align-items: center; gap: 12px; }
+.intensea-study-controls { gap: 4px; }
+.intensea-study-controls > button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #737373;
+  cursor: pointer;
+}
+.intensea-study-controls > button:hover { background: #e9e9e9; color: #262626; }
+.intensea-study-controls svg { display: block; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.study-play-icon, .is-paused .study-pause-icon { display: none; }
+.is-paused .study-play-icon { display: block; }
+@media (prefers-reduced-motion: reduce) {
+  .intensea-study-controls { display: none; }
+}
 .portfolio-essay h2 {
   position: relative;
   margin: 80px 0 28px;

@@ -103,7 +103,7 @@ async function refreshRuntimeLinks(files) {
     const document = parse(await readFile(path, "utf8"));
     let hasIcon = false;
     walk(document, node => {
-      if (node.tagName === "title") {
+      if (node.tagName === "title" && node.parentNode?.tagName === "head") {
         node.childNodes = [{ nodeName: "#text", value: browserTitle, parentNode: node }];
       }
       if (node.tagName === "link" && node.attrs?.some(attr => attr.name === "rel" && attr.value.split(/\s+/).includes("icon"))) {
