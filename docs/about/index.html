@@ -1,2 +1,215 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>workbook of theageofadzz</title><link rel="stylesheet" href="/workbook/workbook.css?v=d68a6dde"><link rel="icon" href="/workbook/assets/intensea-favicon.png?v=3e8080c6" type="image/png"></head>
-<body class="workbook-about"><main><a class="back" href="/workbook/">← 返回作品集</a><p class="eyebrow">DESIGN &amp; ENGINEERING</p><h1>theageofadzz.</h1><p class="lead">作品集 / 我的设计工程师职业生涯</p><hr><h2>关于这个网站</h2><p>这里收集关于界面、交互、动效与设计工程的探索。</p><p>此版本按照「设计垂点」的公开页面复刻视觉与交互，部署于 theageofadzz。示例文章、作品及其原作者署名予以保留，内容版权归各自权利人所有。</p><p><a href="https://wxad.design/abc/" target="_blank" rel="noreferrer">设计参考：设计垂点 / Aragakey. ↗</a></p><p><a href="https://github.com/theageofadzz/workbook" target="_blank" rel="noreferrer">GitHub 仓库 ↗</a></p></main></body></html>
+<!DOCTYPE html><html lang="zh-CN"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>workbook of theageofadzz</title>
+  <meta name="description" content="关于 theageofadzz：cicada、intensea，以及我的界面、标识与交互作品。">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="/workbook/assets/intensea-favicon.png?v=3e8080c6" type="image/png">
+  <link rel="preload" href="/workbook/assets/about-inter.woff2" as="font" type="font/woff2" crossorigin="">
+  <link rel="stylesheet" href="/workbook/about.css?v=b7884c51">
+  <script src="/workbook/about.js?v=3de40b13" defer=""></script>
+</head>
+<body class="workbook-profile">
+  <div class="profile-background" aria-hidden="true"></div>
+  <main class="profile-page">
+    <header class="profile-header">
+      <div class="profile-brand">
+        <h1><a href="/workbook/" aria-label="返回作品集" data-label-en="Back to the portfolio" title="返回作品集">theageofadzz.</a></h1>
+        <p data-en="Less, but better. I love clean and simple interfaces.">去繁留简，我喜欢纯净、简约的界面。</p>
+      </div>
+      <button class="profile-language" type="button" data-language-toggle="" aria-label="Switch to English" title="Switch to English" aria-pressed="false">
+        <svg class="lucide lucide-languages" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="m5 8 6 6"></path>
+  <path d="m4 14 6-6 2-3"></path>
+  <path d="M2 5h12"></path>
+  <path d="M7 2h1"></path>
+  <path d="m22 22-5-10-5 10"></path>
+  <path d="M14 18h6"></path>
+</svg>
+      </button>
+    </header>
+
+    <div class="profile-grid">
+      <section class="profile-card profile-identity" aria-labelledby="identity-title">
+        <div class="profile-icon"><svg class="lucide lucide-user-round" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <circle cx="12" cy="8" r="5"></circle>
+  <path d="M20 21a8 8 0 0 0-16 0"></path>
+</svg></div>
+        <h2 id="identity-title">cicada</h2>
+        <ul class="profile-meta">
+          <li><span data-en="Personal portfolio">个人作品集</span> @<a href="https://github.com/theageofadzz" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><span data-en="Intensea, my original identity">intensea，我的原创标识</span></li>
+          <li><span data-en="theageofadzz, the age of Adz">theageofadzz，奥兹时代</span></li>
+        </ul>
+      </section>
+
+      <section class="profile-card profile-intro" aria-label="个人介绍" data-label-en="About me">
+        <p><span data-en="Cicada is my GitHub nickname, a tribute to my favorite Chinese-language song, 蝉想.">cicada 是我在 GitHub 的昵称，致敬我最喜欢的华语歌曲《蝉想》。</span></p>
+        <p><span data-en="I love the vast blue sea and the universe. Here I collect my explorations in interfaces, identity and interaction.">我喜欢蔚蓝的大海，也痴迷宇宙。在这里，我记录自己的界面、标识与交互尝试。</span></p>
+        <p data-en="I want to make things that feel simple, quiet and thoughtful.">我希望把想法做成纯净、简约而有细节的作品。</p>
+      </section>
+
+      <figure class="profile-portrait" aria-label="cicada 的夏蝉头像" data-label-en="Cicada's summer cicada avatar">
+        <div class="profile-portrait-frame">
+          <img src="/workbook/assets/cicada-avatar.webp" width="880" height="862" alt="浅绿色背景上的夏蝉插画，cicada 的个人头像" data-alt-en="A summer cicada illustration on pale green, cicada's personal avatar" fetchpriority="high" decoding="async">
+        </div>
+      </figure>
+
+      <section class="profile-card profile-works" aria-labelledby="works-title">
+        <div class="profile-icon"><svg class="lucide lucide-pencil-ruler" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M13 7 8.7 2.7a2.41 2.41 0 0 0-3.4 0L2.7 5.3a2.41 2.41 0 0 0 0 3.4L7 13"></path>
+  <path d="m8 6 2-2"></path>
+  <path d="m18 16 2-2"></path>
+  <path d="m17 11 4.3 4.3c.94.94.94 2.46 0 3.4l-2.6 2.6c-.94.94-2.46.94-3.4 0L11 17"></path>
+  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+  <path d="m15 5 4 4"></path>
+</svg></div>
+        <h2 id="works-title" data-en="Works">作品</h2>
+        <ul class="profile-links">
+          <li>
+            <div class="profile-link-main">
+              <img class="profile-project-logo" src="/workbook/assets/intensea-logo.png" width="16" height="16" alt="">
+              <a href="/workbook/" data-en="Workbook, my personal portfolio">Workbook - 我的个人作品集</a>
+            </div>
+          </li>
+          <li>
+            <div class="profile-link-main">
+              <svg class="lucide lucide-pen-tool" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="m18 13-.654-4.736a4 4 0 00-2.756-3.266l-9.163-2.9a2 2 0 00-2.017.493l-.82.819a2 2 0 00-.492 2.017l2.9 9.163a4 4 0 003.266 2.756L13 18"></path>
+  <path d="M18.648 12.352a1.205 1.205 0 011.704 0l1.296 1.296a1.205 1.205 0 010 1.704l-6.296 6.296a1.205 1.205 0 01-1.704 0l-1.296-1.296a1.205 1.205 0 010-1.704z"></path>
+  <path d="m3 3 6.586 6.586"></path>
+  <circle cx="11" cy="11" r="2"></circle>
+</svg>
+              <a href="/workbook/wxad12/#关于-intensea-logo-的设计思路" data-en="Intensea, an original visual identity">Intensea - 原创视觉标识</a>
+            </div>
+            <a href="/workbook/wxad12/#关于-intensea-logo-的设计思路" class="profile-more" data-en="more" aria-label="更多关于 Intensea 标识设计" data-label-en="More about the Intensea identity">更多</a>
+          </li>
+          <li>
+            <div class="profile-link-main">
+              <svg class="lucide lucide-scan-eye" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+  <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+  <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+  <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+  <circle cx="12" cy="12" r="1"></circle>
+  <path d="M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0"></path>
+</svg>
+              <a href="/workbook/wxad12/#黑白之间" data-en="Icon browsing and zoom study">图标浏览与放大演示</a>
+            </div>
+            <a href="/workbook/wxad12/#黑白之间" class="profile-more" data-en="more" aria-label="更多关于图标浏览演示" data-label-en="More about the icon study">更多</a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="profile-card profile-experience" aria-labelledby="experience-title">
+        <div class="profile-icon"><svg class="lucide lucide-contact-round" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M16 2v2"></path>
+  <path d="M17.915 21a6 6 0 10-12 0"></path>
+  <path d="M8 2v2"></path>
+  <circle cx="12" cy="11" r="4"></circle>
+  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+</svg></div>
+        <h2 id="experience-title" data-en="Experience">经历</h2>
+        <ul class="profile-links">
+          <li>
+            <div class="profile-link-main">
+              <svg class="lucide lucide-folder-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path>
+</svg>
+              <a href="/workbook/" data-en="Personal portfolio">个人作品集</a>
+            </div>
+            <span class="profile-detail" data-en="ongoing">持续更新</span>
+          </li>
+          <li>
+            <div class="profile-link-main">
+              <svg class="lucide lucide-pen-tool" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="m18 13-.654-4.736a4 4 0 00-2.756-3.266l-9.163-2.9a2 2 0 00-2.017.493l-.82.819a2 2 0 00-.492 2.017l2.9 9.163a4 4 0 003.266 2.756L13 18"></path>
+  <path d="M18.648 12.352a1.205 1.205 0 011.704 0l1.296 1.296a1.205 1.205 0 010 1.704l-6.296 6.296a1.205 1.205 0 01-1.704 0l-1.296-1.296a1.205 1.205 0 010-1.704z"></path>
+  <path d="m3 3 6.586 6.586"></path>
+  <circle cx="11" cy="11" r="2"></circle>
+</svg>
+              <a href="/workbook/wxad12/#关于-intensea-logo-的设计思路" data-en="Intensea identity">Intensea 标识设计</a>
+            </div>
+            <span class="profile-detail" data-en="original">原创</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="profile-card profile-skills" aria-labelledby="skills-title">
+        <div class="profile-icon"><svg class="lucide lucide-laptop-minimal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <rect width="18" height="12" x="3" y="4" rx="2" ry="2"></rect>
+  <line x1="2" x2="22" y1="20" y2="20"></line>
+</svg></div>
+        <h2 id="skills-title" data-en="Skills">技能</h2>
+        <ul class="profile-tags" aria-label="前端技术" data-label-en="Frontend technologies">
+          <li>react</li>
+          <li>javascript</li>
+          <li>next.js</li>
+          <li>css</li>
+          <li>svg</li>
+          <li>node.js</li>
+        </ul>
+        <hr class="profile-divider">
+        <ul class="profile-tags" aria-label="设计与创作" data-label-en="Design and creative work">
+          <li data-en="motion design">动效设计</li>
+          <li data-en="creative coding">创意编程</li>
+        </ul>
+      </section>
+
+      <section class="profile-card profile-crafts" aria-labelledby="crafts-title">
+        <div class="profile-icon"><svg class="lucide lucide-lightbulb" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+  <path d="M9 18h6"></path>
+  <path d="M10 22h4"></path>
+</svg></div>
+        <h2 id="crafts-title" data-en="Crafts">玩具</h2>
+        <ul class="profile-craft-links">
+          <li><svg class="lucide lucide-box" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+  <path d="m3.3 7 8.7 5 8.7-5"></path>
+  <path d="M12 22V12"></path>
+</svg><a href="/workbook/generative/" data-en="CSS generative art">CSS 生成艺术</a></li>
+          <li><svg class="lucide lucide-notebook-text" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M2 6h4"></path>
+  <path d="M2 10h4"></path>
+  <path d="M2 14h4"></path>
+  <path d="M2 18h4"></path>
+  <rect width="16" height="20" x="4" y="2" rx="2"></rect>
+  <path d="M9.5 8h5"></path>
+  <path d="M9.5 12H16"></path>
+  <path d="M9.5 16H14"></path>
+</svg><a href="/workbook/" data-en="Blog posts">个人博客文章</a></li>
+          <li><svg class="lucide lucide-circle-dot" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <circle cx="12" cy="12" r="1"></circle>
+  <circle cx="12" cy="12" r="10"></circle>
+</svg><a href="/workbook/carousel/" data-en="Interactive carousel">转盘交互实验</a></li>
+          <li><svg class="lucide lucide-orbit" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M20.341 6.484A10 10 0 0 1 10.266 21.85"></path>
+  <path d="M3.659 17.516A10 10 0 0 1 13.74 2.152"></path>
+  <circle cx="12" cy="12" r="3"></circle>
+  <circle cx="19" cy="5" r="2"></circle>
+  <circle cx="5" cy="19" r="2"></circle>
+</svg><a href="/workbook/circular-text/" data-en="Circular typography">环形文字实验</a></li>
+          <li><svg class="lucide lucide-mouse-pointer-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"></path>
+</svg><a href="/workbook/trail/" data-en="Cursor trails">鼠标轨迹实验</a></li>
+          <li><svg class="lucide lucide-scroll-text" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M15 12h-5"></path>
+  <path d="M15 8h-5"></path>
+  <path d="M19 17V5a2 2 0 0 0-2-2H4"></path>
+  <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"></path>
+</svg><a href="/workbook/scroll-mock/" data-en="Scroll interactions">滚动交互实验</a></li>
+          <li><svg class="lucide lucide-palette" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"></path>
+  <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
+  <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
+  <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
+  <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
+</svg><a href="/workbook/conic-gradient/" data-en="Color and gradients">色彩与渐变</a></li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+
+</body></html>

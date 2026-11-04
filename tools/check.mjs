@@ -8,7 +8,7 @@ const manifest = JSON.parse(await readFile(join(root, "site-manifest.json"), "ut
 const config = JSON.parse(await readFile(join(root, "config.json"), "utf8"));
 let checked = 0;
 const missing = new Set();
-for (const page of manifest.pages) {
+for (const page of [...manifest.pages, { route: "/about", file: "about/index.html" }]) {
   const html = await readFile(join(root, page.file), "utf8");
   const document = parse(html);
   const urls = [];

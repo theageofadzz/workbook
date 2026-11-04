@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { parse, parseFragment, serialize } from "parse5";
 import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
+import { writeAboutPage } from "./about.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
@@ -175,6 +176,7 @@ try {
   await writeFavicon();
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await personalizePortfolio({ root, out, base });
+  await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
   await brandClientHeader();
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
@@ -294,12 +296,9 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
   externalMedia: manifest.externalMedia,
   unavailableAssets: manifest.failures
 }, null, 2));
-await mkdir(join(out, "about"), { recursive: true });
-await writeFile(join(out, "about", "index.html"), `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>关于 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head>
-<body class="workbook-about"><main><a class="back" href="${base}/">← 返回作品集</a><p class="eyebrow">DESIGN &amp; ENGINEERING</p><h1>${config.title}.</h1><p class="lead">${config.subtitle}</p><hr><h2>关于这个网站</h2><p>这里收集关于界面、交互、动效与设计工程的探索。</p><p>此版本按照「设计垂点」的公开页面复刻视觉与交互，部署于 ${config.title}。示例文章、作品及其原作者署名予以保留，内容版权归各自权利人所有。</p><p><a href="${config.source}/" target="_blank" rel="noreferrer">设计参考：设计垂点 / Aragakey. ↗</a></p><p><a href="${config.repository}" target="_blank" rel="noreferrer">GitHub 仓库 ↗</a></p></main></body></html>`);
 await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
 await personalizePortfolio({ root, out, base });
+await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
 await brandClientHeader();
 await refreshRuntimeLinks([...pages.map(page => page.file), "about/index.html", "404.html"]);
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);

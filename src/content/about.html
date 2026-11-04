@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{browserTitle}}</title>
+  <meta name="description" content="关于 theageofadzz：cicada、intensea，以及我的界面、标识与交互作品。">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="{{favicon}}" type="image/png">
+  <link rel="preload" href="{{base}}/assets/about-inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{base}}/about.css?v={{cssVersion}}">
+  <script src="{{base}}/about.js?v={{jsVersion}}" defer></script>
+</head>
+<body class="workbook-profile">
+  <div class="profile-background" aria-hidden="true"></div>
+  <main class="profile-page">
+    <header class="profile-header">
+      <div class="profile-brand">
+        <h1><a href="{{base}}/" aria-label="返回作品集" data-label-en="Back to the portfolio" title="返回作品集">theageofadzz.</a></h1>
+        <p data-en="Less, but better. I love clean and simple interfaces.">去繁留简，我喜欢纯净、简约的界面。</p>
+      </div>
+      <button class="profile-language" type="button" data-language-toggle aria-label="Switch to English" title="Switch to English" aria-pressed="false">
+        {{icon:languages}}
+      </button>
+    </header>
+
+    <div class="profile-grid">
+      <section class="profile-card profile-identity" aria-labelledby="identity-title">
+        <div class="profile-icon">{{icon:user-round}}</div>
+        <h2 id="identity-title">cicada</h2>
+        <ul class="profile-meta">
+          <li><span data-en="Personal portfolio">个人作品集</span> @<a href="https://github.com/theageofadzz" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><span data-en="Intensea, my original identity">intensea，我的原创标识</span></li>
+          <li><span data-en="theageofadzz, the age of Adz">theageofadzz，奥兹时代</span></li>
+        </ul>
+      </section>
+
+      <section class="profile-card profile-intro" aria-label="个人介绍" data-label-en="About me">
+        <p><span data-en="Cicada is my GitHub nickname, a tribute to my favorite Chinese-language song, 蝉想.">cicada 是我在 GitHub 的昵称，致敬我最喜欢的华语歌曲《蝉想》。</span></p>
+        <p><span data-en="I love the vast blue sea and the universe. Here I collect my explorations in interfaces, identity and interaction.">我喜欢蔚蓝的大海，也痴迷宇宙。在这里，我记录自己的界面、标识与交互尝试。</span></p>
+        <p data-en="I want to make things that feel simple, quiet and thoughtful.">我希望把想法做成纯净、简约而有细节的作品。</p>
+      </section>
+
+      <figure class="profile-portrait" aria-label="cicada 的夏蝉头像" data-label-en="Cicada's summer cicada avatar">
+        <div class="profile-portrait-frame">
+          <img src="{{base}}/assets/cicada-avatar.webp" width="880" height="862" alt="浅绿色背景上的夏蝉插画，cicada 的个人头像" data-alt-en="A summer cicada illustration on pale green, cicada's personal avatar" fetchpriority="high" decoding="async">
+        </div>
+      </figure>
+
+      <section class="profile-card profile-works" aria-labelledby="works-title">
+        <div class="profile-icon">{{icon:pencil-ruler}}</div>
+        <h2 id="works-title" data-en="Works">作品</h2>
+        <ul class="profile-links">
+          <li>
+            <div class="profile-link-main">
+              <img class="profile-project-logo" src="{{base}}/assets/intensea-logo.png" width="16" height="16" alt="">
+              <a href="{{base}}/" data-en="Workbook, my personal portfolio">Workbook - 我的个人作品集</a>
+            </div>
+          </li>
+          <li>
+            <div class="profile-link-main">
+              {{icon:pen-tool}}
+              <a href="{{base}}/wxad12/#关于-intensea-logo-的设计思路" data-en="Intensea, an original visual identity">Intensea - 原创视觉标识</a>
+            </div>
+            <a href="{{base}}/wxad12/#关于-intensea-logo-的设计思路" class="profile-more" data-en="more" aria-label="更多关于 Intensea 标识设计" data-label-en="More about the Intensea identity">更多</a>
+          </li>
+          <li>
+            <div class="profile-link-main">
+              {{icon:scan-eye}}
+              <a href="{{base}}/wxad12/#黑白之间" data-en="Icon browsing and zoom study">图标浏览与放大演示</a>
+            </div>
+            <a href="{{base}}/wxad12/#黑白之间" class="profile-more" data-en="more" aria-label="更多关于图标浏览演示" data-label-en="More about the icon study">更多</a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="profile-card profile-experience" aria-labelledby="experience-title">
+        <div class="profile-icon">{{icon:contact-round}}</div>
+        <h2 id="experience-title" data-en="Experience">经历</h2>
+        <ul class="profile-links">
+          <li>
+            <div class="profile-link-main">
+              {{icon:folder-open}}
+              <a href="{{base}}/" data-en="Personal portfolio">个人作品集</a>
+            </div>
+            <span class="profile-detail" data-en="ongoing">持续更新</span>
+          </li>
+          <li>
+            <div class="profile-link-main">
+              {{icon:pen-tool}}
+              <a href="{{base}}/wxad12/#关于-intensea-logo-的设计思路" data-en="Intensea identity">Intensea 标识设计</a>
+            </div>
+            <span class="profile-detail" data-en="original">原创</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="profile-card profile-skills" aria-labelledby="skills-title">
+        <div class="profile-icon">{{icon:laptop-minimal}}</div>
+        <h2 id="skills-title" data-en="Skills">技能</h2>
+        <ul class="profile-tags" aria-label="前端技术" data-label-en="Frontend technologies">
+          <li>react</li>
+          <li>javascript</li>
+          <li>next.js</li>
+          <li>css</li>
+          <li>svg</li>
+          <li>node.js</li>
+        </ul>
+        <hr class="profile-divider">
+        <ul class="profile-tags" aria-label="设计与创作" data-label-en="Design and creative work">
+          <li data-en="motion design">动效设计</li>
+          <li data-en="creative coding">创意编程</li>
+        </ul>
+      </section>
+
+      <section class="profile-card profile-crafts" aria-labelledby="crafts-title">
+        <div class="profile-icon">{{icon:lightbulb}}</div>
+        <h2 id="crafts-title" data-en="Crafts">玩具</h2>
+        <ul class="profile-craft-links">
+          <li>{{icon:box}}<a href="{{base}}/generative/" data-en="CSS generative art">CSS 生成艺术</a></li>
+          <li>{{icon:notebook-text}}<a href="{{base}}/" data-en="Blog posts">个人博客文章</a></li>
+          <li>{{icon:circle-dot}}<a href="{{base}}/carousel/" data-en="Interactive carousel">转盘交互实验</a></li>
+          <li>{{icon:orbit}}<a href="{{base}}/circular-text/" data-en="Circular typography">环形文字实验</a></li>
+          <li>{{icon:mouse-pointer-2}}<a href="{{base}}/trail/" data-en="Cursor trails">鼠标轨迹实验</a></li>
+          <li>{{icon:scroll-text}}<a href="{{base}}/scroll-mock/" data-en="Scroll interactions">滚动交互实验</a></li>
+          <li>{{icon:palette}}<a href="{{base}}/conic-gradient/" data-en="Color and gradients">色彩与渐变</a></li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
