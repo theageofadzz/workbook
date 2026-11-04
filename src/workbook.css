@@ -25,6 +25,10 @@ a[aria-label="访问 Aragakey 个人主页"]::after {
   object-fit: contain;
   filter: brightness(0);
 }
+.workbook-home-logo {
+  /* Match the adjacent neutral-600 icons (#525252). */
+  filter: brightness(0) invert(32.16%);
+}
 [data-role="footer-item"] { position: relative; }
 [data-role="footer-item"]::after {
   content: attr(data-tooltip);
