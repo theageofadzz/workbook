@@ -23,20 +23,21 @@
     }
   }, { threshold: .15 });
 
-  function initializeLogoDrawings() {
-    document.querySelectorAll(".intensea-logo-study").forEach(figure => {
+  function initializeMotionStudies() {
+    document.querySelectorAll(".intensea-logo-study, .portfolio-icon-browser").forEach(figure => {
       if (initializedDrawings.has(figure)) return;
       initializedDrawings.add(figure);
       figure.classList.add("is-initialized");
-      const toggle = figure.querySelector("[data-logo-toggle]");
+      const toggle = figure.querySelector("[data-logo-toggle], [data-icon-toggle]");
+      const action = figure.matches(".portfolio-icon-browser") ? "浏览演示" : "绘制动画";
       const syncToggle = paused => {
         figure.classList.toggle("is-paused", paused);
         toggle.setAttribute("aria-pressed", String(paused));
-        toggle.setAttribute("aria-label", paused ? "继续绘制动画" : "暂停绘制动画");
-        toggle.title = paused ? "继续绘制动画" : "暂停绘制动画";
+        toggle.setAttribute("aria-label", `${paused ? "继续" : "暂停"}${action}`);
+        toggle.title = `${paused ? "继续" : "暂停"}${action}`;
       };
       toggle.addEventListener("click", () => syncToggle(!figure.classList.contains("is-paused")));
-      figure.querySelector("[data-logo-replay]").addEventListener("click", () => {
+      figure.querySelector("[data-logo-replay], [data-icon-replay]").addEventListener("click", () => {
         figure.getAnimations({ subtree: true }).forEach(animation => { animation.currentTime = 0; });
         syncToggle(false);
       });
@@ -67,7 +68,7 @@
       }
     }
     if (!fullBranding) return;
-    initializeLogoDrawings();
+    initializeMotionStudies();
     document.title = config.browserTitle || "workbook of theageofadzz";
     document.querySelectorAll("h2 a").forEach(anchor => {
       if (anchor.textContent === "设计垂点") anchor.textContent = config.title;

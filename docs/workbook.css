@@ -152,14 +152,14 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .portfolio-tv-scrollbar { position: absolute; top: 6px; right: 3px; bottom: 6px; width: 2px; }
 .portfolio-tv-scrollbar > span { display: block; width: 2px; height: 28%; border-radius: 2px; background: #d4d4d4; animation: portfolio-tv-scrollbar var(--tv-cycle) ease-in-out infinite; }
 .portfolio-tv-cursor { position: absolute; z-index: 2; top: 0; left: 0; width: 100%; height: 100%; transform-origin: 0 0; pointer-events: none; animation: portfolio-tv-cursor var(--tv-cycle) ease-in-out infinite; }
-.portfolio-tv-cursor > svg {
+.portfolio-tv-cursor > svg, .icon-browser-cursor > svg {
   display: block;
   width: 16px;
   height: 17px;
   overflow: visible;
   filter: drop-shadow(0 1px 3px #00000059);
 }
-.portfolio-tv-cursor > span {
+.portfolio-tv-cursor > span, .icon-browser-cursor > span {
   position: absolute;
   left: 14px;
   top: 14px;
@@ -215,8 +215,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .intensea-logo-study { width: 100%; max-width: 680px; margin: 40px auto 32px; }
 .intensea-logo-study > svg { display: block; width: 100%; height: auto; aspect-ratio: 1; }
 .intensea-logo-study.is-initialized:not(.is-visible) .study-motion,
-.intensea-logo-study.is-paused .study-motion { animation-play-state: paused; }
-.intensea-logo-study > figcaption {
+.intensea-logo-study.is-paused .study-motion,
+.portfolio-icon-browser.is-initialized:not(.is-visible) .icon-browser-motion,
+.portfolio-icon-browser.is-paused .icon-browser-motion { animation-play-state: paused; }
+.intensea-logo-study > figcaption, .portfolio-icon-browser > figcaption {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -225,7 +227,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   color: #858585;
   font: 11px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
 }
-.intensea-logo-study > figcaption > span:first-child { font-family: monospace; }
+.intensea-logo-study > figcaption > span:first-child, .portfolio-icon-browser > figcaption > span:first-child { font-family: monospace; }
 .intensea-study-actions, .intensea-study-controls { display: flex; align-items: center; gap: 12px; }
 .intensea-study-controls { gap: 4px; }
 .intensea-study-controls > button {
@@ -246,6 +248,69 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .is-paused .study-play-icon { display: block; }
 @media (prefers-reduced-motion: reduce) {
   .intensea-study-controls { display: none; }
+}
+.portfolio-icon-browser { width: 100%; max-width: 680px; margin: 40px auto 32px; }
+.icon-browser-stage {
+  position: relative;
+  aspect-ratio: 1274 / 920;
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background: #fff;
+}
+.icon-browser-motion {
+  animation-duration: 14s;
+  animation-timing-function: cubic-bezier(.4, 0, .2, 1);
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+.icon-browser-grid { display: block; width: 100%; max-width: none; height: auto; animation-name: icon-browser-browse; }
+.icon-browser-veil { position: absolute; inset: 0; background: #fafafaf2; opacity: 0; animation-name: icon-browser-focus; }
+.icon-browser-preview, .icon-browser-selection {
+  position: absolute;
+  left: 2.354788%;
+  top: 2.391304%;
+  width: 14.128728%;
+  aspect-ratio: 1;
+  height: auto;
+}
+.icon-browser-preview { display: block; opacity: 0; transform-origin: center; animation-name: icon-browser-zoom; }
+.icon-browser-selection { border: 1px solid #737373; border-radius: 6px; opacity: 0; animation-name: icon-browser-select; }
+.icon-browser-cursor { position: absolute; inset: 0; pointer-events: none; transform-origin: 0 0; animation-name: icon-browser-pointer; }
+@keyframes icon-browser-browse {
+  0%, 12%, 40%, 100% { transform: translateY(0); }
+  24%, 31% { transform: translateY(-22%); }
+}
+@keyframes icon-browser-focus {
+  0%, 46%, 85%, 100% { opacity: 0; }
+  54%, 76% { opacity: 1; }
+}
+@keyframes icon-browser-select {
+  0%, 39%, 48%, 100% { opacity: 0; }
+  42%, 46% { opacity: 1; }
+}
+@keyframes icon-browser-zoom {
+  0%, 45%, 85%, 100% { opacity: 0; transform: translate(0, 0) scale(1); }
+  46% { opacity: 1; transform: translate(0, 0) scale(1); }
+  54%, 76% { opacity: 1; transform: translate(287.222222%, 193.333333%) scale(2.9); }
+  84% { opacity: 1; transform: translate(0, 0) scale(1); }
+}
+@keyframes icon-browser-pointer {
+  0%, 5%, 94%, 100% { transform: translate(78%, 66%); }
+  14%, 20% { transform: translate(54%, 36%); }
+  28%, 31% { transform: translate(29%, 46%); }
+  42%, 45% { transform: translate(10%, 13%); }
+  46% { transform: translate(10%, 13%) scale(.86); }
+  48% { transform: translate(10%, 13%); }
+  56%, 67% { transform: translate(64%, 65%); }
+  73%, 75% { transform: translate(53%, 52%); }
+  76% { transform: translate(53%, 52%) scale(.86); }
+  79% { transform: translate(53%, 52%); }
+  85% { transform: translate(22%, 29%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .icon-browser-motion { animation: none; }
+  .icon-browser-cursor, .icon-browser-veil, .icon-browser-selection, .icon-browser-preview { display: none; }
 }
 .intensea-wave-reference, .portfolio-album-reference { width: 100%; max-width: 680px; margin: 32px auto; }
 .intensea-wave-reference > img, .portfolio-album-reference > img { display: block; width: 330px; max-width: 100%; height: auto; margin: 0 auto; }
