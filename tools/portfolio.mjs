@@ -2,6 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse, parseFragment, serialize } from "parse5";
 import { parse as parseJavaScript } from "acorn";
+import { createHash } from "node:crypto";
 
 function walk(node, visit) {
   visit(node);
@@ -84,11 +85,15 @@ function updateByline(container, frontmatter) {
 
 export async function personalizePortfolio({ root, out, base }) {
   const contentRoot = join(root, "src", "content");
+  const logoStudy = await readFile(join(root, "src", "assets", "intensea-golden-ratio.svg"), "utf8");
+  const studyVersion = createHash("sha256").update(logoStudy).digest("hex").slice(0, 8);
+  await writeFile(join(out, "assets", "intensea-golden-ratio.svg"), logoStudy);
   const frontmatter = JSON.parse(await readFile(join(contentRoot, "portfolio-design.json"), "utf8"));
   const coverHTML = (await readFile(join(contentRoot, "portfolio-cover.html"), "utf8")).replaceAll("{{base}}", base).trim();
   const cover = parseFragment(coverHTML).childNodes[0];
   const articleHTML = (await readFile(join(contentRoot, "portfolio-design.html"), "utf8"))
     .replaceAll("{{base}}", base)
+    .replaceAll("{{logoStudy}}", `${base}/assets/intensea-golden-ratio.svg?v=${studyVersion}`)
     .replaceAll("{{description}}", frontmatter.description)
     .replaceAll("{{cover}}", coverHTML).trim();
   const article = parseFragment(articleHTML).childNodes[0];

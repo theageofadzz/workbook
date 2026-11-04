@@ -211,6 +211,18 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .portfolio-essay .portfolio-essay-lead { color: #737373; font-size: 16px; }
 .portfolio-essay-cover { margin: 48px 0 72px; }
 .portfolio-essay-cover .portfolio-cover { max-width: 440px; margin: auto; }
+.intensea-logo-study { width: 100%; max-width: 680px; margin: 40px auto 32px; }
+.intensea-logo-study > img { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+.intensea-logo-study > figcaption {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 14px;
+  color: #858585;
+  font: 11px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+.intensea-logo-study > figcaption > span:first-child { font-family: monospace; }
 .portfolio-essay h2 {
   position: relative;
   margin: 80px 0 28px;
