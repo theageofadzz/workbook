@@ -152,14 +152,26 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .portfolio-tv-scrollbar { position: absolute; top: 6px; right: 3px; bottom: 6px; width: 2px; }
 .portfolio-tv-scrollbar > span { display: block; width: 2px; height: 28%; border-radius: 2px; background: #d4d4d4; animation: portfolio-tv-scrollbar var(--tv-cycle) ease-in-out infinite; }
 .portfolio-tv-cursor { position: absolute; z-index: 2; top: 0; left: 0; width: 100%; height: 100%; transform-origin: 0 0; pointer-events: none; animation: portfolio-tv-cursor var(--tv-cycle) ease-in-out infinite; }
-.portfolio-tv-cursor > i {
+.portfolio-tv-cursor > svg {
   display: block;
-  width: 9px;
-  height: 12px;
-  background: #262626;
-  clip-path: polygon(0 0, 95% 68%, 56% 72%, 44% 100%);
+  width: 16px;
+  height: 17px;
+  overflow: visible;
+  filter: drop-shadow(0 1px 3px #00000059);
 }
-.portfolio-tv-cursor > span { position: absolute; left: 9px; top: 12px; padding: 1px 4px; border-radius: 3px; background: #262626; color: #fff; font: 5px/1.5 monospace; }
+.portfolio-tv-cursor > span {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: max-content;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #000;
+  box-shadow: 0 1px 3px #0000001f;
+  color: #fff;
+  font: 550 11px/16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  white-space: nowrap;
+}
 .portfolio-tv-chin { display: flex; align-items: center; justify-content: center; height: 18px; color: #a3a3a3; font: 4.5px/1 Weixin, sans-serif; }
 .portfolio-tv-chin > i { position: absolute; right: 14px; width: 3px; height: 3px; border-radius: 50%; background: #b5b5b5; }
 .portfolio-tv-neck { position: relative; z-index: 0; width: 15%; height: 18px; margin: -1px auto 0; background: #dedede; box-shadow: 0 3px 5px #0000000a inset; }
