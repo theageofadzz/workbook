@@ -208,6 +208,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 }
 .portfolio-essay { color: #404040; }
 .portfolio-essay > p { margin: 0 0 24px; line-height: 1.95; }
+.portfolio-essay em, .portfolio-tv-article-page em { font-style: italic; }
 .portfolio-essay .portfolio-essay-lead { color: #737373; font-size: 16px; }
 .portfolio-essay-cover { margin: 48px 0 72px; }
 .portfolio-essay-cover .portfolio-cover { max-width: 440px; margin: auto; }
@@ -246,9 +247,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 @media (prefers-reduced-motion: reduce) {
   .intensea-study-controls { display: none; }
 }
-.intensea-wave-reference { width: 100%; max-width: 680px; margin: 32px auto; }
-.intensea-wave-reference > img { display: block; width: 330px; max-width: 100%; height: auto; margin: 0 auto; }
-.intensea-wave-reference > figcaption {
+.intensea-wave-reference, .portfolio-album-reference { width: 100%; max-width: 680px; margin: 32px auto; }
+.intensea-wave-reference > img, .portfolio-album-reference > img { display: block; width: 330px; max-width: 100%; height: auto; margin: 0 auto; }
+.intensea-wave-reference > figcaption, .portfolio-album-reference > figcaption {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;

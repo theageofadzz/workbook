@@ -94,6 +94,7 @@ export async function personalizePortfolio({ root, out, base }) {
   const logoStudy = await readFile(join(root, "src", "assets", "intensea-golden-ratio.svg"), "utf8");
   await writeFile(join(out, "assets", "intensea-golden-ratio.svg"), logoStudy);
   await copyFile(join(root, "src", "assets", "hokusai-great-wave.png"), join(out, "assets", "hokusai-great-wave.png"));
+  await copyFile(join(root, "src", "assets", "the-age-of-adz.png"), join(out, "assets", "the-age-of-adz.png"));
   const frontmatter = JSON.parse(await readFile(join(contentRoot, "portfolio-design.json"), "utf8"));
   const coverHTML = (await readFile(join(contentRoot, "portfolio-cover.html"), "utf8")).replaceAll("{{base}}", base).trim();
   const cover = parseFragment(coverHTML).childNodes[0];
