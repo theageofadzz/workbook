@@ -2,7 +2,8 @@
 a[aria-label="访问 Aragakey 个人主页"] {
   display: inline-flex;
   flex-direction: column;
-  width: 132px;
+  width: max-content;
+  max-width: 100%;
   color: #282828;
   text-decoration: none;
 }
@@ -11,14 +12,14 @@ a[aria-label="访问 Aragakey 个人主页"] > svg { display: none; }
 [data-workbook-signature]::before,
 a[aria-label="访问 Aragakey 个人主页"]::before {
   content: attr(data-brand);
-  font: italic 29px/1.2 Georgia, "Times New Roman", serif;
+  font: 500 29px/1.2 Weixin, sans-serif;
   border-bottom: 1px solid #777;
 }
 [data-workbook-signature]::after,
 a[aria-label="访问 Aragakey 个人主页"]::after {
   content: "Design & Engineering";
   margin-top: 5px;
-  font: italic 9px/1.3 Georgia, "Times New Roman", serif;
+  font: 500 9px/1.3 Weixin, sans-serif;
 }
 .workbook-header-logo,
 .workbook-home-logo {
