@@ -11,6 +11,7 @@ export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc
     base,
     browserTitle,
     favicon: faviconSrc,
+    portraitVersion: version(await readFile(join(root, "src", "assets", "about-portrait.webp"))),
     cssVersion: version(css),
     jsVersion: version(js)
   };
@@ -26,7 +27,7 @@ export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc
   await writeFile(join(out, "about", "index.html"), html);
   await writeFile(join(out, "about.css"), css);
   await writeFile(join(out, "about.js"), js);
-  for (const file of ["about-inter.woff2", "about-grid.webp"]) {
+  for (const file of ["about-inter.woff2", "about-grid.webp", "about-portrait.webp"]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
   await copyFile(
