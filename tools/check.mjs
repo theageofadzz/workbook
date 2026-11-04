@@ -133,4 +133,37 @@ assert.match(
 assert.match(home, /_next\/static\/chunks\/[^"]+-workbook-[a-f0-9]{8}\.js/, "Expected the branded client header to have a new asset URL");
 assert.match(home, /href="\/workbook\/workbook\.css\?v=[a-f0-9]{8}"/, "Expected versioned site styles");
 assert.match(home, /src="\/workbook\/workbook\.js\?v=[a-f0-9]{8}"/, "Expected a cache-busted branding script");
+const essay = JSON.parse(await readFile(new URL("../src/content/portfolio-design.json", import.meta.url), "utf8"));
+assert(home.includes(essay.title) && home.includes(essay.description), "Expected the new featured essay on the homepage");
+assert(!home.includes("微广 12 周年活动记录"), "Expected the old featured title to be removed");
+const articleHTML = await readFile(join(root, essay.slug, "index.html"), "utf8");
+const articleDocument = parse(articleHTML);
+const nodeText = node => node.nodeName === "#text" ? node.value : (node.childNodes || []).map(nodeText).join("");
+const nodes = [];
+function collect(node) { nodes.push(node); for (const child of node.childNodes || []) collect(child); }
+collect(articleDocument);
+const nextScript = nodes.find(node => node.tagName === "script" && node.attrs.some(attr => attr.name === "id" && attr.value === "__NEXT_DATA__"));
+const articleData = JSON.parse(nodeText(nextScript));
+const content = articleData.props.pageProps.content;
+assert.deepEqual(content.frontmatter, essay, "Expected the article byline and metadata to match the featured essay");
+assert.deepEqual(
+  JSON.parse(await readFile(join(root, "_next", "data", articleData.buildId, `${essay.slug}.json`), "utf8")),
+  articleData.props,
+  "Expected direct visits and client navigation to receive the same article"
+);
+const essayNode = nodes.find(node => node.tagName === "article");
+assert(essayNode, "Expected the complete new essay in the static article");
+assert(!articleHTML.includes("词语重组") && !articleHTML.includes("时钟转盘") && !articleHTML.includes("wxad12-full.mp4"), "Expected old anniversary content and demos to be removed");
+for (const heading of content.headings) {
+  assert(nodes.some(node => node.tagName === "h2" && node.attrs.some(attr => attr.name === "id" && attr.value === heading.id)), `Missing article section ${heading.text}`);
+}
+// Exercise the stored component as Next does, without requiring a browser or React.
+const runtime = { jsxs: (tag, props) => ({ tag, props }) };
+const renderedEssay = Function("_jsx_runtime", content.code)(runtime).default();
+const renderedText = node => typeof node === "string" ? node : (node.props.children || []).map(renderedText).join("");
+assert.equal(renderedText(renderedEssay), nodeText(essayNode), "Expected static and hydrated article text to remain identical");
+const activeChunks = [...home.matchAll(/<script[^>]+src="([^"]+\/chunks\/[^"]+\.js)"/g)].map(match => match[1]);
+const activeSources = await Promise.all(activeChunks.map(url => readFile(join(root, url.slice(manifest.basePath.length)), "utf8")));
+assert(activeSources.some(source => source.includes(`title:${JSON.stringify(essay.title)}`) && source.includes("portfolio-cover")), "Expected the loaded homepage component to keep the new entry and cover after hydration");
+assert(articleHTML.includes("workbook-sidebar-logo"), "Expected the article sidebar to use Intensea branding");
 console.log(`Validated ${checked} pages, their local links and assets, and the GitHub Pages configuration.`);

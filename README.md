@@ -30,7 +30,7 @@
 
 ### 交互与体验
 
-- [微广 12 周年活动记录](https://theageofadzz.github.io/workbook/wxad12/)：围绕个性化文字重组与时钟转盘，梳理周年 H5 中的视觉概念和交互节奏。
+- [我的作品集网站设计大纲](https://theageofadzz.github.io/workbook/wxad12/)：去繁留简，从留白、黑白配色、文字层级与 Intensea 标识出发，记录这个作品集的设计思路。
 - [制作有趣的界面：朋友圈广告年度评选 2025](https://theageofadzz.github.io/workbook/making-fun-interfaces/)：从入场、投票到结果公布，记录如何用速度、碰撞和节奏为评选体验增加活力。
 - [转盘交互动画](https://theageofadzz.github.io/workbook/carousel/)：通过可操作的转盘体验，拆解拖动、惯性、停靠和回弹带来的感受差异。
 - [一类叫作“跳跃”的 UI 动效](https://theageofadzz.github.io/workbook/springen/)：总结输入框、头像、折叠面板等组件在状态切换时连贯、舒适的动效表达。

@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { parse, parseFragment, serialize } from "parse5";
 import sharp from "sharp";
+import { personalizePortfolio } from "./portfolio.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
@@ -44,6 +45,7 @@ async function brandClientHeader() {
   const component = /(\(0,\w+\.jsx\))\((?:\w+\.f|"img"),\{(?:src:"[^"]*",alt:"","aria-hidden":!0,)?className:"relative w-12 h-12 74:top-\[0\.15rem\] 74:mr-2 74:w-10 74:h-10 opacity-80(?: workbook-header-logo)?"\}\)/;
   const headerTitleComponent = /(\(0,\w+\.jsx\)\("h1",\{className:"relative -left-px font-\[Weixin\][^"]*",children:)"[^"]*"(\}\))/;
   const homeComponent = /(\(0,\w+\.jsx\))\((?:\w+\.f,\{width:void 0,height:void 0,className:"size-1\/2 text-neutral-600"|"img",\{src:"[^"]*",alt:"","aria-hidden":!0,className:"size-1\/2 workbook-home-logo")\}\)/;
+  const sidebarComponent = /(\(0,\w+\.jsx\))\((?:\w+\.f|"img"),\{(?:src:"[^"]*",alt:"","aria-hidden":!0,)?className:"size-12(?: workbook-sidebar-logo)?"\}\)/;
   for (const file of await readdir(chunks)) {
     if (!file.endsWith(".js") || file.includes("-workbook-")) continue;
     const path = join(chunks, file);
@@ -57,6 +59,11 @@ async function brandClientHeader() {
     if (source.includes('"data-role":"footer-item"')) {
       branded = branded.replace(homeComponent, (_, factory) =>
         `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(homeLogoClasses)}})`
+      );
+    }
+    if (source.includes("fixed hidden 74:flex")) {
+      branded = branded.replace(sidebarComponent, (_, factory) =>
+        `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:"size-12 workbook-sidebar-logo"})`
       );
     }
     branded = branded.replace(
@@ -126,6 +133,16 @@ async function refreshRuntimeLinks(files) {
           siblings.splice(siblings.indexOf(mark), 1, logo);
         });
       }
+      if (node.tagName === "a" && node.parentNode?.tagName === "h2"
+        && node.attrs?.some(attr => attr.name === "href" && attr.value.replace(/\/$/, "") === base)) {
+        const mark = node.childNodes.find(child => child.attrs?.some(attr =>
+          attr.name === "class" && /lucide-pyramid|workbook-sidebar-logo/.test(attr.value)));
+        if (mark) {
+          const logo = parseFragment(`<img src="${logoSrc}" alt="" aria-hidden="true" class="size-12 workbook-sidebar-logo">`).childNodes[0];
+          logo.parentNode = node;
+          node.childNodes.splice(node.childNodes.indexOf(mark), 1, logo);
+        }
+      }
       for (const attr of node.attrs || []) {
         if (attr.name === "href" && /\/workbook\.css(?:\?|$)/.test(attr.value)) {
           attr.value = `${base}/workbook.css?v=${cssVersion}`;
@@ -157,6 +174,7 @@ try {
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
+  await personalizePortfolio({ root, out, base });
   await brandClientHeader();
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
@@ -281,6 +299,7 @@ await writeFile(join(out, "about", "index.html"), `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>关于 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head>
 <body class="workbook-about"><main><a class="back" href="${base}/">← 返回作品集</a><p class="eyebrow">DESIGN &amp; ENGINEERING</p><h1>${config.title}.</h1><p class="lead">${config.subtitle}</p><hr><h2>关于这个网站</h2><p>这里收集关于界面、交互、动效与设计工程的探索。</p><p>此版本按照「设计垂点」的公开页面复刻视觉与交互，部署于 ${config.title}。示例文章、作品及其原作者署名予以保留，内容版权归各自权利人所有。</p><p><a href="${config.source}/" target="_blank" rel="noreferrer">设计参考：设计垂点 / Aragakey. ↗</a></p><p><a href="${config.repository}" target="_blank" rel="noreferrer">GitHub 仓库 ↗</a></p></main></body></html>`);
 await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
+await personalizePortfolio({ root, out, base });
 await brandClientHeader();
 await refreshRuntimeLinks([...pages.map(page => page.file), "about/index.html", "404.html"]);
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);
