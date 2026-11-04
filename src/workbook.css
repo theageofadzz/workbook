@@ -340,12 +340,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   height: 3px;
   background: currentColor;
 }
-.portfolio-essay h3 {
-  margin: 36px 0 16px;
-  font: 500 18px/1.6 Weixin, sans-serif;
-  color: #262626;
-}
-.portfolio-essay code { overflow-wrap: anywhere; }
 .portfolio-essay ul { margin: 24px 0; padding-left: 20px; list-style: disc; }
 .portfolio-essay li { margin-bottom: 12px; line-height: 1.8; }
 .portfolio-essay li::marker { color: #a3a3a3; }
