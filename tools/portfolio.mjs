@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { copyFile, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse, parseFragment, serialize } from "parse5";
 import { parse as parseJavaScript } from "acorn";
@@ -93,6 +93,7 @@ export async function personalizePortfolio({ root, out, base }) {
   const contentRoot = join(root, "src", "content");
   const logoStudy = await readFile(join(root, "src", "assets", "intensea-golden-ratio.svg"), "utf8");
   await writeFile(join(out, "assets", "intensea-golden-ratio.svg"), logoStudy);
+  await copyFile(join(root, "src", "assets", "hokusai-great-wave.png"), join(out, "assets", "hokusai-great-wave.png"));
   const frontmatter = JSON.parse(await readFile(join(contentRoot, "portfolio-design.json"), "utf8"));
   const coverHTML = (await readFile(join(contentRoot, "portfolio-cover.html"), "utf8")).replaceAll("{{base}}", base).trim();
   const cover = parseFragment(coverHTML).childNodes[0];

@@ -246,6 +246,19 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 @media (prefers-reduced-motion: reduce) {
   .intensea-study-controls { display: none; }
 }
+.intensea-wave-reference { width: 100%; max-width: 680px; margin: 32px auto; }
+.intensea-wave-reference > img { display: block; width: 330px; max-width: 100%; height: auto; margin: 0 auto; }
+.intensea-wave-reference > figcaption {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 14px;
+  color: #858585;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.intensea-wave-reference a:hover { color: #525252; text-decoration: underline; text-underline-offset: 4px; }
 .portfolio-essay h2 {
   position: relative;
   margin: 80px 0 28px;
