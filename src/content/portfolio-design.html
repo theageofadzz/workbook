@@ -77,9 +77,28 @@
     <img src="{{base}}/assets/cicada-avatar.webp" width="880" height="862" alt="cicada 的夏蝉头像，浅绿色背景上的夏蝉插画" loading="lazy" decoding="async">
   </figure>
 
-  <h2 id="一个清晰的标识">一个清晰的标识</h2>
-  <p>Intensea 的标识是整个作品集的识别点。我把它放在页首、底部首页入口和浏览器标签中，让这些不同大小的位置拥有同一个形状。</p>
-  <p>标识的颜色随环境调整：页首使用黑色，底部导航与旁边的图标保持相同的灰度。它应该容易认出，也应该融入界面。小尺寸下的轮廓、与文字的距离、图标之间的视觉重量，都是需要反复确认的细节。</p>
+  <h2 id="一个清晰的标识">技术实现方案</h2>
+  <p>我喜欢简约的界面，也想知道这种简约具体是怎样实现的。把视觉感受拆成布局、材质和交互，再把这些细节描述清楚，是我使用 vibe coding 时很在意的一步。</p>
+
+  <h3>基础技术栈</h3>
+  <p>这个网站沿用 React 与 Next.js 的页面结构和客户端交互，用 Tailwind CSS 组织布局、间距和响应式样式，再通过原生 CSS、JavaScript 与 SVG 完成定制的视觉和演示。当前发布版本是静态 HTML、样式、脚本和图片文件，由 GitHub Pages 托管，浏览器加载后继续运行交互。</p>
+
+  <h3>导航栏附近的渐隐模糊</h3>
+  <p>滚动到页面底部时，正文会逐渐隐入一层柔和的雾面。这层效果使用 CSS 的 <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/backdrop-filter" target="_blank" rel="noopener noreferrer"><code>backdrop-filter</code></a> 模糊它后面的内容，再用 <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/mask-image" target="_blank" rel="noopener noreferrer"><code>mask-image</code></a> 与 <code>linear-gradient()</code> 让模糊层由底部向上淡出。这里的模糊半径保持 8px，渐变蒙版控制它显现的程度。</p>
+  <p>这层模糊固定在视口底部，宽度覆盖整屏，高度使用 <code>clamp(80px, 10vh, 200px)</code> 随屏幕调整。它位于正文上方、导航栏下方，并设置 <code>pointer-events: none</code>，让链接和按钮仍然可以正常点击。导航栏本体则使用 60% 不透明度的白色背景、4px 背景模糊、圆润的胶囊轮廓和柔和阴影。</p>
+  <blockquote>在页面底部做一层固定的渐隐背景模糊：模糊半径为 8px，底部最明显，向上逐渐变透明，过渡自然，不出现生硬的水平边缘。高度随屏幕在 80px 到 200px 之间调整。这层效果放在正文上方、导航栏下方，并允许鼠标点击穿透。导航栏单独使用半透明白底与 4px 背景模糊，确保图标和提示文字清晰。</blockquote>
+
+  <h3>交互与演示动画</h3>
+  <p>底部导航的圆形按钮会根据鼠标距离从 40px 平滑放大到最多 80px，附近的按钮也会一起回应。这里使用 React 读取鼠标位置，通过 <a href="https://react-spring.dev/docs/components/use-spring" target="_blank" rel="noopener noreferrer">React Spring</a> 做弹簧过渡，让按钮自然放大、回落；在触屏设备上保持常规点击状态。</p>
+  <p>文章中的 Logo 绘制使用 SVG 描边和 CSS 关键帧，浏览图标与小电视演示则组合了位移、缩放和透明度变化。Logo 与图标浏览演示通过 <code>IntersectionObserver</code> 在进入视口后播放，离开时暂停，并提供暂停、重播和减少动态效果的适配。</p>
+
+  <h3>纸感背景、字体与响应式</h3>
+  <p>页面以浅灰色为底，叠加一张噪点纹理，通过 <code>mix-blend-mode: hard-light</code> 融入背景，形成细微的纸感。中文标题沿用 Weixin 字体，正文使用无衬线字体，日期与作者使用 Berkeley Mono 等宽字体。层级主要由字号、字重、行距和留白建立。</p>
+  <p>布局使用 Flex、Grid 与媒体查询：桌面上为正文和侧边目录留出各自的位置，手机上收起侧边目录，以单列内容展开。图片按容器缩放，长文字自然换行，文章底部预留导航栏所需的阅读空间。</p>
+
+  <h3>我会怎样向 AI 描述这个界面</h3>
+  <blockquote>用 React、Next.js 与 Tailwind CSS 做一个简约的个人作品集。页面使用浅灰纸感背景、低对比度噪点、黑灰文字和充足留白。桌面端显示侧边目录，手机端采用单列阅读。底部放置居中的半透明磨砂胶囊导航，使用圆形图标按钮；鼠标靠近时按距离平滑放大，离开后以轻柔的弹簧动效复位。导航附近添加向上淡出的背景模糊，让正文滚动经过时自然隐入雾面，导航图标始终清晰。所有装饰层允许点击穿透，支持键盘聚焦和减少动态效果，并将页面整理为可部署到 GitHub Pages 的静态文件。</blockquote>
+  <p>对我来说，提示词越具体，设计就越容易落地。说明效果出现的位置、影响的对象、变化的方式，以及手机上如何表现，才能让 AI 更准确地理解我想要的界面。</p>
 
   <h2 id="轻而明确的交互">轻而明确的交互</h2>
   <p>阅读文章、返回首页、查看作品和进入 GitHub，是这个网站最常用的几条路径。我把它们做成简洁的文字入口和底部快捷导航，让位置和含义保持稳定。</p>
