@@ -2,6 +2,7 @@ import { readFile, access, readdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { parse } from "parse5";
 import assert from "node:assert/strict";
+import { excludedRoutes, isExcludedRoute } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..", "docs");
 const manifest = JSON.parse(await readFile(join(root, "site-manifest.json"), "utf8"));
@@ -19,6 +20,9 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     for (const child of node.childNodes || []) visit(child);
     if (node.tagName === "script" && node.attrs?.some(attr => attr.name === "id" && attr.value === "__NEXT_DATA__")) {
       const data = JSON.parse(node.childNodes.map(child => child.value || "").join(""));
+      for (const route of excludedRoutes) {
+        assert(!data.props?.pageProps?.content?.code?.includes(`href:"${manifest.basePath}${route}`), `Excluded link in hydrated content: ${page.route}`);
+      }
       for (const item of data.props?.pageProps?.dataSource || []) {
         for (const key of ["imageUrl", "posterUrl", "videoUrl"]) {
           if (item[key]?.startsWith(`${manifest.basePath}/`)) urls.push(item[key]);
@@ -37,7 +41,25 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
   checked++;
 }
 assert.equal(missing.size, 0, `Missing local resources:\n${[...missing].join("\n")}`);
-assert(checked >= 30, "Expected all article pages and the crafts page");
+assert.equal(checked, manifest.pages.length + 1, "Expected every retained page and the profile page to be checked");
+assert(!manifest.pages.some(page => isExcludedRoute(page.route)), "Excluded pages must not be published");
+for (const route of excludedRoutes) {
+  await assert.rejects(access(join(root, route.slice(1))), `Excluded page directory still exists: ${route}`);
+  for (const build of await readdir(join(root, "_next", "data"))) {
+    await assert.rejects(access(join(root, "_next", "data", build, `${route.slice(1)}.json`)), `Excluded client data still exists: ${route}`);
+  }
+}
+for (const build of await readdir(join(root, "_next", "static"))) {
+  if (build === "chunks") continue;
+  for (const file of ["_buildManifest.js", "_ssgManifest.js"]) {
+    const registry = await readFile(join(root, "_next", "static", build, file), "utf8");
+    assert(!registry.includes("/crafts") && !registry.includes("\\u002Fcrafts"), `Removed gallery still registered in ${file}`);
+  }
+}
+const aboutHTML = await readFile(join(root, "about", "index.html"), "utf8");
+assert.match(aboutHTML, /data-en="Creative Experiments">创意实验<\/h2>/);
+assert(!/profile-craft-links|>玩具<|CSS 生成艺术|转盘交互实验|环形文字实验|鼠标轨迹实验|滚动交互实验|色彩与渐变|个人博客文章/.test(aboutHTML), "The profile must not list the removed third-party experiments");
+assert.match(aboutHTML, /href="https:\/\/gamestation\.cc\/"/, "Expected the GameStation preview to remain available");
 assert.equal(config.title, "theageofadzz", "Expected the site to use the personal brand");
 assert.equal(config.headerTitle, "奥兹时代", "Expected the requested Chinese header name");
 assert.equal(config.browserTitle, "workbook of theageofadzz", "Expected the browser tab to use the requested title");

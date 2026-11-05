@@ -81,7 +81,7 @@
       anchor.setAttribute("aria-label", `关于 ${config.title}`);
     });
     const footer = [...document.querySelectorAll('[data-role="footer-item"]')];
-    const labels = ["文章首页", "作品与实验", "GitHub 个人主页", `关于 ${config.title}`];
+    const labels = ["文章首页", "作品", "GitHub 个人主页", `关于 ${config.title}`];
     footer.forEach((anchor, index) => {
       if (!labels[index]) return;
       anchor.dataset.tooltip = labels[index];
@@ -96,6 +96,10 @@
           logo.className = "size-1/2 workbook-home-logo";
           mark.replaceWith(logo);
         }
+      }
+      if (index === 1) {
+        const worksHref = `${base}/about/#works-title`;
+        if (anchor.getAttribute("href") !== worksHref) anchor.setAttribute("href", worksHref);
       }
       if (index === 2 && anchor.href !== profile) {
         anchor.href = profile;

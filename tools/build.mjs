@@ -5,6 +5,7 @@ import { parse, parseFragment, serialize } from "parse5";
 import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
+import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
@@ -193,11 +194,13 @@ try {
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
-  const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await personalizePortfolio({ root, out, base });
   await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
+  await pruneExcludedContent({ out, base, url: config.url });
+  const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
+  await pruneUnusedBranding({ out });
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
   console.log("Using the checked-in static build. Run npm run sync to refresh the reference snapshot.");
   process.exit(0);
@@ -270,23 +273,17 @@ function nextData(document) {
   return result;
 }
 
-function normalizeCrafts(data) {
-  for (const item of data.props?.pageProps?.dataSource || []) {
-    for (const key of ["posterUrl", "imageUrl", "videoUrl"]) {
-      if (item[key] && !item[key].startsWith("http") && !item[key].startsWith("/")) {
-        const url = new URL(item[key], `${config.source}/`).href;
-        item[key] = mapping.get(url) || url;
-      }
-    }
-  }
-}
-
 await mkdir(out, { recursive: true });
 const pages = [];
+const retiredContent = [];
 for (const record of manifest.files) {
   const input = join(cache, record.local);
   if (record.kind === "page") {
     const route = new URL(record.url).pathname.slice(source.pathname.length).replace(/\/$/, "") || "/";
+    if (isExcludedRoute(route)) {
+      retiredContent.push(rewrite(await readFile(input, "utf8")));
+      continue;
+    }
     const output = join(out, route === "/" ? "index.html" : `${route.slice(1)}/index.html`);
     let html = await readFile(input, "utf8");
     const document = parse(html);
@@ -298,7 +295,6 @@ for (const record of manifest.files) {
     });
     const script = nextData(document);
     const data = JSON.parse(script.childNodes.map(node => node.value || "").join(""));
-    normalizeCrafts(data);
     script.childNodes[0].value = JSON.stringify(data).replaceAll("<", "\\u003c");
     html = rewrite(serialize(document));
     html = html.replace(/(<title[^>]*>)(.*?)(<\/title>)/, (_, open, title, close) => `${open}${title === "设计垂点" || title === config.title ? config.title : `${title} · ${config.title}`}${close}`);
@@ -315,6 +311,7 @@ for (const record of manifest.files) {
     }
     pages.push({ route, title: html.match(/<title[^>]*>(.*?)<\/title>/)?.[1] || config.title, file: output.slice(out.length + 1) });
   } else {
+    if (record.local.startsWith("crafts/")) continue;
     if (record.originalLocal) await rm(join(out, record.originalLocal), { force: true });
     const output = join(out, record.local);
     await mkdir(dirname(output), { recursive: true });
@@ -348,6 +345,8 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
 await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
 await personalizePortfolio({ root, out, base });
 await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
+await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();
 await refreshRuntimeLinks([...pages.map(page => page.file), "about/index.html", "404.html"]);
+await pruneUnusedBranding({ out });
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);
