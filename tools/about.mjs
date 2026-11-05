@@ -26,7 +26,13 @@ export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc
   await writeFile(join(out, "about", "index.html"), html);
   await writeFile(join(out, "about.css"), css);
   await writeFile(join(out, "about.js"), js);
-  for (const file of ["about-inter.woff2", "about-grid.webp", "about-profile-icon.png"]) {
+  for (const file of [
+    "about-inter.woff2",
+    "about-grid.webp",
+    "about-profile-icon.png",
+    "wormhole-logo-gray.png",
+    "jiangsu-university-logo-gray.png"
+  ]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
   await copyFile(
