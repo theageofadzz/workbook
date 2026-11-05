@@ -30,7 +30,7 @@
 ### 交互与体验
 
 - [关于我和我的作品](https://theageofadzz.github.io/workbook/wxad12/)：去繁留简，从留白、黑白配色、文字层级与 Intensea 标识出发，记录这个作品集的设计思路。
-- [GameStation：把游戏收藏搬进浏览器](https://theageofadzz.github.io/workbook/gamestation/)：从可展开的立体光盘盒，到分类检索、攻略与奖杯清单，记录这个游戏网站的设计与开发过程。[在线体验](https://gamestation.cc/)。
+- [一次3D交互实验](https://theageofadzz.github.io/workbook/gamestation/)：尝试把实体游戏盘搬入数字世界，想让鼠标变成人的手一般与虚拟世界交互。[在线体验](https://gamestation.cc/)。
 - [制作有趣的界面：朋友圈广告年度评选 2025](https://theageofadzz.github.io/workbook/making-fun-interfaces/)：从入场、投票到结果公布，记录如何用速度、碰撞和节奏为评选体验增加活力。
 - [一类叫作“跳跃”的 UI 动效](https://theageofadzz.github.io/workbook/springen/)：总结输入框、头像、折叠面板等组件在状态切换时连贯、舒适的动效表达。
 - [一类叫作“发芽”的 UI 组件](https://theageofadzz.github.io/workbook/spross/)：围绕气泡提示、对话框、抽屉和全局提醒，探索浮层组件之间一致的行为与反馈。

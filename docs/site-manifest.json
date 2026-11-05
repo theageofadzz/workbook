@@ -16,7 +16,7 @@
     },
     {
       "route": "/gamestation",
-      "title": "GameStation：把游戏收藏搬进浏览器",
+      "title": "一次3D交互实验",
       "file": "gamestation/index.html"
     },
     {

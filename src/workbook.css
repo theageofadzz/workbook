@@ -362,8 +362,136 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   color: #737373;
 }
 .portfolio-essay-footer a:hover { color: #262626; text-decoration: underline; text-underline-offset: 4px; }
-.gamestation-cover { width: 100%; margin: 0; }
-.gamestation-cover img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 1px solid #dedede; border-radius: 6px; }
+.gamestation-cover {
+  --game-cycle: 20s;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  border-radius: 50%;
+  background-image: url("./grid.svg");
+  background-size: 40px 40px;
+}
+.gamestation-computer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 76.48%;
+  transform: translateY(4%);
+}
+.gamestation-monitor {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #d4d4d4cc;
+  border-radius: 16px;
+  background: #f5f5f5;
+  box-shadow: 0 4px 24px #0000000f;
+}
+.gamestation-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 24px;
+  padding: 0 11px;
+  border-bottom: 1px solid #e5e5e5;
+  color: #858585;
+}
+.gamestation-browser-dots { display: flex; gap: 4px; }
+.gamestation-browser-dots i { width: 4px; height: 4px; border-radius: 50%; background: #bcbcbc; }
+.gamestation-browser-address { flex: 1; text-align: center; font: 7px/1 monospace; }
+.gamestation-browser-menu { display: flex; gap: 3px; }
+.gamestation-browser-menu i { width: 6px; height: 6px; border: 1px solid #bcbcbc; border-radius: 1px; }
+.gamestation-screen { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: white; }
+.gamestation-screen img { display: block; width: 100%; height: auto; }
+.gamestation-screen-page { animation: gamestation-page-scroll var(--game-cycle) cubic-bezier(.45, 0, .2, 1) infinite; }
+.gamestation-screen-detail {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: gamestation-open-case var(--game-cycle) ease-in-out infinite;
+}
+.gamestation-screen-scrollbar { position: absolute; top: 4px; right: 3px; bottom: 4px; width: 2px; }
+.gamestation-screen-scrollbar > span {
+  display: block;
+  width: 2px;
+  height: 35%;
+  border-radius: 2px;
+  background: #a3a3a3;
+  opacity: .6;
+  animation: gamestation-scrollbar var(--game-cycle) ease-in-out infinite;
+}
+.gamestation-screen-cursor {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  transform-origin: 0 0;
+  animation: gamestation-cursor var(--game-cycle) ease-in-out infinite;
+}
+.gamestation-screen-cursor > svg { position: absolute; top: 0; left: 0; width: 13px; height: 14px; filter: drop-shadow(0 1px 1px #00000040); }
+.gamestation-cursor-name {
+  position: absolute;
+  top: 13px;
+  left: 12px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #262626;
+  color: white;
+  font: 6px/1.6 sans-serif;
+}
+.gamestation-click-ring {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #737373;
+  border-radius: 50%;
+  opacity: 0;
+  animation: gamestation-click var(--game-cycle) ease-out infinite;
+}
+.gamestation-keyboard {
+  position: relative;
+  width: 92%;
+  aspect-ratio: 380 / 32;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 50%, #d4d4d8 100%);
+  transform: perspective(400px) rotateX(28deg);
+  box-shadow: 0 8px 0 #d4d4d8, 0 10px 20px -4px #0000001a;
+}
+@keyframes gamestation-page-scroll {
+  0%, 14%, 50%, 100% { transform: translateY(0); }
+  28%, 38% { transform: translateY(-37%); }
+}
+@keyframes gamestation-open-case {
+  0%, 57%, 88%, 100% { opacity: 0; transform: scale(.96); }
+  60%, 85% { opacity: 1; transform: scale(1); }
+}
+@keyframes gamestation-scrollbar {
+  0%, 14%, 50%, 100% { transform: translateY(0); opacity: .6; }
+  28%, 38% { transform: translateY(150%); opacity: .6; }
+  58%, 86% { transform: translateY(0); opacity: 0; }
+}
+@keyframes gamestation-cursor {
+  0%, 8%, 100% { transform: translate(72%, 70%); }
+  14%, 38% { transform: translate(66%, 60%); }
+  50%, 56%, 62% { transform: translate(39%, 69%); }
+  56.5% { transform: translate(39%, 69%) scale(.86); }
+  72%, 82%, 86% { transform: translate(95.8%, 6.9%); }
+  82.5% { transform: translate(95.8%, 6.9%) scale(.86); }
+  94% { transform: translate(72%, 70%); }
+}
+@keyframes gamestation-click {
+  0%, 56%, 60%, 82%, 86%, 100% { opacity: 0; transform: scale(.4); }
+  56.5%, 82.5% { opacity: .65; transform: scale(.4); }
+  59.5%, 85.5% { opacity: 0; transform: scale(2); }
+}
 .gamestation-project-links { display: flex; flex-wrap: wrap; gap: 12px 28px; margin: 28px 0 40px; font-size: 14px; }
 .gamestation-essay a { text-decoration: underline; text-decoration-color: #b4b4b4; text-underline-offset: 4px; }
 .gamestation-essay a:hover { color: #171717; text-decoration-color: currentColor; }
@@ -378,6 +506,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .gamestation-timeline p { margin: 8px 0 0; color: #737373; line-height: 1.9; }
 .gamestation-essay .gamestation-sources { margin-top: 40px; color: #858585; font-size: 12px; }
 @media (max-width: 767px) {
+  .gamestation-computer { gap: 12px; }
+  .gamestation-monitor { border-radius: 12px; }
+  .gamestation-browser-bar { height: 18px; padding: 0 7px; gap: 6px; }
+  .gamestation-browser-address { font-size: 6px; }
+  .gamestation-screen-cursor > svg { width: 10px; height: 11px; }
+  .gamestation-cursor-name { top: 10px; left: 9px; font-size: 5px; }
   .portfolio-tv { width: 76%; }
   .portfolio-tv-body { padding: 6px 6px 0; border-radius: 9px; }
   .portfolio-tv-toolbar { height: 13px; padding: 0 5px; gap: 5px; }
@@ -396,6 +530,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
   [data-role="footer-item"]::after { transition: none; }
-  .portfolio-cover * { animation: none !important; }
+  .portfolio-cover *, .gamestation-cover * { animation: none !important; }
   .portfolio-tv-cursor { transform: translate(23%, 42%); }
+  .gamestation-screen-cursor { transform: translate(72%, 70%); }
 }

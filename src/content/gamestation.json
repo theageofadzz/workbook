@@ -1,8 +1,8 @@
 {
-  "title": "GameStation：把游戏收藏搬进浏览器",
-  "description": "从一个玩家的检索需求出发，把立体游戏盒、图文攻略与奖杯清单放进一个更安静的游戏网站。",
+  "title": "一次3D交互实验",
+  "description": "尝试把实体游戏盘搬入数字世界，想让鼠标变成人的手一般与虚拟世界交互。",
   "slug": "gamestation",
-  "publishedAt": "2026-11-05",
+  "publishedAt": "2026-02-26",
   "author": "cicada@github",
   "authorLink": "https://github.com/theageofadzz",
   "comments": false

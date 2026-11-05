@@ -98,7 +98,7 @@ export async function personalizePortfolio({ root, out, base }) {
   for (const file of ["icon-browse-grid.webp", "icon-browse-first.webp", "cicada-avatar.webp"]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
-  for (const file of ["gamestation-gallery.webp", "gamestation-open-case.webp"]) {
+  for (const file of ["gamestation-gallery.webp", "gamestation-open-case.webp", "gamestation-browse.webp"]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
   const retiredContent = [];
