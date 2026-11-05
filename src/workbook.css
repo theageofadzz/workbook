@@ -502,19 +502,19 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .gamestation-walkthrough video { background: #ededed; }
 .gamestation-background-reference img { aspect-ratio: 5 / 3; }
 .gamestation-figure figcaption { margin-top: 12px; color: #858585; font: 11px/1.7 monospace; }
-.gamestation-code { margin: 28px 0; border: 1px solid #d9d9d9; border-radius: 6px; background: #f7f7f7b3; }
-.gamestation-code > figcaption { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 4px 12px 4px 18px; border-bottom: 1px solid #dedede; color: #737373; font: 11px/1.5 monospace; }
-.gamestation-code button { position: relative; display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 4px; color: #737373; cursor: pointer; }
-.gamestation-code button:hover { background: #e6e6e6; color: #262626; }
-.gamestation-code button:focus-visible, .gamestation-code pre:focus-visible { outline: 2px solid #858585; outline-offset: 3px; }
+.gamestation-code { margin: 28px 0; border: 1px solid #626262; border-radius: 6px; background: #525252; color-scheme: dark; }
+.gamestation-code > figcaption { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 4px 12px 4px 18px; border-bottom: 1px solid #ffffff26; color: #e5e5e5; font: 11px/1.5 monospace; }
+.gamestation-code button { position: relative; display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 4px; color: #e5e5e5; cursor: pointer; }
+.gamestation-code button:hover { background: #ffffff14; color: white; }
+.gamestation-code button:focus-visible, .gamestation-code pre:focus-visible { outline: 2px solid #f5f5f5; outline-offset: 3px; }
 .gamestation-code button > svg { width: 15px; height: 15px; }
 .gamestation-code button > .lucide-check { display: none; }
 .gamestation-code button[data-copied="true"] > .lucide-copy { display: none; }
 .gamestation-code button[data-copied="true"] > .lucide-check { display: block; }
 .gamestation-code button::after { position: absolute; right: 0; bottom: calc(100% + 7px); padding: 5px 8px; border-radius: 4px; background: #303030; color: white; font: 11px/1.5 sans-serif; white-space: nowrap; content: attr(aria-label); opacity: 0; pointer-events: none; }
 .gamestation-code button:hover::after, .gamestation-code button:focus-visible::after { opacity: 1; }
-.gamestation-code pre { max-height: 400px; margin: 0; padding: 20px; overflow: auto; scrollbar-width: thin; tab-size: 2; }
-.gamestation-code pre code { padding: 0; background: transparent; color: #404040; font: 12px/1.85 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }
+.gamestation-code pre { max-height: 400px; margin: 0; padding: 20px; overflow: auto; scrollbar-width: thin; scrollbar-color: #a3a3a3 #525252; tab-size: 2; }
+.gamestation-code pre code { padding: 0; background: transparent; color: #f5f5f5; font: 12px/1.85 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre; }
 .gamestation-copy-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .gamestation-essay .gamestation-sources { margin-top: 40px; color: #858585; font-size: 12px; }
 @media (max-width: 767px) {
