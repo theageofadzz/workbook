@@ -8,6 +8,7 @@
   const githubIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="size-1/2 text-neutral-600" aria-hidden="true"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.8A5.3 5.3 0 0 0 18.7 5a5 5 0 0 0-.1-3.6S17.4 1 15 2.8a13.4 13.4 0 0 0-6 0C6.6 1 5.4 1.4 5.4 1.4A5 5 0 0 0 5.3 5a5.3 5.3 0 0 0-1.5 3.7c0 5.3 3.1 6.5 6.1 6.8A3.4 3.4 0 0 0 9 18.1V22"/></svg>';
   const initializedDrawings = new WeakSet();
   const startedDrawings = new WeakSet();
+  const copyResets = new WeakMap();
   const drawingViewport = new IntersectionObserver(entries => {
     for (const entry of entries) {
       const figure = entry.target;
@@ -44,6 +45,40 @@
       drawingViewport.observe(figure);
     });
   }
+
+  document.addEventListener("click", async event => {
+    const button = event.target instanceof Element && event.target.closest("[data-code-copy]");
+    if (!button) return;
+    const code = button.closest(".gamestation-code")?.querySelector("pre code");
+    if (!code) return;
+    clearTimeout(copyResets.get(button));
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      copied = true;
+    } catch {
+      const selection = window.getSelection();
+      const previous = selection?.rangeCount ? selection.getRangeAt(0).cloneRange() : null;
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      try { copied = document.execCommand("copy"); } catch {}
+      selection?.removeAllRanges();
+      if (previous) selection?.addRange(previous);
+    }
+    const label = copied ? "已复制代码" : "复制失败，请选择代码复制";
+    button.dataset.copied = String(copied);
+    button.setAttribute("aria-label", label);
+    button.title = label;
+    button.closest(".gamestation-code").querySelector("[role=status]").textContent = label;
+    copyResets.set(button, setTimeout(() => {
+      delete button.dataset.copied;
+      button.setAttribute("aria-label", "复制代码");
+      button.title = "复制代码";
+      button.closest(".gamestation-code")?.querySelector("[role=status]")?.replaceChildren();
+    }, 2400));
+  });
 
   function applyBrand() {
     const icon = document.querySelector('link[rel~="icon"]');

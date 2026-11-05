@@ -33,15 +33,22 @@ function find(node, predicate) {
 // Compile the same semantic HTML for static output and React hydration.
 const reactAttributes = {
   class: "className",
+  autoplay: "autoPlay",
+  playsinline: "playsInline",
+  tabindex: "tabIndex",
+  "stroke-width": "strokeWidth",
+  "stroke-linecap": "strokeLinecap",
+  "stroke-linejoin": "strokeLinejoin",
   "font-family": "fontFamily",
   "font-size": "fontSize",
   "font-weight": "fontWeight",
   "text-anchor": "textAnchor"
 };
+const booleanAttributes = new Set(["autoplay", "controls", "loop", "muted", "playsinline"]);
 function reactNode(node, runtime) {
   if (node.nodeName === "#text") return JSON.stringify(node.value);
   const properties = Object.fromEntries((node.attrs || []).map(({ name, value }) =>
-    [reactAttributes[name] || name, value]
+    [reactAttributes[name] || name, booleanAttributes.has(name) ? true : value]
   ));
   const children = (node.childNodes || []).filter(child => child.nodeName !== "#comment");
   const props = Object.entries(properties).map(([key, value]) => `${JSON.stringify(key)}:${JSON.stringify(value)}`);
@@ -98,7 +105,10 @@ export async function personalizePortfolio({ root, out, base }) {
   for (const file of ["icon-browse-grid.webp", "icon-browse-first.webp", "cicada-avatar.webp"]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
-  for (const file of ["gamestation-gallery.webp", "gamestation-open-case.webp", "gamestation-browse.webp"]) {
+  for (const file of [
+    "gamestation-gallery.webp", "gamestation-open-case.webp", "gamestation-browse.webp",
+    "gamestation-walkthrough.mp4", "gamestation-trophies.webp", "gamestation-background.webp"
+  ]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
   const retiredContent = [];
@@ -148,11 +158,15 @@ async function personalizeArticle({ contentRoot, out, base, logoStudy, name, cov
   const frontmatter = JSON.parse(await readFile(join(contentRoot, `${name}.json`), "utf8"));
   const coverHTML = (await readFile(join(contentRoot, `${coverName}.html`), "utf8")).replaceAll("{{base}}", base).trim();
   const cover = parseFragment(coverHTML).childNodes[0];
-  const articleHTML = (await readFile(join(contentRoot, `${name}.html`), "utf8"))
+  let articleHTML = (await readFile(join(contentRoot, `${name}.html`), "utf8"))
     .replaceAll("{{base}}", base)
     .replaceAll("{{logoStudy}}", logoStudy)
     .replaceAll("{{description}}", frontmatter.description)
     .replaceAll("{{cover}}", coverHTML).trim();
+  for (const [, icon] of articleHTML.matchAll(/\{\{icon:([a-z-]+)\}\}/g)) {
+    const svg = await readFile(new URL(`../node_modules/lucide-static/icons/${icon}.svg`, import.meta.url), "utf8");
+    articleHTML = articleHTML.replaceAll(`{{icon:${icon}}}`, svg.replace("<svg", '<svg aria-hidden="true"'));
+  }
   const article = parseFragment(articleHTML).childNodes[0];
   const headings = [];
   walk(article, node => {

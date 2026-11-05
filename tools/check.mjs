@@ -232,7 +232,13 @@ assert.equal(renderedText(renderedProject), nodeText(projectArticle), "GameStati
 for (const heading of projectData.props.pageProps.content.headings) {
   assert(projectNodes.some(node => node.tagName === "h2" && node.attrs.some(attr => attr.name === "id" && attr.value === heading.id)), `Missing project section ${heading.text}`);
 }
-assert(projectHTML.includes('href="https://gamestation.cc/"') && projectHTML.includes('href="https://github.com/theageofadzz/GameStation"'), "Expected working preview and source entry points");
+assert(!projectHTML.includes('href="https://gamestation.cc/"') && !projectHTML.includes('href="https://github.com/theageofadzz/GameStation"'), "Project article must omit the removed preview and GitHub entry points");
+const walkthrough = projectNodes.find(node => node.tagName === "video");
+assert(walkthrough, "Expected an actual website walkthrough video");
+for (const name of ["autoplay", "muted", "loop", "playsinline", "controls"]) {
+  assert(walkthrough.attrs.some(attr => attr.name === name), `Walkthrough must retain ${name}`);
+}
+assert.equal(projectNodes.filter(node => node.tagName === "button" && node.attrs.some(attr => attr.name === "data-code-copy")).length, 4, "Expected four copyable code sections");
 assert(activeSources.some(source => source.includes(`title:${JSON.stringify(project.title)}`) && source.includes("gamestation-cover")), "Expected the hydrated homepage to use the project cover");
 await assert.rejects(access(join(root, "interactive-design-in-ai")), "The replaced AI article must be removed");
 for (const file of await readdir(root, { recursive: true })) {
