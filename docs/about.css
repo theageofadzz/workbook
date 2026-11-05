@@ -91,9 +91,8 @@
 .profile-links > li { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
 .profile-link-main { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
 .profile-link-main > :is(img, svg) { flex: none; width: 16px; height: 16px; color: #989898; stroke-width: 1.7; }
-.profile-project-logo { object-fit: contain; filter: brightness(0) invert(60%); }
 .profile-link-main a { min-width: 0; overflow-wrap: anywhere; }
-.profile-more, .profile-detail { flex: none; white-space: nowrap; }
+.profile-detail { flex: none; white-space: nowrap; }
 .profile-experience-list > li { display: grid; grid-template-columns: minmax(0, 1fr) 11ch; }
 .profile-experience-list .profile-link-main { display: grid; grid-template-columns: 16px minmax(0, 1fr); }
 .profile-experience-logo { display: block; object-fit: contain; }

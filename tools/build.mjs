@@ -5,7 +5,7 @@ import { parse, parseFragment, serialize } from "parse5";
 import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
-import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding } from "./content-policy.mjs";
+import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
@@ -194,13 +194,14 @@ try {
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
-  await personalizePortfolio({ root, out, base });
+  const retiredArticles = await personalizePortfolio({ root, out, base });
   await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
   await pruneExcludedContent({ out, base, url: config.url });
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
   await pruneUnusedBranding({ out });
+  await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
   console.log("Using the checked-in static build. Run npm run sync to refresh the reference snapshot.");
   process.exit(0);
@@ -343,10 +344,12 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
   unavailableAssets: manifest.failures
 }, null, 2));
 await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
-await personalizePortfolio({ root, out, base });
+const retiredArticles = await personalizePortfolio({ root, out, base });
 await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
 await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();
-await refreshRuntimeLinks([...pages.map(page => page.file), "about/index.html", "404.html"]);
+const publishedPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
+await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "404.html"]);
 await pruneUnusedBranding({ out });
+await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);

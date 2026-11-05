@@ -1,11 +1,11 @@
-import { copyFile, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parse, parseFragment, serialize } from "parse5";
 import { parse as parseJavaScript } from "acorn";
 
 function walk(node, visit) {
   visit(node);
-  for (const child of node.childNodes || []) walk(child, visit);
+  for (const child of [...node.childNodes || []]) walk(child, visit);
 }
 
 const text = node => node.nodeName === "#text"
@@ -58,13 +58,13 @@ function visitJavaScript(node, visit) {
   }
 }
 
-function replaceFeaturedItem(source, frontmatter, cover) {
+function replaceFeaturedItem(source, frontmatter, cover, sourceSlug) {
   let featured;
   visitJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
     if (node.type !== "ObjectExpression") return;
     const slug = node.properties.find(property => property.key?.name === "slug");
     const children = node.properties.find(property => property.key?.name === "children");
-    if (slug?.value.value === frontmatter.slug && children) featured = { node, children };
+    if ([frontmatter.slug, sourceSlug].includes(slug?.value.value) && children) featured = { node, children };
   });
   if (!featured) throw new Error("Could not find the featured portfolio entry.");
   const { node, children } = featured;
@@ -98,10 +98,57 @@ export async function personalizePortfolio({ root, out, base }) {
   for (const file of ["icon-browse-grid.webp", "icon-browse-first.webp", "cicada-avatar.webp"]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
-  const frontmatter = JSON.parse(await readFile(join(contentRoot, "portfolio-design.json"), "utf8"));
-  const coverHTML = (await readFile(join(contentRoot, "portfolio-cover.html"), "utf8")).replaceAll("{{base}}", base).trim();
+  for (const file of ["gamestation-gallery.webp", "gamestation-open-case.webp"]) {
+    await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
+  }
+  const retiredContent = [];
+  const compiledArticles = [];
+  for (const entry of [
+    { name: "portfolio-design", cover: "portfolio-cover", sourceSlug: "wxad12" },
+    { name: "gamestation", cover: "gamestation-cover", sourceSlug: "interactive-design-in-ai" }
+  ]) {
+    const result = await personalizeArticle({ contentRoot, out, base, logoStudy, ...entry });
+    retiredContent.push(...result.retiredContent);
+    compiledArticles.push(result.compiled);
+  }
+  // Next's static route registry and client data must use the new project URL too.
+  for (const file of await readdir(out, { recursive: true })) {
+    if (!/\.(?:html|js|json|xml)$/.test(file)) continue;
+    const path = join(out, file);
+    const source = await readFile(path, "utf8");
+    const updated = source.replaceAll("interactive-design-in-ai", "gamestation");
+    if (source !== updated) await writeFile(path, updated);
+  }
+  const articleChunk = join(out, "_next", "static", "chunks", "34ch75b_hd0t9.js");
+  let client = await readFile(articleChunk, "utf8");
+  let compiler;
+  visitJavaScript(parseJavaScript(client, { ecmaVersion: "latest" }), node => {
+    if (node.type === "FunctionDeclaration" && node.id?.name === "i"
+      && client.slice(node.start, node.end).includes("return Function(...Object.keys(r),e)")) compiler = node;
+  });
+  if (!compiler) throw new Error("Could not find the article compiler.");
+  const precompiled = compiledArticles.map(({ token, code }) =>
+    `case ${JSON.stringify(token)}:return(function(_jsx_runtime){${code}})(s);`
+  ).join("");
+  const replacement = `function i(e,t){switch(e){${precompiled}}let r={React:n,ReactDOM:l,_jsx_runtime:s,...t};return Function(...Object.keys(r),e)(...Object.values(r))}`;
+  client = client.slice(0, compiler.start) + replacement + client.slice(compiler.end);
+  client = client.replace(
+    'Z[6]===Symbol.for("react.memo_cache_sentinel")?(c=(0,t.jsx)("meta",{name:"author",content:"Aragakey."}),Z[6]=c):c=Z[6]',
+    'c=(0,t.jsx)("meta",{name:"author",content:et.author||"Aragakey."})'
+  );
+  client = client.replace('children:[$,K,U,V,J]', 'children:[$,K,U,V,et.comments===!1?null:J]');
+  if (!client.includes('content:et.author||"Aragakey."') || !client.includes("et.comments===!1?null:J")) {
+    throw new Error("Could not personalize the article metadata and discussion section.");
+  }
+  await writeFile(articleChunk, client);
+  return retiredContent;
+}
+
+async function personalizeArticle({ contentRoot, out, base, logoStudy, name, cover: coverName, sourceSlug }) {
+  const frontmatter = JSON.parse(await readFile(join(contentRoot, `${name}.json`), "utf8"));
+  const coverHTML = (await readFile(join(contentRoot, `${coverName}.html`), "utf8")).replaceAll("{{base}}", base).trim();
   const cover = parseFragment(coverHTML).childNodes[0];
-  const articleHTML = (await readFile(join(contentRoot, "portfolio-design.html"), "utf8"))
+  const articleHTML = (await readFile(join(contentRoot, `${name}.html`), "utf8"))
     .replaceAll("{{base}}", base)
     .replaceAll("{{logoStudy}}", logoStudy)
     .replaceAll("{{description}}", frontmatter.description)
@@ -112,11 +159,12 @@ export async function personalizePortfolio({ root, out, base }) {
     if (node.tagName === "h2") headings.push({ text: text(node), id: attr(node, "id") });
   });
   const code = `return {default:function(){return ${reactNode(article, "_jsx_runtime")};}};`;
+  const token = `workbook:${frontmatter.slug}`;
 
   const homepagePath = join(out, "index.html");
   const homepage = parse(await readFile(homepagePath, "utf8"));
   const titleLink = find(homepage, node => node.tagName === "a"
-    && attr(node, "href") === `${base}/${frontmatter.slug}`
+    && [frontmatter.slug, sourceSlug].some(slug => attr(node, "href")?.replace(/\/$/, "") === `${base}/${slug}`)
     && attr(node, "class")?.includes("font-[Weixin]"));
   if (!titleLink) throw new Error("Could not find the static featured entry.");
   const intro = titleLink.parentNode;
@@ -124,16 +172,31 @@ export async function personalizePortfolio({ root, out, base }) {
   const description = intro.childNodes.find(node => attr(node, "class")?.includes("whitespace-break-spaces"));
   updateByline(byline, frontmatter);
   setText(titleLink, frontmatter.title);
+  setAttr(titleLink, "href", `${base}/${frontmatter.slug}`);
   setText(description, frontmatter.description);
   const columns = intro.parentNode.childNodes.filter(node => node.tagName);
+  const retiredContent = [serialize(columns[1])];
   setHTML(columns[1], coverHTML);
   await writeFile(homepagePath, serialize(homepage));
 
   const articlePath = join(out, frontmatter.slug, "index.html");
-  const document = parse(await readFile(articlePath, "utf8"));
+  let previousArticle;
+  try { previousArticle = await readFile(articlePath, "utf8"); }
+  catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    previousArticle = await readFile(join(out, sourceSlug, "index.html"), "utf8");
+  }
+  retiredContent.push(previousArticle);
+  const document = parse(previousArticle);
+  walk(document, node => {
+    if (node.tagName !== "link" || attr(node, "rel") !== "preload" || attr(node, "as") !== "image") return;
+    const siblings = node.parentNode.childNodes;
+    siblings.splice(siblings.indexOf(node), 1);
+  });
   const script = find(document, node => attr(node, "id") === "__NEXT_DATA__");
   const data = JSON.parse(text(script));
-  data.props.pageProps.content = { frontmatter, headings, code };
+  data.props.pageProps.content = { frontmatter, headings, code: token };
+  if (data.query?.slug) data.query.slug = frontmatter.slug;
   setText(script, JSON.stringify(data).replaceAll("<", "\\u003c"));
   const title = find(document, node => node.tagName === "h1");
   const body = title.parentNode;
@@ -152,26 +215,24 @@ export async function personalizePortfolio({ root, out, base }) {
     if (name === "author") setAttr(node, "content", frontmatter.author);
     if (name === "og:title") setAttr(node, "content", frontmatter.title);
   });
+  await mkdir(join(out, frontmatter.slug), { recursive: true });
   await writeFile(articlePath, serialize(document));
   await writeFile(join(out, "_next", "data", data.buildId, `${frontmatter.slug}.json`), JSON.stringify(data.props));
+  if (sourceSlug !== frontmatter.slug) {
+    await rm(join(out, sourceSlug), { recursive: true, force: true });
+    await rm(join(out, "_next", "data", data.buildId, `${sourceSlug}.json`), { force: true });
+  }
 
   const chunks = join(out, "_next", "static", "chunks");
   const homepageChunk = join(chunks, "2ka_qt01g8-f4.js");
-  await writeFile(homepageChunk, replaceFeaturedItem(await readFile(homepageChunk, "utf8"), frontmatter, cover));
-  const articleChunk = join(chunks, "34ch75b_hd0t9.js");
-  let client = await readFile(articleChunk, "utf8");
-  client = client.replace(
-    'Z[6]===Symbol.for("react.memo_cache_sentinel")?(c=(0,t.jsx)("meta",{name:"author",content:"Aragakey."}),Z[6]=c):c=Z[6]',
-    'c=(0,t.jsx)("meta",{name:"author",content:et.author||"Aragakey."})'
-  );
-  client = client.replace('children:[$,K,U,V,J]', 'children:[$,K,U,V,et.comments===!1?null:J]');
-  if (!client.includes('content:et.author||"Aragakey."') || !client.includes("et.comments===!1?null:J")) {
-    throw new Error("Could not personalize the article metadata and discussion section.");
-  }
-  await writeFile(articleChunk, client);
+  const clientHome = await readFile(homepageChunk, "utf8");
+  retiredContent.push(clientHome);
+  await writeFile(homepageChunk, replaceFeaturedItem(clientHome, frontmatter, cover, sourceSlug));
 
   const manifestPath = join(out, "site-manifest.json");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-  manifest.pages.find(page => page.route === `/${frontmatter.slug}`).title = frontmatter.title;
+  const page = manifest.pages.find(page => [frontmatter.slug, sourceSlug].some(slug => page.route === `/${slug}`));
+  Object.assign(page, { title: frontmatter.title, route: `/${frontmatter.slug}`, file: `${frontmatter.slug}/index.html` });
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
+  return { retiredContent, compiled: { token, code } };
 }

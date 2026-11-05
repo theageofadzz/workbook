@@ -1,0 +1,56 @@
+<article class="portfolio-essay gamestation-essay">
+  <p class="portfolio-essay-lead">{{description}}</p>
+  <div class="gamestation-project-links">
+    <a href="https://gamestation.cc/" target="_blank" rel="noopener noreferrer">在线体验 ↗</a>
+    <a href="https://github.com/theageofadzz/GameStation" target="_blank" rel="noopener noreferrer">GitHub 项目 ↗</a>
+  </div>
+  <figure class="gamestation-figure">
+    <img src="{{base}}/assets/gamestation-gallery.webp" width="1280" height="720" alt="GameStation 的游戏展示首页，热门游戏以蓝色立体光盘盒呈现" fetchpriority="high" decoding="async">
+    <figcaption>01 / GAME GALLERY · 网站实际界面</figcaption>
+  </figure>
+
+  <h2 id="从玩家的需要出发">从玩家的需要出发</h2>
+  <p>GameStation 的起点很简单：我喜欢玩游戏，也经常需要查攻略。玩《博德之门 3》的时候，我会在不同网站之间来回找信息。攻略并不少，但真正需要的答案经常夹在杂乱的版面和讨论之中。我想做一个自己也愿意反复打开的网站，让检索这件事更纯净一点。</p>
+  <p>所以这个项目从一开始就围绕游戏展示和攻略阅读展开。首页负责帮助人找到游戏，进入游戏之后，再选择图文攻略、奖杯列表或相关资源。没有开设论坛，是我在项目初期就做出的选择。我更希望把精力放在内容的整理，以及阅读时的秩序感上。</p>
+
+  <h2 id="一排可以打开的游戏盒">一排可以打开的游戏盒</h2>
+  <p>游戏封面是最直接的识别方式。我没有把它们只当作平面的缩略图，而是把首页做成了一排排立起来的光盘盒：蓝色的塑料边框、顶部的 PlayStation 标识、侧面的厚度和落在底部的阴影，共同建立起实体收藏的感觉。</p>
+  <p>鼠标经过时，盒子会跟随指针轻微倾斜，反光也随位置变化。点击之后，选中的盒子从原来的位置移动到画面中央，再打开封面。左边呈现光盘，右边像一本说明书，放置简介和内容入口。关闭时，盒子沿原来的方向回到列表，让浏览和查看保持连续。</p>
+  <figure class="gamestation-figure">
+    <img src="{{base}}/assets/gamestation-open-case.webp" width="1280" height="720" alt="点击《最后生还者 1》后的展开状态：左侧是光盘，右侧是简介、图文攻略和奖杯入口" loading="lazy" decoding="async">
+    <figcaption>02 / OPEN THE CASE · 从封面进入具体内容</figcaption>
+  </figure>
+  <p>这套交互使用 CSS 透视、三维变换和过渡完成。光盘盒的前后与侧面由页面元素组合，翻盖围绕盒脊旋转；展开前记录卡片的位置和尺寸，再衔接到放大后的状态。对这个项目来说，三维效果的意义是让“选择一款游戏”更有触感，同时保留熟悉的网页操作方式。</p>
+
+  <h2 id="让寻找和阅读各有秩序">让寻找和阅读各有秩序</h2>
+  <p>首页把“看一看”和“找某一款”两种需要放在一起。热门游戏提供快速浏览入口，全部游戏以网格排列；分类和关键词搜索帮助缩小范围，分页则控制每次出现的信息量。搜索可以匹配游戏名称和制作方，切换分类时会回到第一页，避免筛选后落在空白页。</p>
+  <p>游戏盒展开之后，内容被分成三个方向：完整图文攻略、全奖杯列表和友情资源。它们对应不同的目的：卡在流程里时查步骤，准备白金时看收集要求，需要补充材料时再去资源页。让入口清楚，比在同一屏里堆入所有内容更重要。</p>
+  <p>长篇攻略再通过章节、子标题和侧边目录组织。以《最后生还者》系列为例，流程、收集品和奖杯提示需要被反复查阅，目录让读者直接回到正在游玩的章节。整理互联网资料时，保留参考来源也同样重要，界面设计和内容整理是不同的工作，不能混为一谈。</p>
+
+  <h2 id="从上线到逐步补全">从上线到逐步补全</h2>
+  <p>这个网站是边使用、边补全的。下面的节点来自项目的更新日志与 GitHub 提交记录，它们比一个笼统的“已完成”更接近真实的开发过程。</p>
+  <ol class="gamestation-timeline">
+    <li><time datetime="2026-02-25">2026.02.25</time><div><strong>开始做一个自己的攻略网站</strong><p>从游玩《博德之门 3》时查找攻略的经历出发，明确纯净检索的方向。</p></div></li>
+    <li><time datetime="2026-02-26">2026.02.26</time><div><strong>第一版正式上线</strong><p>完成首批游戏封面，加入《最后生还者 2》的初版攻略页面，并修正图片路径与生产构建。</p></div></li>
+    <li><time datetime="2026-03-01">2026.03.01</time><div><strong>继续完善攻略内容</strong><p>《最后生还者 2》攻略上线，围绕流程阅读逐步整理内容。</p></div></li>
+    <li><time datetime="2026-03-04">2026.03.04</time><div><strong>加入地图入口</strong><p>更新《生化危机 9》前瞻攻略，通过嵌入页面提供交互地图。</p></div></li>
+    <li><time datetime="2026-03-08">2026.03.08</time><div><strong>调整视觉基调</strong><p>更新图标标识，把导航和页脚调整为白底与黑灰文字，让阅读区域更明亮。</p></div></li>
+    <li><time datetime="2026-03-14">2026.03.14</time><div><strong>扩充《地平线：西之绝境》</strong><p>补充白金路线、主线流程、核心技巧与易错过奖杯提示。</p></div></li>
+    <li><time datetime="2026-04-01">2026.04.01</time><div><strong>补充《血源诅咒》攻略</strong><p>整理白金路线、三结局分支、支线提醒，以及圣杯地牢和战斗建议。</p></div></li>
+    <li><time datetime="2026-04-26">2026.04.26</time><div><strong>增加项目贡献入口</strong><p>首页接入 GitHub 链接与 Stars、Forks 数量，让项目的代码入口更容易被找到。</p></div></li>
+  </ol>
+
+  <h2 id="目前做到哪里">目前做到哪里</h2>
+  <p>截至 2026 年 11 月 5 日，这篇记录所依据的仓库最近一次提交是 2026 年 4 月 26 日。当前项目已经包含游戏展示、分类搜索、分页、光盘盒展开、多个游戏的攻略与奖杯页面，以及更新日志和资源入口。页面由 React 组织，使用 Vite 构建；路由负责连接首页、攻略与奖杯，CSS 负责立体盒子的视觉和状态过渡。</p>
+  <p>但游戏目录和攻略完成度是两回事。当前列表中也包含用于扩充展示的生成条目，部分封面被复用，因此列表的长度不能代表已经完成了多少篇独立攻略。这个阶段更适合被看作一个持续整理中的游戏展示与攻略项目。</p>
+  <p>如果继续往下做，我会优先核对游戏资料、明确区分已有攻略和待补充内容，补齐图片与来源，再完善手机端和键盘操作。比起单纯增加条目，我更在意每一个点进去的页面都能让人找到有用的信息。</p>
+
+  <h2 id="想留下的体验">想留下的体验</h2>
+  <p>我喜欢实体游戏盒承载的那一点仪式感，也希望查攻略时可以少一点打扰。GameStation 把这两件事放在一起：浏览时有收藏的乐趣，进入内容之后，页面又回到清楚、安静的阅读。</p>
+  <p>它记录了我把一个具体需要做成网站的过程，也留下了还需要继续打磨的地方。</p>
+  <p class="gamestation-sources">开发记录参考：<a href="https://github.com/theageofadzz/GameStation/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">项目更新日志</a>、<a href="https://github.com/theageofadzz/GameStation/commits/main/" target="_blank" rel="noopener noreferrer">GitHub 提交记录</a>与当前项目源码。文中截图取自 GameStation 实际页面；游戏图像与相关标识归各自权利人所有。</p>
+  <footer class="portfolio-essay-footer">
+    <a href="{{base}}/about/#works-title">返回我的作品</a>
+    <a href="https://gamestation.cc/" target="_blank" rel="noopener noreferrer">打开 GameStation ↗</a>
+  </footer>
+</article>

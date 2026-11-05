@@ -231,3 +231,24 @@ export async function pruneUnusedBranding({ out }) {
     }
   }
 }
+
+export async function pruneRetiredAssets({ out, base, retiredContent }) {
+  const candidates = new Set();
+  for (const source of retiredContent) {
+    for (const match of source.matchAll(/\/media\/([^/"'<>\\\s?]+)(?:\?[^"'<>\\\s]*)?/g)) {
+      candidates.add(match[1]);
+    }
+  }
+  const retained = [];
+  for (const file of await readdir(out, { recursive: true })) {
+    if (!/\.(?:html|js|json|css|svg)$/.test(file) || (file.startsWith("media/") && candidates.has(file.slice(6)))) continue;
+    retained.push(await readFile(join(out, file), "utf8"));
+  }
+  let removed = 0;
+  for (const file of candidates) {
+    if (retained.some(source => source.includes(file))) continue;
+    await rm(join(out, "media", file), { force: true });
+    removed++;
+  }
+  console.log(`Removed ${removed} unreferenced assets from replaced articles.`);
+}

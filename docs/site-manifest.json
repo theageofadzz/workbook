@@ -15,9 +15,9 @@
       "file": "wxad12/index.html"
     },
     {
-      "route": "/interactive-design-in-ai",
-      "title": "使用 AI 制作交互动画的建议 · theageofadzz",
-      "file": "interactive-design-in-ai/index.html"
+      "route": "/gamestation",
+      "title": "GameStation：把游戏收藏搬进浏览器",
+      "file": "gamestation/index.html"
     },
     {
       "route": "/small-p",
