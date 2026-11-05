@@ -70,12 +70,14 @@
 .profile-crafts { grid-area: 4 / 5 / 5 / 13; min-height: 260px; }
 .profile-icon { display: grid; place-items: center; width: 32px; height: 32px; margin-left: -4px; border: 1px solid #dedede; border-radius: 8px; background: #fff; box-shadow: 0 1px 2px #0000000d; color: #525252; }
 .profile-icon > svg { width: 20px; height: 20px; stroke-width: 1.8; }
+.profile-icon > img { display: block; width: 20px; height: 20px; object-fit: contain; }
 .profile-card h2 { margin: 8px 0 24px; font-size: 16px; line-height: 24px; font-weight: 500; }
-.profile-identity h2 { margin-bottom: 16px; }
+.profile-identity h2 { margin-bottom: 16px; font-weight: 600; }
 .profile-meta, .profile-links, .profile-tags, .profile-craft-links { margin: 0; padding: 0; list-style: none; }
 .profile-meta { display: grid; gap: 8px; color: #808080; }
 .profile-meta li { position: relative; padding-left: 12px; overflow-wrap: anywhere; }
 .profile-meta li::before { content: ""; position: absolute; left: 0; top: 6px; width: 4px; height: 4px; border-radius: 50%; background: #d4d4d4; }
+.profile-company { text-decoration: underline dotted #929292; text-underline-offset: 3px; }
 .profile-intro { display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; color: #808080; }
 .profile-intro p { margin: 0; }
 .profile-portrait { position: relative; min-width: 0; min-height: 0; margin: 0; padding: 6px; border: 1px solid #dedede; border-radius: 6px; background: #ffffffb3; }
