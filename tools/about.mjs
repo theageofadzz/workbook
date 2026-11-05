@@ -30,6 +30,7 @@ export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc
     "about-inter.woff2",
     "about-grid.webp",
     "about-profile-icon.png",
+    "about-experience-icon.png",
     "wormhole-logo-gray.png",
     "jiangsu-university-logo-gray.png"
   ]) {
