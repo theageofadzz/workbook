@@ -14,6 +14,7 @@ const assetVersion = async file => createHash("sha256")
   .slice(0, 8);
 const cssVersion = await assetVersion("workbook.css");
 const jsVersion = await assetVersion("workbook.js");
+const securityVersion = await assetVersion("security.js");
 const source = new URL(config.source);
 const base = config.basePath;
 const cache = join(root, ".cache", "reference");
@@ -26,6 +27,23 @@ const headerTitle = config.headerTitle || config.title;
 const headerClasses = "relative w-12 h-12 74:top-[0.15rem] 74:mr-2 74:w-10 74:h-10 opacity-80";
 const logoClasses = `${headerClasses} workbook-header-logo`;
 const homeLogoClasses = "size-1/2 workbook-home-logo";
+const securityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "script-src 'self' 'unsafe-inline'",
+  "script-src-attr 'none'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' data: blob: https:",
+  "font-src 'self' data: https:",
+  "connect-src 'self'",
+  "frame-src 'self' https:",
+  "worker-src 'self' blob:",
+  "form-action 'none'",
+  "frame-ancestors 'none'",
+  "upgrade-insecure-requests"
+].join("; ");
 
 async function writeFavicon() {
   const logo = join(root, "src", "assets", "intensea-logo.png");
@@ -160,6 +178,7 @@ async function refreshRuntimeLinks(files) {
       icon.parentNode = head;
       head.childNodes.push(icon);
     }
+    hardenDocument(document);
     await writeFile(path, serialize(document));
   }
 }
@@ -170,7 +189,7 @@ try {
 } catch {
   // Checked-in docs are a complete, ready-to-publish static build.
   await accessBuild();
-  for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
+  for (const file of ["workbook.css", "workbook.js", "security.js"]) await copyFile(join(root, "src", file), join(out, file));
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
@@ -211,6 +230,36 @@ function rewrite(value) {
 function walk(node, callback) {
   callback(node);
   for (const child of node.childNodes || []) walk(child, callback);
+}
+
+function hardenDocument(document) {
+  let head;
+  walk(document, node => {
+    if (node.tagName === "head") head = node;
+    if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "target" && attr.value === "_blank")) {
+      const rel = node.attrs.find(attr => attr.name === "rel");
+      const values = new Set((rel?.value || "").split(/\s+/).filter(Boolean));
+      values.add("noopener");
+      values.add("noreferrer");
+      if (rel) rel.value = [...values].join(" ");
+      else node.attrs.push({ name: "rel", value: "noopener noreferrer" });
+    }
+  });
+  if (!head) throw new Error("Could not locate document head for security hardening.");
+  const hasCsp = head.childNodes.some(node =>
+    node.tagName === "meta"
+    && node.attrs?.some(attr =>
+      attr.name === "http-equiv" && attr.value.toLowerCase() === "content-security-policy"
+    )
+  );
+  if (hasCsp) return;
+  const security = parseFragment(
+    `<meta http-equiv="Content-Security-Policy" content="${securityPolicy}"><meta name="referrer" content="strict-origin-when-cross-origin"><meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"><script src="${base}/security.js?v=${securityVersion}" defer></script>`
+  ).childNodes;
+  for (const node of security.reverse()) {
+    node.parentNode = head;
+    head.childNodes.unshift(node);
+  }
 }
 
 function nextData(document) {
@@ -277,7 +326,7 @@ for (const record of manifest.files) {
   }
 }
 
-for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
+for (const file of ["workbook.css", "workbook.js", "security.js"]) await copyFile(join(root, "src", file), join(out, file));
 await mkdir(join(out, "assets"), { recursive: true });
 await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
 await writeFavicon();
