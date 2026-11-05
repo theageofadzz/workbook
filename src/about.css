@@ -94,11 +94,11 @@
 .profile-project-logo { object-fit: contain; filter: brightness(0) invert(60%); }
 .profile-link-main a, .profile-craft-links a { min-width: 0; overflow-wrap: anywhere; }
 .profile-more, .profile-detail { flex: none; white-space: nowrap; }
-.profile-experience-list > li { display: grid; grid-template-columns: minmax(0, 1fr) max-content; }
+.profile-experience-list > li { display: grid; grid-template-columns: minmax(0, 1fr) 11ch; }
 .profile-experience-list .profile-link-main { display: grid; grid-template-columns: 16px minmax(0, 1fr); }
 .profile-experience-logo { display: block; object-fit: contain; }
 .profile-experience-name { min-width: 0; overflow-wrap: anywhere; text-decoration: underline dotted #929292; text-underline-offset: 3px; }
-.profile-experience-list .profile-detail { text-align: right; font-variant-numeric: tabular-nums; }
+.profile-experience-list .profile-detail { text-align: left; font-variant-numeric: tabular-nums; }
 .profile-tags { display: flex; flex-wrap: wrap; gap: 4px; color: #626262; }
 .profile-tags > li { display: flex; align-items: center; min-height: 28px; padding: 4px 8px; border-radius: 6px; background: #eaeaea; }
 .profile-divider { margin: 16px 0; border: 0; border-top: 1px dashed #e1e1e1; }
