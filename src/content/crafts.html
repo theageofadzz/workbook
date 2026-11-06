@@ -30,7 +30,7 @@
 
   <dialog class="reading-window" data-reader aria-labelledby="reader-title">
     <div class="reading-toolbar">
-      <span class="reading-window-brand"><img src="{{logo}}" width="22" height="16" alt=""><span>theageofadzz<span class="reading-toolbar-divider">/</span><span data-reader-category>文字</span></span></span>
+      <span class="crafts-category" data-reader-category>文字</span>
       <div class="reading-tools">
         <button class="writing-icon-button" type="button" data-toggle-toc aria-label="文章目录" title="文章目录" aria-expanded="false" aria-controls="reader-toc" hidden>{{icon:list}}</button>
         <div class="reading-font-tools" role="group" aria-label="阅读字号">
@@ -51,7 +51,7 @@
             <p class="reading-article-meta"><time data-reader-date></time><span aria-hidden="true">/</span><span data-reader-minutes></span></p>
             <h2 id="reader-title"></h2>
             <p class="reading-deck" data-reader-subtitle></p>
-            <div class="reading-byline"><img src="{{base}}/assets/cicada-avatar.webp" width="25" height="25" alt=""><span>theageofadzz.</span><span class="reading-original">centurypaw 原文</span></div>
+            <div class="reading-byline"><img src="{{base}}/assets/cicada-avatar.webp" width="25" height="25" alt=""><span>cicada</span><span class="reading-original">centurypaw 原文</span></div>
           </header>
           <div class="reading-body" data-reader-body></div>
           <footer class="reading-end">
@@ -64,7 +64,7 @@
         </article>
       </div>
     </div>
-    <footer class="reading-statusbar"><span data-reader-status role="status" aria-live="polite">centurypaw / 文字存档</span><span data-reader-percent>0%</span></footer>
+    <footer class="reading-statusbar"><span data-reader-status role="status" aria-live="polite">cicada / centurypaw</span><span data-reader-percent>0%</span></footer>
     <progress class="reading-progress" data-reader-progress aria-label="阅读进度" max="100" value="0"></progress>
   </dialog>
   <script type="application/json" id="crafts-content">{{data}}</script>

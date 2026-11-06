@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
 import { writeCraftsPage } from "./crafts.mjs";
-import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets } from "./content-policy.mjs";
+import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets, useStandaloneNavigation } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
@@ -81,6 +81,7 @@ async function brandClientHeader() {
       branded = branded.replace(homeComponent, (_, factory) =>
         `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(homeLogoClasses)}})`
       );
+      branded = useStandaloneNavigation(branded, base);
     }
     if (source.includes("fixed hidden 74:flex")) {
       branded = branded.replace(sidebarComponent, (_, factory) =>

@@ -45,7 +45,7 @@
 ## 作品浏览
 
 - [文章首页](https://theageofadzz.github.io/workbook/)：浏览设计记录、项目回顾与交互实验。
-- [作品](https://theageofadzz.github.io/workbook/crafts/)：保留原有 Crafts 作品墙，centurypaw 文章以 3:4 竖版动态预览呈现，点击后在悬浮窗口阅读。原有的 59 个影像作品仍在同一作品墙中。
+- [作品](https://theageofadzz.github.io/workbook/crafts/)：沿用 Crafts 作品墙风格，仅展示 cicada 在 centurypaw 的文章。新旧文章随机交错，以带鼠标上下浏览效果的 3:4 竖版预览呈现，点击后打开 3:4 阅读卡片。
 - [关于 theageofadzz](https://theageofadzz.github.io/workbook/about/)：了解这个作品集。
 
 ## 文章更新
@@ -59,7 +59,7 @@ npm run check
 npm run dev
 ```
 
-导入需要已登录的 GitHub CLI。文章卡片会缓慢浏览真实的标题、配图和正文，离开视口或打开阅读窗口后暂停动画；系统开启减少动态效果时显示静态预览。阅读窗口提供字号、目录、进度和文章链接，并在当前会话中记住阅读位置。生成后的静态网站位于 `docs/`，预览地址为 `http://127.0.0.1:4173/workbook/`。
+导入需要已登录的 GitHub CLI。文章预览中的鼠标、滚轮和正文同步上下浏览，停顿后回看；离开视口或打开阅读卡片后暂停动画，系统开启减少动态效果时显示静态预览。文章在每次打开页面时随机排列，日期和分类仍显示在卡片下方。3:4 阅读卡片提供字号、目录、进度和文章链接，并在当前会话中记住阅读位置。旧 Crafts 的作品、数据和媒体不再发布。生成后的静态网站位于 `docs/`，预览地址为 `http://127.0.0.1:4173/workbook/`。
 
 ## 内容与署名
 

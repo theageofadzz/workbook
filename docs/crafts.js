@@ -1,6 +1,18 @@
 (() => {
   "use strict";
-  const { articles, gallery } = JSON.parse(document.querySelector("#crafts-content").textContent);
+  const { articles } = JSON.parse(document.querySelector("#crafts-content").textContent);
+  const displayArticles = [...articles];
+  for (let index = displayArticles.length - 1; index > 0; index--) {
+    const other = Math.floor(Math.random() * (index + 1));
+    [displayArticles[index], displayArticles[other]] = [displayArticles[other], displayArticles[index]];
+  }
+  if (displayArticles.length > 2) {
+    const dates = displayArticles.map(article => article.publishedAt);
+    if (dates.every((date, index) => !index || date <= dates[index - 1])
+      || dates.every((date, index) => !index || date >= dates[index - 1])) {
+      [displayArticles[0], displayArticles[1]] = [displayArticles[1], displayArticles[0]];
+    }
+  }
   const bySlug = new Map(articles.map(article => [article.slug, article]));
   const dialog = document.querySelector("[data-reader]");
   const scroll = document.querySelector("[data-reader-scroll]");
@@ -25,71 +37,15 @@
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const previews = new Map();
-  const visibleVideos = new Set();
   function refreshMotion() {
     const playing = !document.hidden && !dialog.open && !reducedMotion.matches;
     for (const state of previews.values()) {
       for (const animation of state.animations || []) {
-        if (reducedMotion.matches) animation.currentTime = state.duration * .08;
+        if (reducedMotion.matches) animation.currentTime = 0;
         if (playing && state.visible) animation.play();
         else animation.pause();
       }
     }
-    document.querySelectorAll("[data-gallery] video").forEach(video => {
-      if (playing && visibleVideos.has(video)) {
-        if (!video.src) video.src = video.dataset.src;
-        video.play().catch(() => {});
-      } else video.pause();
-    });
-  }
-  const galleryViewport = new IntersectionObserver(entries => {
-    for (const { target: video, isIntersecting } of entries) {
-      if (isIntersecting) visibleVideos.add(video);
-      else visibleVideos.delete(video);
-    }
-    refreshMotion();
-  }, { rootMargin: "80px" });
-
-  function initializeGallery() {
-    const container = document.querySelector("[data-gallery]");
-    const fragment = document.createDocumentFragment();
-    for (const item of gallery) {
-      const figure = document.createElement("div");
-      figure.className = "crafts-item";
-      const card = document.createElement("figure");
-      card.className = "crafts-card";
-      const media = document.createElement("div");
-      media.className = "crafts-item-media";
-      media.style.setProperty("--craft-ratio", String(item.aspectRatio || 1));
-      const image = document.createElement("img");
-      image.src = item.posterUrl || item.imageUrl;
-      image.alt = item.title;
-      image.loading = "lazy";
-      image.decoding = "async";
-      media.append(image);
-      if (item.videoUrl) {
-        const video = document.createElement("video");
-        video.dataset.src = item.videoUrl;
-        video.poster = image.src;
-        video.muted = true;
-        video.loop = true;
-        video.playsInline = true;
-        video.preload = "none";
-        video.setAttribute("aria-label", item.title);
-        media.append(video);
-        galleryViewport.observe(video);
-      }
-      const caption = document.createElement("figcaption");
-      caption.append(document.createTextNode(item.title));
-      const time = document.createElement("time");
-      time.dateTime = item.date;
-      time.textContent = item.date;
-      caption.append(time);
-      card.append(media, caption);
-      figure.append(card);
-      fragment.append(figure);
-    }
-    container.append(fragment);
   }
 
   function sizePreview(frame) {
@@ -98,33 +54,44 @@
     const scale = frame.clientWidth / 480;
     if (!scale) return;
     frame.style.setProperty("--preview-scale", scale);
-    frame.style.setProperty("--preview-sheet-height", `${Math.ceil(frame.clientHeight / scale + 160)}px`);
+    frame.style.setProperty("--preview-sheet-height", `${Math.ceil(frame.clientHeight / scale)}px`);
     const distance = Math.max(0, sheet.scrollHeight - frame.clientHeight / scale);
     const signature = `${frame.clientWidth}:${distance}`;
     if (state.signature === signature) return;
     state.signature = signature;
-    const fraction = state.animations?.[0]?.currentTime / state.duration || .06;
+    const fraction = state.animations?.[0]?.currentTime / state.duration || state.phase;
     state.animations?.forEach(animation => animation.cancel());
-    state.duration = Math.min(36000, 13000 + distance * 16);
-    const frames = amount => [
-      { transform: "translateY(0)", opacity: 0, offset: 0 },
-      { transform: "translateY(0)", opacity: 1, offset: .04 },
-      { transform: "translateY(0)", opacity: 1, offset: .14 },
-      { transform: `translateY(${amount}px)`, opacity: 1, offset: .84 },
-      { transform: `translateY(${amount}px)`, opacity: 1, offset: .95 },
-      { transform: `translateY(${amount}px)`, opacity: 0, offset: 1 }
-    ];
+    state.duration = Math.min(32000, 22000 + distance * 8);
+    // The content, scrollbar, pointer and wheel share one forward-and-back reading cycle.
+    const stops = [[0, 0], [.1, 0], [.28, .45], [.36, .45], [.56, 1], [.64, 1], [.8, .35], [.87, .35], [1, 0]];
+    const easing = "cubic-bezier(.25,.65,.35,1)";
+    const frames = amount => stops.map(([offset, progress]) => ({
+      transform: `translateY(${amount * progress}px)`, offset, easing
+    }));
     const timing = { duration: state.duration, iterations: Infinity, easing: "linear" };
+    const pointerStops = [
+      [0, .7, .32], [.1, .72, .36], [.28, .65, .63], [.36, .62, .61],
+      [.56, .73, .74], [.64, .7, .7], [.8, .59, .4], [.87, .62, .38], [1, .7, .32]
+    ];
+    const wheelStops = [[0, 0], [.1, 0], [.19, 3], [.28, 0], [.36, 0], [.46, 3],
+      [.56, 0], [.64, 0], [.72, -3], [.8, 0], [.87, 0], [.94, -3], [1, 0]];
     state.animations = [
       sheet.animate(frames(-distance), timing),
-      frame.querySelector(".preview-scrollbar > span").animate(frames((frame.clientHeight - 24) * .83), timing)
+      frame.querySelector(".preview-scrollbar > span").animate(frames((frame.clientHeight - 24) * .83), timing),
+      frame.querySelector(".preview-cursor").animate(pointerStops.map(([offset, x, y]) => ({
+        transform: `translate(${frame.clientWidth * x}px, ${frame.clientHeight * y}px)`, offset, easing
+      })), timing),
+      frame.querySelector(".preview-wheel > span").animate(wheelStops.map(([offset, y]) => ({
+        transform: `translateY(${y}px)`, offset
+      })), timing)
     ];
     for (const animation of state.animations) animation.currentTime = fraction * state.duration;
     refreshMotion();
   }
   function initializeWall() {
-    initializeGallery();
     const wall = document.querySelector("[data-gallery]");
+    const cards = new Map([...wall.children].map(card => [card.dataset.slug, card]));
+    for (const article of displayArticles) wall.append(cards.get(article.slug));
     const layout = new ResizeObserver(entries => {
       for (const { target: card } of entries) {
         card.parentElement.style.gridRowEnd = `span ${Math.ceil(card.getBoundingClientRect().height) + 12}`;
@@ -142,8 +109,8 @@
     const previewSize = new ResizeObserver(entries => {
       for (const { target } of entries) sizePreview(target.closest(".article-preview"));
     });
-    for (const frame of wall.querySelectorAll(".article-preview")) {
-      previews.set(frame, { visible: false });
+    for (const [index, frame] of [...wall.querySelectorAll(".article-preview")].entries()) {
+      previews.set(frame, { visible: false, phase: index % 3 * .025 });
       sizePreview(frame);
       previewSize.observe(frame);
       previewSize.observe(frame.querySelector(".article-preview-sheet"));
@@ -225,9 +192,9 @@
     }
     tocButton.hidden = article.headings.length < 2;
     showToc(false);
-    status.textContent = "centurypaw / 文字存档";
-    const index = articles.indexOf(article);
-    for (const [button, item] of [[previous, articles[index - 1]], [next, articles[index + 1]]]) {
+    status.textContent = "cicada / centurypaw";
+    const index = displayArticles.indexOf(article);
+    for (const [button, item] of [[previous, displayArticles[index - 1]], [next, displayArticles[index + 1]]]) {
       button.disabled = !item;
       button.querySelector("strong").textContent = item?.title || (button === previous ? "已是第一篇" : "已是最后一篇");
       button.dataset.slug = item?.slug || "";
@@ -316,7 +283,7 @@
       status.textContent = "请从地址栏复制文章链接";
     }
     clearTimeout(shareReset);
-    shareReset = setTimeout(() => { status.textContent = "centurypaw / 文字存档"; }, 2400);
+    shareReset = setTimeout(() => { status.textContent = "cicada / centurypaw"; }, 2400);
   });
   function syncLocation() {
     const url = new URL(location.href);

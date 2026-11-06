@@ -3,7 +3,7 @@ import { join, resolve } from "node:path";
 import { parse } from "parse5";
 import { parse as parseJavaScript } from "acorn";
 import assert from "node:assert/strict";
-import { excludedRoutes, isExcludedRoute } from "./content-policy.mjs";
+import { excludedRoutes, isExcludedRoute, standaloneRoutes } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..", "docs");
 const manifest = JSON.parse(await readFile(join(root, "site-manifest.json"), "utf8"));
@@ -39,16 +39,6 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     }
     if (node.tagName === "script" && node.attrs?.some(attr => attr.name === "id" && attr.value === "crafts-content")) {
       writingData = JSON.parse(node.childNodes.map(child => child.value || "").join(""));
-      for (const item of writingData.gallery) {
-        for (const key of ["imageUrl", "posterUrl", "videoUrl"]) {
-          if (!item[key]) continue;
-          assert(
-            item[key].startsWith(`${manifest.basePath}/`) || /^https?:\/\//.test(item[key]),
-            `Gallery media must work with a trailing slash: ${item[key]}`
-          );
-          if (item[key].startsWith(`${manifest.basePath}/`)) urls.push(item[key]);
-        }
-      }
     }
   }
   visit(document);
@@ -58,7 +48,13 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     assert.equal(writingData.articles.length, imported.articles.length, "Every original essay must be available");
     assert.equal((html.match(/class="article-preview"/g) || []).length, imported.articles.length, "Every essay needs an animated portrait preview");
     assert.match(html, /<h1>Crafts<\/h1>/, "Keep the original Crafts heading");
-    assert.equal(writingData.gallery.length, 59, "The original 59 crafts must remain available");
+    assert.equal(writingData.gallery, undefined, "Only cicada articles should be published");
+    assert.equal((html.match(/class="preview-cursor"/g) || []).length, imported.articles.length, "Every preview needs a browsing cursor");
+    assert(!html.includes("preview-masthead"), "Preview headers should stay removed");
+    assert.deepEqual(await readdir(join(root, "crafts")), ["index.html"], "Legacy crafts media should be removed");
+    for (const build of await readdir(join(root, "_next", "data"))) {
+      await assert.rejects(access(join(root, "_next", "data", build, "crafts.json")), "Legacy gallery data should be removed");
+    }
     const plainText = node => node.nodeName === "#text" ? node.value : (node.childNodes || []).map(plainText).join("");
     for (const article of writingData.articles) {
       const source = parse(await readFile(new URL(`../src/content/writing/${article.sourcePath}`, import.meta.url), "utf8"));
@@ -92,7 +88,7 @@ for (const build of await readdir(join(root, "_next", "static"))) {
   if (build === "chunks") continue;
   for (const file of ["_buildManifest.js", "_ssgManifest.js"]) {
     const registry = await readFile(join(root, "_next", "static", build, file), "utf8");
-    for (const route of excludedRoutes) {
+    for (const route of [...excludedRoutes, ...standaloneRoutes]) {
       assert(!registry.includes(route) && !registry.includes(route.replace("/", "\\u002F")), `Excluded route ${route} still registered in ${file}`);
     }
   }
@@ -148,6 +144,10 @@ assert(
 assert(
   brandedChunkSources.some(source => source.includes('"data-role":"footer-item"') && source.includes('className:"size-1/2 workbook-home-logo"')),
   "Expected the React navigation to render the personal home logo during hydration"
+);
+assert(
+  brandedChunkSources.some(source => /==="\/crafts"\?"a":/.test(source)),
+  "Expected works navigation to load the standalone page without prefetching retired Next data"
 );
 for (const page of [...manifest.pages.map(page => page.file), "about/index.html", "404.html"]) {
   const document = parse(await readFile(join(root, page), "utf8"));

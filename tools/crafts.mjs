@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { parseFragment, serialize } from "parse5";
@@ -48,7 +48,6 @@ async function articleBody(path) {
 }
 
 export async function writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc }) {
-  const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
   const contentRoot = join(root, "src", "content", "writing");
   const snapshot = JSON.parse(await readFile(join(contentRoot, "manifest.json"), "utf8"));
   const articles = [];
@@ -56,28 +55,14 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     const { plainText, ...body } = await articleBody(join(contentRoot, entry.sourcePath));
     articles.push({ ...entry, ...body, searchText: `${entry.title} ${entry.category} ${plainText}` });
   }
-  // Append the complete original gallery after the new article previews.
-  let gallery;
-  let galleryDataPath;
-  let galleryData;
+  // Retire the old gallery data and media even when building from checked-in docs.
   for (const build of await readdir(join(out, "_next", "data"))) {
-    try {
-      galleryDataPath = join(out, "_next", "data", build, "crafts.json");
-      galleryData = JSON.parse(await readFile(galleryDataPath, "utf8"));
-      gallery = galleryData.pageProps.dataSource;
-      break;
-    } catch (error) { if (error.code !== "ENOENT") throw error; }
+    await rm(join(out, "_next", "data", build, "crafts.json"), { force: true });
   }
-  if (!gallery?.length) throw new Error("The original crafts archive must remain available.");
-  for (const item of gallery) {
-    for (const key of ["imageUrl", "posterUrl", "videoUrl"]) {
-      if (!item[key] || /^(?:https?:)?\//.test(item[key])) continue;
-      item[key] = key === "videoUrl"
-        ? new URL(item[key], `${config.source}/`).href
-        : `${base}/${item[key]}`;
-    }
+  await mkdir(join(out, "crafts"), { recursive: true });
+  for (const entry of await readdir(join(out, "crafts"), { withFileTypes: true })) {
+    if (entry.isDirectory()) await rm(join(out, "crafts", entry.name), { recursive: true });
   }
-  await writeFile(galleryDataPath, JSON.stringify(galleryData));
   const css = await readFile(join(root, "src", "crafts.css"), "utf8");
   const js = await readFile(join(root, "src", "crafts.js"), "utf8");
   const hash = source => createHash("sha256").update(source).digest("hex").slice(0, 8);
@@ -115,11 +100,12 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
               </div>
             </div>
             <span class="preview-scrollbar"><span></span></span>
+            <span class="preview-cursor">{{icon:mouse-pointer-2}}<span class="preview-wheel"><span></span></span></span>
           </div>
           <div class="crafts-caption"><h2>${escape(article.title)}</h2><div class="crafts-caption-meta"><time datetime="${article.publishedAt}">${article.publishedAt}</time><span class="crafts-category">${escape(article.category)}</span></div></div>
         </a>
       </article>`).join(""),
-    data: JSON.stringify({ articles, gallery }).replaceAll("<", "\\u003c")
+    data: JSON.stringify({ articles }).replaceAll("<", "\\u003c")
   };
   let html = await readFile(join(root, "src", "content", "crafts.html"), "utf8");
   for (const [name, value] of Object.entries(replacements)) html = html.replaceAll(`{{${name}}}`, value);
@@ -136,5 +122,5 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
   await writeFile(join(out, "crafts", "index.html"), html.replace(/^[ \t]+$/gm, ""));
   await writeFile(join(out, "crafts.css"), css);
   await writeFile(join(out, "crafts.js"), js);
-  console.log(`Published ${articles.length} original essays and retained ${gallery.length} crafts.`);
+  console.log(`Published ${articles.length} cicada essays; removed the legacy crafts gallery.`);
 }

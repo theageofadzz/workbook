@@ -12,9 +12,15 @@ export const excludedRoutes = [
   "/conic-gradient"
 ];
 const excludedSlugs = new Set(excludedRoutes.map(route => route.slice(1)));
+export const standaloneRoutes = ["/crafts"];
 
 export function isExcludedRoute(route) {
   return excludedSlugs.has(route.replace(/^\/+/, "").split(/[/?#]/)[0]);
+}
+
+export function isRetiredClientRoute(route) {
+  return isExcludedRoute(route)
+    || standaloneRoutes.some(path => route === path || route.startsWith(`${path}/`));
 }
 
 const attr = (node, name) => node.attrs?.find(item => item.name === name)?.value;
@@ -36,14 +42,37 @@ function removeNode(node) {
   if (index >= 0) siblings.splice(index, 1);
 }
 
-// Remove complete cover components and route registrations, including archived chunks.
+export function useStandaloneNavigation(source, base) {
+  if (!source.includes('"data-role":"footer-item"')) return source;
+  const edits = [];
+  walkJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
+    if (node.type !== "CallExpression" || node.arguments.length < 2) return;
+    const props = node.arguments[1];
+    if (props.type !== "ObjectExpression"
+      || !props.properties.some(property => property.key?.value === "data-role" && property.value?.value === "footer-item")) return;
+    const href = props.properties.find(property => property.key?.name === "href")?.value;
+    if (href?.type !== "Identifier") return;
+    const condition = standaloneRoutes.map(route => `${href.name}===${JSON.stringify(route)}`).join("||");
+    const component = node.arguments[0];
+    edits.push(
+      { start: component.start, end: component.end, value: `${condition}?"a":${source.slice(component.start, component.end)}` },
+      { start: href.start, end: href.end, value: `${condition}?${JSON.stringify(base)}+${href.name}+"/":${href.name}` }
+    );
+  });
+  for (const edit of edits.sort((a, b) => b.start - a.start)) {
+    source = source.slice(0, edit.start) + edit.value + source.slice(edit.end);
+  }
+  return source;
+}
+
+// Standalone pages keep their HTML but retire the previous Next route and data.
 function pruneJavaScript(source, collectRemoved) {
   const original = source;
   const edits = [];
   walkJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
     if (node.type === "ArrayExpression") {
       const keep = node.elements.filter(element => {
-        if (element?.type === "Literal") return !(typeof element.value === "string" && element.value.startsWith("/") && isExcludedRoute(element.value));
+        if (element?.type === "Literal") return !(typeof element.value === "string" && element.value.startsWith("/") && isRetiredClientRoute(element.value));
         const slug = element?.properties?.find(property => property.key?.name === "slug");
         return !excludedSlugs.has(slug?.value.value);
       });
@@ -58,7 +87,7 @@ function pruneJavaScript(source, collectRemoved) {
     if (node.type === "ObjectExpression") {
       const keep = node.properties.filter(property => {
         const key = property.key?.value;
-        return !(typeof key === "string" && key.startsWith("/") && isExcludedRoute(key));
+        return !(typeof key === "string" && key.startsWith("/") && isRetiredClientRoute(key));
       });
       if (keep.length !== node.properties.length) {
         edits.push({ start: node.start, end: node.end, value: `{${keep.map(property => source.slice(property.start, property.end)).join(",")}}` });
@@ -152,7 +181,8 @@ export async function pruneExcludedContent({ out, base, url, retiredContent = []
   }
 
   const staticRoot = join(out, "_next", "static");
-  const galleryChunks = new Set();
+  const retiredChunks = new Set();
+  const retainedChunks = new Set();
   for (const file of await readdir(staticRoot)) {
     if (file === "chunks") continue;
     const path = join(staticRoot, file, "_buildManifest.js");
@@ -161,19 +191,16 @@ export async function pruneExcludedContent({ out, base, url, retiredContent = []
     walkJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
       if (node.type !== "ObjectExpression") return;
       const registry = node.properties.filter(property => String(property.key?.value || "").startsWith("/"));
-      if (!registry.some(property => isExcludedRoute(property.key.value))) return;
-      const retained = new Set();
-      const removed = new Set();
       for (const property of registry) {
         walkJavaScript(property.value, value => {
           if (value.type === "Literal" && typeof value.value === "string" && value.value.startsWith("static/chunks/")) {
-            (isExcludedRoute(property.key.value) ? removed : retained).add(value.value);
+            (isRetiredClientRoute(property.key.value) ? retiredChunks : retainedChunks).add(value.value);
           }
         });
       }
-      for (const chunk of removed) if (!retained.has(chunk)) galleryChunks.add(chunk);
     });
   }
+  const galleryChunks = new Set([...retiredChunks].filter(chunk => !retainedChunks.has(chunk)));
   for (const chunk of galleryChunks) await rm(join(out, "_next", chunk), { force: true });
 
   let changedChunks = 0;

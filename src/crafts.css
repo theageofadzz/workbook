@@ -24,13 +24,13 @@ html.reading-open { overflow: hidden; }
 .writing-page [hidden] { display: none !important; }
 .writing-page :is(button, a, input):focus-visible { outline: 2px solid #777; outline-offset: 5px; }
 .writing-page svg { display: block; width: 18px; height: 18px; stroke-width: 1.5; flex: none; }
-.writing-dock img, .reading-window-brand img { display: block; object-fit: contain; filter: brightness(0); }
+.writing-dock img { display: block; object-fit: contain; filter: brightness(0); }
 .writing-main { max-width: 1440px; margin: 0 auto; padding: 0 64px 120px; }
 .writing-heading { margin: 160px 0 72px; text-align: center; }
 .writing-heading h1 { margin: 0; font: 600 48px/1.1 Georgia, "Songti SC", serif; color: #080808; }
 .crafts-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 12px; }
 .crafts-gallery.is-masonry { grid-auto-rows: 1px; row-gap: 0; }
-.writing-entry, .crafts-item { min-width: 0; margin: 0; }
+.writing-entry { min-width: 0; margin: 0; }
 .crafts-card { display: block; margin: 0; padding: 4px; border: 1px solid #dedede; border-radius: 7px; overflow: hidden; }
 .writing-link { transition: border-color 160ms; }
 .writing-link:hover { border-color: #bcbcbc; }
@@ -42,14 +42,18 @@ html.reading-open { overflow: hidden; }
 .preview-title { margin: 0 0 18px; color: #222; font: 500 34px/1.45 "Songti SC", STSong, Georgia, serif; overflow-wrap: anywhere; }
 .preview-subtitle { margin: 0 0 28px; color: #999; font-size: 13px; line-height: 1.9; }
 .preview-cover { display: block; width: 100%; height: auto; max-height: 360px; margin-bottom: 30px; object-fit: contain; }
-.preview-body { padding-top: 24px; border-top: 1px solid #ededed; color: #626262; font: 15px/2.15 "PingFang SC", "Microsoft YaHei", sans-serif; overflow-wrap: anywhere; }
+.preview-body { padding-top: 24px; border-top: 1px solid #ededed; color: #626262; font: 17px/2.25 "PingFang SC", "Microsoft YaHei", sans-serif; overflow-wrap: anywhere; }
 .preview-body p { margin: 0 0 25px; }
 .preview-end { padding: 40px 0 20px; color: #aaa; text-align: center; font: 18px/1 Georgia, serif; }
 .preview-scrollbar { position: absolute; top: 12px; right: 4px; bottom: 12px; width: 2px; border-radius: 2px; background: #f4f4f4; }
 .preview-scrollbar > span { display: block; width: 100%; height: 17%; border-radius: inherit; background: #cfcfcf; }
+.preview-cursor { position: absolute; z-index: 1; top: 0; left: 0; width: 24px; height: 30px; color: #282828; pointer-events: none; filter: drop-shadow(0 1px 2px #00000030); will-change: transform; }
+.writing-page .preview-cursor > svg { width: 21px; height: 24px; fill: #303030; stroke: #fff; stroke-width: 1.4; }
+.preview-wheel { position: absolute; top: 13px; left: 17px; display: grid; place-items: center; width: 10px; height: 17px; border: 1px solid #b7b7b7; border-radius: 6px; background: #fffffff0; }
+.preview-wheel > span { width: 2px; height: 5px; border-radius: 2px; background: #555; }
 .crafts-caption { padding: 7px 6px 6px; }
-.crafts-caption h2, .crafts-item figcaption { margin: 0; color: #222; font: 400 12px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; overflow-wrap: anywhere; }
-.crafts-caption time, .crafts-item time { display: block; margin-top: 2px; color: #777; font-size: 12px; line-height: 1.5; }
+.crafts-caption h2 { margin: 0; color: #222; font: 400 12px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; overflow-wrap: anywhere; }
+.crafts-caption time { display: block; margin-top: 2px; color: #777; font-size: 12px; line-height: 1.5; }
 .crafts-caption-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
 .crafts-caption-meta time { flex: none; margin: 0; }
 .crafts-category { display: inline-flex; align-items: center; flex: none; min-height: 19px; padding: 0 7px; border: 1px solid #ddd; border-radius: 999px; color: #777; background: #f3f3f3; font-size: 10px; line-height: 1.6; white-space: nowrap; }
@@ -67,8 +71,9 @@ html.reading-open { overflow: hidden; }
 .reading-window {
   --reading-size: 17px;
   position: fixed;
-  width: min(960px, calc(100% - 96px));
-  height: min(860px, calc(100dvh - 80px));
+  width: min(540px, calc(100vw - 32px), calc((100dvh - 48px) * .75));
+  height: auto;
+  aspect-ratio: 3 / 4;
   max-width: none;
   max-height: none;
   margin: auto;
@@ -82,19 +87,18 @@ html.reading-open { overflow: hidden; }
 }
 .reading-window[open] { display: flex; flex-direction: column; }
 .reading-window::backdrop { background: #3939392e; backdrop-filter: blur(5px); }
-.reading-toolbar { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 58px; padding: 10px 20px; border-bottom: 1px solid #e5e5e5; background: #fafafae6; }
-.reading-window-brand { display: inline-flex; align-items: center; gap: 11px; color: #777; font-size: 11px; white-space: nowrap; }
-.reading-toolbar-divider { margin: 0 11px; color: #b5b5b5; }
+.reading-toolbar { position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; flex: none; min-height: 48px; padding: 7px 12px; border-bottom: 1px solid #e5e5e5; background: #fafafae6; }
 .reading-tools, .reading-font-tools { display: flex; align-items: center; gap: 4px; }
+.reading-tools { margin-left: auto; }
 .reading-font-value { min-width: 17px; text-align: center; color: #888; font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .reading-toolbar-rule { width: 1px; height: 16px; margin: 0 7px; background: #ddd; }
 .reading-layout { position: relative; display: flex; flex: 1; min-height: 0; }
 .reading-scroll { flex: 1; min-width: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c8c8c8 transparent; outline: none; }
-.reading-article { max-width: 746px; margin: 0 auto; padding: 58px 56px 40px; }
-.reading-article-meta { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 19px; color: #929292; font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
-.reading-header h2 { margin: 0 0 19px; font: 500 36px/1.5 "Songti SC", STSong, Georgia, serif; overflow-wrap: anywhere; }
+.reading-article { margin: 0 auto; padding: 32px 34px 28px; }
+.reading-article-meta { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 16px; color: #929292; font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.reading-header h2 { margin: 0 0 15px; font: 500 29px/1.5 "Songti SC", STSong, Georgia, serif; overflow-wrap: anywhere; }
 .reading-deck { margin: 0; color: #999; font-size: 13px; line-height: 1.9; }
-.reading-byline { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 25px 0 37px; padding-bottom: 28px; border-bottom: 1px solid #e1e1e1; color: #777; font-size: 10px; }
+.reading-byline { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 20px 0 25px; padding-bottom: 20px; border-bottom: 1px solid #e1e1e1; color: #777; font-size: 10px; }
 .reading-byline img { object-fit: cover; border-radius: 50%; opacity: .9; }
 .reading-original { margin-left: auto; color: #999; }
 .reading-body { color: #4c4c4c; font: 400 var(--reading-size)/2 "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif; overflow-wrap: anywhere; }
@@ -117,7 +121,7 @@ html.reading-open { overflow: hidden; }
 .reading-pagination button:last-child > span { justify-content: flex-end; }
 .reading-pagination svg { width: 13px; height: 13px; }
 .reading-pagination strong { display: block; margin-top: 10px; color: #666; font: 500 14px/1.6 "Songti SC", Georgia, serif; overflow-wrap: anywhere; }
-.reading-statusbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 34px; padding: 7px 22px; border-top: 1px solid #e7e7e7; color: #a0a0a0; background: #fafafa; font: 9px/1.6 ui-monospace, SFMono-Regular, Menlo, "PingFang SC", monospace; }
+.reading-statusbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex: none; min-height: 28px; padding: 5px 15px; border-top: 1px solid #e7e7e7; color: #a0a0a0; background: #fafafa; font: 9px/1.6 ui-monospace, SFMono-Regular, Menlo, "PingFang SC", monospace; }
 .reading-progress { appearance: none; display: block; width: 100%; height: 2px; flex: none; border: 0; background: #ededed; color: #7c7c7c; }
 .reading-progress::-webkit-progress-bar { background: #ededed; }
 .reading-progress::-webkit-progress-value { background: #7c7c7c; }
@@ -127,47 +131,40 @@ html.reading-open { overflow: hidden; }
 .reading-toc a { display: block; padding: 7px 8px; color: #656565; font-size: 12px; line-height: 1.6; }
 .reading-toc a:hover { background: #f1f1f1; }
 .reading-toc a[data-level="h3"] { padding-left: 20px; color: #999; font-size: 11px; }
-.crafts-item-media { position: relative; aspect-ratio: var(--craft-ratio); overflow: hidden; border-radius: 3px; background: #eee; }
-.crafts-item-media :is(img, video) { display: block; width: 100%; height: 100%; object-fit: cover; }
-.crafts-item-media video { position: absolute; inset: 0; }
-.crafts-item figcaption { padding: 7px 6px 6px; }
 @media (max-width: 767px) {
   .writing-main { padding-right: 16px; padding-left: 16px; }
   .writing-heading { margin: 96px 0 48px; }
   .writing-heading h1 { font-size: 40px; }
   .crafts-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .reading-window { width: calc(100% - 28px); height: calc(100dvh - 40px); }
-  .reading-article { padding: 40px 35px 30px; }
-  .reading-toolbar { padding: 9px 13px; }
-  .reading-window-brand { gap: 8px; font-size: 10px; }
-  .reading-window-brand > span > span { display: none; }
-  .reading-tools { gap: 1px; }
-  .reading-toolbar-rule { margin: 0 3px; }
 }
 @media (max-width: 540px) {
   .writing-main { padding-right: 12px; padding-left: 12px; }
   .crafts-gallery { column-gap: 10px; }
-  .crafts-caption h2, .crafts-item figcaption { font-size: 11px; }
-  .crafts-caption time, .crafts-item time { font-size: 10px; }
+  .crafts-caption h2 { font-size: 11px; }
+  .crafts-caption time { font-size: 10px; }
   .crafts-caption-meta { gap: 5px; }
   .crafts-caption-meta time { font-size: 9px; }
   .crafts-category { min-height: 17px; padding: 0 4px; font-size: 9px; }
   .writing-dock { bottom: max(20px, env(safe-area-inset-bottom)); gap: 7px; padding: 7px; }
-  .reading-window { width: calc(100% - 16px); height: calc(100dvh - 24px); border-radius: 7px; }
-  .reading-toolbar { gap: 3px; min-height: 54px; padding: 8px 8px 8px 13px; }
-  .reading-window-brand > span { display: none; }
-  .reading-tools { gap: 0; }
-  .reading-toolbar-rule { margin: 0 5px; }
-  .reading-article { padding: 31px 24px 30px; }
-  .reading-header h2 { font-size: 29px; line-height: 1.55; }
+  .reading-window { border-radius: 7px; }
+  .reading-article { padding: 24px 22px; }
+  .reading-header h2 { font-size: 25px; line-height: 1.5; }
   .reading-deck { font-size: 12px; }
-  .reading-byline { margin: 23px 0 29px; padding-bottom: 24px; }
+  .reading-byline { margin: 17px 0 22px; padding-bottom: 18px; }
   .reading-body { line-height: 1.95; }
   .reading-body h2 { font-size: 23px; }
   .reading-body h3 { font-size: 19px; }
   .reading-original { font-size: 9px; }
   .reading-statusbar { padding-right: 15px; padding-left: 15px; }
 }
+@media (max-width: 540px), (max-height: 460px) {
+  .reading-toolbar { gap: 3px; min-height: 44px; padding: 6px 8px; }
+  .reading-toolbar .writing-icon-button { width: 28px; height: 28px; }
+  .reading-font-tools { gap: 1px; }
+  .reading-tools { gap: 0; }
+  .reading-toolbar-rule { margin: 0 4px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .writing-page *, .writing-page *::before, .writing-page *::after { scroll-behavior: auto !important; transition: none !important; }
+  .preview-cursor { visibility: hidden; }
 }
