@@ -50,7 +50,8 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     assert.match(html, /<h1>Crafts<\/h1>/, "Keep the original Crafts heading");
     assert.equal(writingData.gallery, undefined, "Only cicada articles should be published");
     assert.equal((html.match(/class="preview-cursor"/g) || []).length, imported.articles.length, "Every preview needs a browsing cursor");
-    assert.equal((html.match(/class="preview-cursor-label">cicada/g) || []).length, imported.articles.length, "Every cursor should display the complete cicada name");
+    assert.equal((html.match(/class="cicada-pointer"/g) || []).length, imported.articles.length, "Every preview should use the shared cicada pointer");
+    assert(!html.includes("preview-wheel"), "Use the reference pointer without a wheel badge");
     assert(!html.includes("preview-masthead"), "Preview headers should stay removed");
     assert.deepEqual(await readdir(join(root, "crafts")), ["index.html"], "Legacy crafts media should be removed");
     for (const build of await readdir(join(root, "_next", "data"))) {
@@ -122,6 +123,9 @@ await access(join(root, "assets", "intensea-favicon.png"));
 const favicon = await readFile(join(root, "assets", "intensea-favicon.png"));
 assert.equal(favicon.readUInt32BE(16), 64, "Expected a 64px favicon");
 assert.equal(favicon.readUInt32BE(20), 64, "Expected a square favicon");
+await access(join(root, "assets", "cicada-cursor.svg"));
+const cursor = await readFile(join(root, "assets", "cicada-cursor.png"));
+assert(cursor.readUInt32BE(16) <= 128 && cursor.readUInt32BE(20) <= 128, "Native cursor must fit browser size limits");
 assert(
   await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('config.browserTitle || "workbook of theageofadzz"')),
   "Expected client-side navigation to keep the requested browser title"
@@ -152,6 +156,7 @@ assert(
 );
 for (const page of [...manifest.pages.map(page => page.file), "about/index.html", "404.html"]) {
   const document = parse(await readFile(join(root, page), "utf8"));
+  assert.match(await readFile(join(root, page), "utf8"), /href="\/workbook\/cursor\.css\?v=[a-f0-9]{8}"/, `Expected the shared cursor on ${page}`);
   let title = "";
   let icon;
   let homeLink;

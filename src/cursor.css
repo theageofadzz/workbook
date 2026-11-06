@@ -1,0 +1,12 @@
+.cicada-pointer {
+  display: block;
+  width: 72px;
+  aspect-ratio: 22 / 15;
+  background: url("./assets/cicada-cursor.svg") left top / 100% 100% no-repeat;
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  html, html *, html *::before, html *::after, dialog::backdrop {
+    cursor: url("./assets/cicada-cursor.png") 5 5, auto !important;
+  }
+}

@@ -2,6 +2,7 @@ import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promi
 import { join } from "node:path";
 import { parse, parseFragment, serialize } from "parse5";
 import { parse as parseJavaScript } from "acorn";
+import { cursorMarkup } from "./cursor.mjs";
 
 function walk(node, visit) {
   visit(node);
@@ -170,14 +171,17 @@ async function personalizeArticle({
   sourceSlug
 }) {
   const frontmatter = JSON.parse(await readFile(join(contentRoot, `${name}.json`), "utf8"));
-  const coverHTML = (await readFile(join(contentRoot, `${coverName}.html`), "utf8")).replaceAll("{{base}}", base).trim();
+  const coverHTML = (await readFile(join(contentRoot, `${coverName}.html`), "utf8"))
+    .replaceAll("{{base}}", base).replaceAll("{{cursor}}", cursorMarkup).trim();
   const articleCoverHTML = (await readFile(join(contentRoot, `${articleCoverName}.html`), "utf8"))
     .replaceAll("{{base}}", base)
+    .replaceAll("{{cursor}}", cursorMarkup)
     .trim();
   const cover = parseFragment(coverHTML).childNodes[0];
   let articleHTML = (await readFile(join(contentRoot, `${name}.html`), "utf8"))
     .replaceAll("{{base}}", base)
     .replaceAll("{{logoStudy}}", logoStudy)
+    .replaceAll("{{cursor}}", cursorMarkup)
     .replaceAll("{{description}}", frontmatter.description)
     .replaceAll("{{cover}}", articleCoverHTML).trim();
   for (const [, icon] of articleHTML.matchAll(/\{\{icon:([a-z-]+)\}\}/g)) {

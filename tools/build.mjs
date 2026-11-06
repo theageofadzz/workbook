@@ -6,6 +6,7 @@ import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
 import { writeCraftsPage } from "./crafts.mjs";
+import { writeCursorAssets } from "./cursor.mjs";
 import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets, useStandaloneNavigation } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
@@ -17,6 +18,7 @@ const assetVersion = async file => createHash("sha256")
 const cssVersion = await assetVersion("workbook.css");
 const jsVersion = await assetVersion("workbook.js");
 const securityVersion = await assetVersion("security.js");
+const cursorVersion = await assetVersion("cursor.css");
 const source = new URL(config.source);
 const base = config.basePath;
 const cache = join(root, ".cache", "reference");
@@ -46,6 +48,9 @@ const securityPolicy = [
   "frame-ancestors 'none'",
   "upgrade-insecure-requests"
 ].join("; ");
+
+await mkdir(join(out, "assets"), { recursive: true });
+await writeCursorAssets({ root, out });
 
 async function writeFavicon() {
   const logo = join(root, "src", "assets", "intensea-logo.png");
@@ -173,6 +178,9 @@ async function refreshRuntimeLinks(files) {
         }
       }
       for (const attr of node.attrs || []) {
+        if (attr.name === "href" && /\/cursor\.css(?:\?|$)/.test(attr.value)) {
+          attr.value = `${base}/cursor.css?v=${cursorVersion}`;
+        }
         if (attr.name === "href" && /\/workbook\.css(?:\?|$)/.test(attr.value)) {
           attr.value = `${base}/workbook.css?v=${cssVersion}`;
         }
@@ -188,6 +196,17 @@ async function refreshRuntimeLinks(files) {
       icon.parentNode = head;
       head.childNodes.push(icon);
     }
+    let head;
+    let hasCursorStyle = false;
+    walk(document, node => {
+      if (node.tagName === "head") head = node;
+      if (node.tagName === "link" && node.attrs?.some(attr => attr.name === "href" && attr.value.includes("/cursor.css?"))) hasCursorStyle = true;
+    });
+    if (!hasCursorStyle) {
+      const style = parseFragment(`<link rel="stylesheet" href="${base}/cursor.css?v=${cursorVersion}">`).childNodes[0];
+      style.parentNode = head;
+      head.childNodes.push(style);
+    }
     hardenDocument(document);
     await writeFile(path, serialize(document));
   }
@@ -199,7 +218,7 @@ try {
 } catch {
   // Checked-in docs are a complete, ready-to-publish static build.
   await accessBuild();
-  for (const file of ["workbook.css", "workbook.js", "security.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
+  for (const file of ["workbook.css", "workbook.js", "security.js", "cursor.css", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
@@ -352,7 +371,7 @@ for (const record of manifest.files) {
   }
 }
 
-for (const file of ["workbook.css", "workbook.js", "security.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
+for (const file of ["workbook.css", "workbook.js", "security.js", "cursor.css", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
 await mkdir(join(out, "assets"), { recursive: true });
 await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
 await writeFavicon();

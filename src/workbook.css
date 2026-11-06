@@ -213,36 +213,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .portfolio-tv-scrollbar { position: absolute; top: 6px; right: 3px; bottom: 6px; width: 2px; }
 .portfolio-tv-scrollbar > span { display: block; width: 2px; height: 28%; border-radius: 2px; background: #d4d4d4; animation: portfolio-tv-scrollbar var(--tv-cycle) ease-in-out infinite; }
 .portfolio-tv-cursor { position: absolute; z-index: 2; top: 0; left: 0; width: 100%; height: 100%; transform-origin: 0 0; pointer-events: none; animation: portfolio-tv-cursor var(--tv-cycle) ease-in-out infinite; }
-.portfolio-tv-cursor > svg, .icon-browser-cursor > svg {
-  display: block;
-  width: 16px;
-  height: 17px;
-  overflow: visible;
-  filter: drop-shadow(0 1px 3px #00000059);
-}
-.portfolio-computer .portfolio-tv-cursor > svg { display: none; }
-.portfolio-computer .portfolio-tv-cursor::before {
-  content: "";
-  display: block;
-  width: 13px;
-  height: 16px;
-  clip-path: polygon(0 0, 100% 68%, 59% 72%, 43% 100%);
-  background: #fff;
-  filter: drop-shadow(0 1px 2px #00000059);
-}
-.portfolio-tv-cursor > span, .icon-browser-cursor > span {
-  position: absolute;
-  left: 14px;
-  top: 14px;
-  width: max-content;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: #000;
-  box-shadow: 0 1px 3px #0000001f;
-  color: #fff;
-  font: 550 11px/16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  white-space: nowrap;
-}
+.portfolio-tv-cursor > .cicada-pointer { width: 48px; }
 .portfolio-tv-chin { display: flex; align-items: center; justify-content: center; height: 18px; color: #a3a3a3; font: 4.5px/1 Weixin, sans-serif; }
 .portfolio-tv-chin > i { position: absolute; right: 14px; width: 3px; height: 3px; border-radius: 50%; background: #b5b5b5; }
 .portfolio-tv-neck { position: relative; z-index: 0; width: 15%; height: 18px; margin: -1px auto 0; background: #dedede; box-shadow: 0 3px 5px #0000000a inset; }
@@ -367,7 +338,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   84% { opacity: 1; transform: translate(0, 0) scale(1); }
 }
 @keyframes icon-browser-pointer {
-  0%, 5%, 94%, 100% { transform: translate(78%, 66%); }
+  0%, 5%, 94%, 100% { transform: translate(min(78%, calc(100% - 80px)), 66%); }
   14%, 20% { transform: translate(54%, 36%); }
   28%, 31% { transform: translate(29%, 46%); }
   42%, 45% { transform: translate(10%, 13%); }
@@ -505,17 +476,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   transform-origin: 0 0;
   animation: gamestation-cursor var(--game-cycle) ease-in-out infinite;
 }
-.gamestation-screen-cursor > svg { position: absolute; top: 0; left: 0; width: 13px; height: 14px; filter: drop-shadow(0 1px 1px #00000040); }
-.gamestation-cursor-name {
-  position: absolute;
-  top: 13px;
-  left: 12px;
-  padding: 1px 4px;
-  border-radius: 3px;
-  background: #262626;
-  color: white;
-  font: 6px/1.6 sans-serif;
-}
+.gamestation-screen-cursor > .cicada-pointer { width: 42px; }
 .gamestation-click-ring {
   position: absolute;
   top: -8px;
@@ -554,8 +515,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   14%, 38% { transform: translate(66%, 60%); }
   50%, 56%, 62% { transform: translate(39%, 69%); }
   56.5% { transform: translate(39%, 69%) scale(.86); }
-  72%, 82%, 86% { transform: translate(95.8%, 6.9%); }
-  82.5% { transform: translate(95.8%, 6.9%) scale(.86); }
+  72%, 82%, 86% { transform: translate(calc(100% - 46px), 6.9%); }
+  82.5% { transform: translate(calc(100% - 46px), 6.9%) scale(.86); }
   94% { transform: translate(72%, 70%); }
 }
 @keyframes gamestation-click {
@@ -593,8 +554,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   .gamestation-monitor { border-radius: 12px; }
   .gamestation-browser-bar { height: 18px; padding: 0 7px; gap: 6px; }
   .gamestation-browser-address { font-size: 6px; }
-  .gamestation-screen-cursor > svg { width: 10px; height: 11px; }
-  .gamestation-cursor-name { top: 10px; left: 9px; font-size: 5px; }
   .portfolio-tv { width: 76%; }
   .portfolio-computer { width: 82%; }
   .portfolio-computer-shell { padding: 5px 5px 0; }

@@ -63,7 +63,7 @@
     const fraction = state.animations?.[0]?.currentTime / state.duration || state.phase;
     state.animations?.forEach(animation => animation.cancel());
     state.duration = Math.min(32000, 22000 + distance * 8);
-    // The content, scrollbar, pointer and wheel share one forward-and-back reading cycle.
+    // The content, scrollbar and pointer share one forward-and-back reading cycle.
     const stops = [[0, 0], [.1, 0], [.28, .45], [.36, .45], [.56, 1], [.64, 1], [.8, .35], [.87, .35], [1, 0]];
     const easing = "cubic-bezier(.25,.65,.35,1)";
     const frames = amount => stops.map(([offset, progress]) => ({
@@ -77,16 +77,11 @@
     const cursorInset = 10;
     const cursorTravelX = Math.max(0, frame.clientWidth - cursor.offsetWidth - cursorInset * 2);
     const cursorTravelY = Math.max(0, frame.clientHeight - cursor.offsetHeight - cursorInset * 2);
-    const wheelStops = [[0, 0], [.1, 0], [.19, 3], [.28, 0], [.36, 0], [.46, 3],
-      [.56, 0], [.64, 0], [.72, -3], [.8, 0], [.87, 0], [.94, -3], [1, 0]];
     state.animations = [
       sheet.animate(frames(-distance), timing),
       frame.querySelector(".preview-scrollbar > span").animate(frames((frame.clientHeight - 24) * .83), timing),
       cursor.animate(pointerStops.map(([offset, x, y]) => ({
         transform: `translate(${cursorInset + cursorTravelX * x}px, ${cursorInset + cursorTravelY * y}px)`, offset, easing
-      })), timing),
-      frame.querySelector(".preview-wheel > span").animate(wheelStops.map(([offset, y]) => ({
-        transform: `translateY(${y}px)`, offset
       })), timing)
     ];
     for (const animation of state.animations) animation.currentTime = fraction * state.duration;
