@@ -104,7 +104,6 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
           <div class="article-preview" aria-hidden="true">
             <div class="article-preview-canvas">
               <div class="article-preview-sheet">
-                <div class="preview-masthead"><img src="${logoSrc}" width="23" height="16" alt=""><span>theageofadzz.</span><span>${escape(article.category)}</span></div>
                 <div class="preview-article">
                   <p class="preview-date">${article.publishedAt.replaceAll("-", ".")}</p>
                   <div class="preview-title">${escape(article.title)}</div>
@@ -117,7 +116,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
             </div>
             <span class="preview-scrollbar"><span></span></span>
           </div>
-          <div class="crafts-caption"><h2>${escape(article.title)}</h2><time datetime="${article.publishedAt}">${article.publishedAt}</time></div>
+          <div class="crafts-caption"><h2>${escape(article.title)}</h2><div class="crafts-caption-meta"><time datetime="${article.publishedAt}">${article.publishedAt}</time><span class="crafts-category">${escape(article.category)}</span></div></div>
         </a>
       </article>`).join(""),
     data: JSON.stringify({ articles, gallery }).replaceAll("<", "\\u003c")

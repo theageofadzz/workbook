@@ -37,9 +37,6 @@ html.reading-open { overflow: hidden; }
 .article-preview { position: relative; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 4px; background: #fff; }
 .article-preview-canvas { width: 480px; transform: scale(var(--preview-scale, .8)); transform-origin: top left; }
 .article-preview-sheet { min-height: var(--preview-sheet-height, 800px); background: #fff; will-change: transform; }
-.preview-masthead { display: flex; align-items: center; gap: 9px; padding: 27px 32px; border-bottom: 1px solid #ededed; color: #666; font-size: 10px; }
-.preview-masthead img { display: block; object-fit: contain; filter: brightness(0); }
-.preview-masthead > span:last-child { margin-left: auto; color: #999; font-size: 9px; }
 .preview-article { padding: 43px 42px 28px; }
 .preview-date { margin: 0 0 16px; color: #999; font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .preview-title { margin: 0 0 18px; color: #222; font: 500 34px/1.45 "Songti SC", STSong, Georgia, serif; overflow-wrap: anywhere; }
@@ -53,6 +50,9 @@ html.reading-open { overflow: hidden; }
 .crafts-caption { padding: 7px 6px 6px; }
 .crafts-caption h2, .crafts-item figcaption { margin: 0; color: #222; font: 400 12px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; overflow-wrap: anywhere; }
 .crafts-caption time, .crafts-item time { display: block; margin-top: 2px; color: #777; font-size: 12px; line-height: 1.5; }
+.crafts-caption-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+.crafts-caption-meta time { flex: none; margin: 0; }
+.crafts-category { display: inline-flex; align-items: center; flex: none; min-height: 19px; padding: 0 7px; border: 1px solid #ddd; border-radius: 999px; color: #777; background: #f3f3f3; font-size: 10px; line-height: 1.6; white-space: nowrap; }
 .writing-dock { position: fixed; z-index: 4; bottom: 24px; left: 50%; display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid #ffffffb3; border-radius: 40px; background: #f9f9f9ba; box-shadow: 0 6px 22px #0000000a, 0 1px 3px #00000006; transform: translateX(-50%); backdrop-filter: blur(16px); }
 .writing-dock > a { position: relative; display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; color: #666; background: linear-gradient(135deg, #fafafa, #eaeaea, #f6f6f6); }
 .writing-dock > a[aria-current]::before { position: absolute; bottom: -5px; width: 3px; height: 3px; border-radius: 50%; background: #b2b2b2; content: ""; }
@@ -149,6 +149,9 @@ html.reading-open { overflow: hidden; }
   .crafts-gallery { column-gap: 10px; }
   .crafts-caption h2, .crafts-item figcaption { font-size: 11px; }
   .crafts-caption time, .crafts-item time { font-size: 10px; }
+  .crafts-caption-meta { gap: 5px; }
+  .crafts-caption-meta time { font-size: 9px; }
+  .crafts-category { min-height: 17px; padding: 0 4px; font-size: 9px; }
   .writing-dock { bottom: max(20px, env(safe-area-inset-bottom)); gap: 7px; padding: 7px; }
   .reading-window { width: calc(100% - 16px); height: calc(100dvh - 24px); border-radius: 7px; }
   .reading-toolbar { gap: 3px; min-height: 54px; padding: 8px 8px 8px 13px; }
