@@ -121,6 +121,13 @@ async function refreshRuntimeLinks(files) {
   for (const file of files) {
     const path = join(out, file);
     const document = parse(await readFile(path, "utf8"));
+    const crafts = normalizeCrafts(document);
+    if (crafts) {
+      await writeFile(
+        join(out, "_next", "data", crafts.buildId, "crafts.json"),
+        JSON.stringify(crafts.props)
+      );
+    }
     let hasIcon = false;
     walk(document, node => {
       if (node.tagName === "title" && node.parentNode?.tagName === "head") {
@@ -274,6 +281,25 @@ function nextData(document) {
   return result;
 }
 
+function normalizeCrafts(document) {
+  const script = nextData(document);
+  if (!script) return;
+  const data = JSON.parse(script.childNodes.map(node => node.value || "").join(""));
+  if (data.page !== "/crafts") return;
+  for (const item of data.props.pageProps.dataSource) {
+    for (const key of ["imageUrl", "posterUrl", "videoUrl"]) {
+      const value = item[key];
+      if (!value || value.startsWith("/") || /^[a-z][a-z\d+.-]*:/i.test(value)) continue;
+      // Local posters and remote videos must resolve equally with or without a trailing slash.
+      item[key] = key === "videoUrl"
+        ? new URL(value, `${config.source}/`).href
+        : `${base}/${value}`;
+    }
+  }
+  script.childNodes[0].value = JSON.stringify(data).replaceAll("<", "\\u003c");
+  return data;
+}
+
 await mkdir(out, { recursive: true });
 const pages = [];
 const retiredContent = [];
@@ -298,14 +324,6 @@ for (const record of manifest.files) {
     const data = JSON.parse(script.childNodes.map(node => node.value || "").join(""));
     script.childNodes[0].value = JSON.stringify(data).replaceAll("<", "\\u003c");
     html = rewrite(serialize(document));
-    if (route === "/crafts") {
-      // The snapshot keeps large videos at their original host instead of
-      // downloading them into the static build.
-      html = html.replaceAll(
-        '"videoUrl":"crafts/',
-        `"videoUrl":"${config.source}/crafts/`
-      );
-    }
     html = html.replace(/(<title[^>]*>)(.*?)(<\/title>)/, (_, open, title, close) => `${open}${title === "设计垂点" || title === config.title ? config.title : `${title} · ${config.title}`}${close}`);
     html = html.replace(/(<meta name="description" content=")[^"]*"/, `$1${config.subtitle}"`);
     html = html.replace("</head>", `<link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"><script src="${base}/workbook.js?v=${jsVersion}" defer></script><meta name="theme-color" content="#f3f3f3"></head>`);

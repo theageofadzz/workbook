@@ -14,6 +14,7 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
   const html = await readFile(join(root, page.file), "utf8");
   const document = parse(html);
   const urls = [];
+  let pageData;
   function visit(node) {
     for (const attr of node.attrs || []) {
       if (["src", "href", "poster"].includes(attr.name) && attr.value.startsWith(`${manifest.basePath}/`)) urls.push(attr.value);
@@ -21,17 +22,31 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     for (const child of node.childNodes || []) visit(child);
     if (node.tagName === "script" && node.attrs?.some(attr => attr.name === "id" && attr.value === "__NEXT_DATA__")) {
       const data = JSON.parse(node.childNodes.map(child => child.value || "").join(""));
+      pageData = data;
       for (const route of excludedRoutes) {
         assert(!data.props?.pageProps?.content?.code?.includes(`href:"${manifest.basePath}${route}`), `Excluded link in hydrated content: ${page.route}`);
       }
       for (const item of data.props?.pageProps?.dataSource || []) {
         for (const key of ["imageUrl", "posterUrl", "videoUrl"]) {
+          if (item[key]) {
+            assert(
+              item[key].startsWith(`${manifest.basePath}/`) || /^https?:\/\//.test(item[key]),
+              `Media must work on direct visits with a trailing slash: ${page.route}: ${item[key]}`
+            );
+          }
           if (item[key]?.startsWith(`${manifest.basePath}/`)) urls.push(item[key]);
         }
       }
     }
   }
   visit(document);
+  if (page.route === "/crafts") {
+    assert.deepEqual(
+      JSON.parse(await readFile(join(root, "_next", "data", pageData.buildId, "crafts.json"), "utf8")),
+      pageData.props,
+      "Works page must keep the same content on direct visits and client navigation"
+    );
+  }
   for (const url of urls) {
     let path = decodeURIComponent(url.split(/[?#]/)[0].slice(manifest.basePath.length));
     if (!path.split("/").pop().includes(".")) path = `${path.replace(/\/$/, "")}/index.html`;
