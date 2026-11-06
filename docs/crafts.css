@@ -24,7 +24,7 @@ html.reading-open { overflow: hidden; }
 .writing-page [hidden] { display: none !important; }
 .writing-page :is(button, a, input):focus-visible { outline: 2px solid #777; outline-offset: 5px; }
 .writing-page svg { display: block; width: 18px; height: 18px; stroke-width: 1.5; flex: none; }
-.writing-dock img { display: block; object-fit: contain; filter: brightness(0); }
+.writing-dock img { display: block; object-fit: contain; filter: brightness(0) invert(40%); }
 .writing-main { max-width: 1440px; margin: 0 auto; padding: 0 64px 120px; }
 .writing-heading { margin: 160px 0 72px; text-align: center; }
 .writing-heading h1 { margin: 0; font: 600 48px/1.1 Georgia, "Songti SC", serif; color: #080808; }
@@ -59,6 +59,7 @@ html.reading-open { overflow: hidden; }
 .writing-dock > a { position: relative; display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; color: #666; background: linear-gradient(135deg, #fafafa, #eaeaea, #f6f6f6); }
 .writing-dock > a[aria-current]::before { position: absolute; bottom: -5px; width: 3px; height: 3px; border-radius: 50%; background: #b2b2b2; content: ""; }
 .writing-dock > a:hover { color: #252525; }
+.writing-dock > a:hover img { filter: brightness(0) invert(14.51%); }
 .writing-dock svg { width: 21px; height: 21px; stroke-width: 1.7; }
 .writing-dock img { width: 22px; height: 16px; }
 .writing-dock-separator { width: 1px; height: 24px; margin: 0 1px; background: #dedede; }
