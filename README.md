@@ -45,8 +45,21 @@
 ## 作品浏览
 
 - [文章首页](https://theageofadzz.github.io/workbook/)：浏览设计记录、项目回顾与交互实验。
-- [作品](https://theageofadzz.github.io/workbook/crafts/)：浏览以前保留的交互作品与创意编程作品。
+- [文字与作品](https://theageofadzz.github.io/workbook/crafts/)：浏览 centurypaw 的文章，点击后在悬浮窗口阅读；切换到「影像」可查看原有的 59 个作品。
 - [关于 theageofadzz](https://theageofadzz.github.io/workbook/about/)：了解这个作品集。
+
+## 文章更新
+
+`src/content/writing/` 保存从 `theageofadzz/centurypaw` 导入的原文、分类和日期，`manifest.json` 记录导入时的来源版本。正文在构建时整理为阅读内容，文章的原始文字和视频保留。
+
+```sh
+npm run import:writing
+npm run build
+npm run check
+npm run dev
+```
+
+导入需要已登录的 GitHub CLI。页面默认显示文字，支持分类和正文搜索；阅读窗口提供字号、目录、进度和文章链接，并在当前会话中记住阅读位置。生成后的静态网站位于 `docs/`，预览地址为 `http://127.0.0.1:4173/workbook/`。
 
 ## 内容与署名
 

@@ -14,7 +14,7 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
   const html = await readFile(join(root, page.file), "utf8");
   const document = parse(html);
   const urls = [];
-  let pageData;
+  let writingData;
   function visit(node) {
     for (const attr of node.attrs || []) {
       if (["src", "href", "poster"].includes(attr.name) && attr.value.startsWith(`${manifest.basePath}/`)) urls.push(attr.value);
@@ -22,7 +22,6 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     for (const child of node.childNodes || []) visit(child);
     if (node.tagName === "script" && node.attrs?.some(attr => attr.name === "id" && attr.value === "__NEXT_DATA__")) {
       const data = JSON.parse(node.childNodes.map(child => child.value || "").join(""));
-      pageData = data;
       for (const route of excludedRoutes) {
         assert(!data.props?.pageProps?.content?.code?.includes(`href:"${manifest.basePath}${route}`), `Excluded link in hydrated content: ${page.route}`);
       }
@@ -38,14 +37,35 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
         }
       }
     }
+    if (node.tagName === "script" && node.attrs?.some(attr => attr.name === "id" && attr.value === "crafts-content")) {
+      writingData = JSON.parse(node.childNodes.map(child => child.value || "").join(""));
+      for (const item of writingData.gallery) {
+        for (const key of ["imageUrl", "posterUrl", "videoUrl"]) {
+          if (!item[key]) continue;
+          assert(
+            item[key].startsWith(`${manifest.basePath}/`) || /^https?:\/\//.test(item[key]),
+            `Gallery media must work with a trailing slash: ${item[key]}`
+          );
+          if (item[key].startsWith(`${manifest.basePath}/`)) urls.push(item[key]);
+        }
+      }
+    }
   }
   visit(document);
   if (page.route === "/crafts") {
-    assert.deepEqual(
-      JSON.parse(await readFile(join(root, "_next", "data", pageData.buildId, "crafts.json"), "utf8")),
-      pageData.props,
-      "Works page must keep the same content on direct visits and client navigation"
-    );
+    assert(writingData, "Expected the standalone writing archive");
+    const imported = JSON.parse(await readFile(new URL("../src/content/writing/manifest.json", import.meta.url), "utf8"));
+    assert.equal(writingData.articles.length, imported.articles.length, "Every original essay must be available");
+    assert.equal(writingData.gallery.length, 59, "The original 59 crafts must remain available");
+    const plainText = node => node.nodeName === "#text" ? node.value : (node.childNodes || []).map(plainText).join("");
+    for (const article of writingData.articles) {
+      const source = parse(await readFile(new URL(`../src/content/writing/${article.sourcePath}`, import.meta.url), "utf8"));
+      assert.equal(plainText(parse(article.html)).replace(/\s/g, ""), plainText(source).replace(/\s/g, ""), `Original wording changed: ${article.title}`);
+      assert(!/<script\b|on\w+=|javascript:/i.test(article.html), `Article must contain only reading content: ${article.title}`);
+      for (const heading of article.headings) assert(article.html.includes(`id="${heading.id}"`), `Missing reading section ${heading.text}`);
+    }
+    assert(!html.includes("__NEXT_DATA__"), "Next hydration must not replace the custom writing archive");
+    assert.match(html, /<dialog[^>]+aria-labelledby="reader-title"/, "Expected an accessible reading dialog");
   }
   for (const url of urls) {
     let path = decodeURIComponent(url.split(/[?#]/)[0].slice(manifest.basePath.length));

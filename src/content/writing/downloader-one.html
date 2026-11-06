@@ -1,0 +1,83 @@
+<p>很久没有更新了，这段时间忙着工作，没什么时间管side project。</p>
+<p>不过我依旧没有忘记opendownload，我忘记是什么时候，我决定改一个全新的名字downloader one，原因是od这个名字太大众，而且搜索的时候太多同名内容，为了作区分和宣传，就重新想了个名字，并且设计了全新的logo。</p>
+<h2>重新出发</h2>
+<p>前几年很喜欢一个软件，叫做raycast，Mac用户或许比较熟悉它，这是一款面向 macOS 的效率启动器和命令中心，可以理解为 Spotlight 的增强版，定位上也类似 Alfred，但更偏向极客。</p>
+<p>之后突发奇想尝试模仿raycast的设计来融合网站功能，我喜欢那种简洁，快捷，方便的设计理念。既然我取名downloader one，就是想体现一个 one 的感觉。所以，我决定把整个网站的首页做成一个搜索框的样子，在搜索框左边icon我放了三个小巧思。</p>
+<h2>搜索框的三种状态</h2>
+<h3>默认状态</h3>
+<p>第一个是默认状态，即默认的放大镜icon，非常传统，也让一切看起来平凡。</p>
+<h3>呼吸态</h3>
+<p>第二个是呼吸态，当你只是点击搜索框而没有输入内容的时候，左边icon就会变成一个会呼吸的圆球，或许是想炫技，或许我只是觉得这样好看，没有太大实用价值，只是想让这个搜索框变的没那么无聊。</p>
+<h3>输入态</h3>
+<p>第三个是输入态，当你在搜索框输入内容的时候，icon就会变成多边形不断切换的样子，希望这一切能让你在搜索的时候没那么平淡，至少我想用户会觉得这很炫酷（笑）。</p>
+<h2>Beam Light 效果</h2>
+<p>除了搜索框icon的变化还有就是搜索框本身添加了beam light，这份灵感来自Apple的Siri模式，用全新Siri设计语言，更贴近Ai科幻感。</p>
+<h2>关于我</h2>
+<p>我其实是一名设计师，多亏了Ai技术的发展，业余时间会把设计稿转变成可以落地的website，我选择上线web单纯因为成本低（上架iOS或者安卓比较麻烦啦），本身我也是因网页设计入行，因此目前我上线的项目都是web端，只是都会做移动端适配。现在回头想想今年是我入行做design engineer的第二年了，去年我制作了gamestation，其实现在我觉得很青涩，不过确实因此让我接触css和vue，后面没怎么更新了，也不是我不玩游戏，只是单纯没时间。</p>
+<p>之前opendownload只是做了内容分享，这次全新升级downloader one我添加了更新文档，全站所有的设计资源和技术方案都做了整理，大家感兴趣可以看看。</p>
+<h2>设计资源分享</h2>
+<p>以下是一些设计资源源代码分享。</p>
+<div>
+<h3>搜索框呼吸态</h3>
+<div>
+<p>Installation</p>
+<div>
+<pre>npm install thinking-orbs</pre>
+</div>
+</div>
+<div>
+<p>Usage</p>
+<div>
+<pre>import { ThinkingOrb } from 'thinking-orbs'; &lt;ThinkingOrb state="listening" size={64} /&gt;</pre>
+</div>
+</div>
+<div>
+<p>Playground</p>
+<div>
+<pre>import { ThinkingOrb } from 'thinking-orbs'; &lt;ThinkingOrb state="listening" size={64} /&gt;</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>搜索框输入态</h3>
+<div>
+<p>Installation</p>
+<div>
+<pre>npm install thinking-orbs</pre>
+</div>
+</div>
+<div>
+<p>Usage</p>
+<div>
+<pre>import { ThinkingOrb } from 'thinking-orbs'; &lt;ThinkingOrb state="listening" size={64} /&gt;</pre>
+</div>
+</div>
+<div>
+<p>Playground</p>
+<div>
+<pre>import { ThinkingOrb } from 'thinking-orbs'; &lt;ThinkingOrb state="shaping" size={64} /&gt;</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>搜索框霓虹效果</h3>
+<div>
+<p>Installation</p>
+<div>
+<pre>npm install border-beam</pre>
+</div>
+</div>
+<div>
+<p>Usage</p>
+<div>
+<pre>import { BorderBeam } from 'border-beam'; &lt;BorderBeam&gt; &lt;YourCard&gt;Content&lt;/YourCard&gt; &lt;/BorderBeam&gt;</pre>
+</div>
+</div>
+<div>
+<p>Playground</p>
+<div>
+<pre>&lt;BorderBeam size="md" colorVariant="colorful" strength={0.7}&gt; &lt;Card&gt;Content&lt;/Card&gt; &lt;/BorderBeam&gt;</pre>
+</div>
+</div>
+</div>
+<p>更多内容请浏览：<a href="https://beam.jakubantalik.com/" target="_blank">https://beam.jakubantalik.com/</a> 以及 <a href="https://orbs.jakubantalik.com/" target="_blank">https://orbs.jakubantalik.com/</a></p>

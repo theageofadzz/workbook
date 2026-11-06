@@ -5,6 +5,7 @@ import { parse, parseFragment, serialize } from "parse5";
 import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
+import { writeCraftsPage } from "./crafts.mjs";
 import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
@@ -197,7 +198,7 @@ try {
 } catch {
   // Checked-in docs are a complete, ready-to-publish static build.
   await accessBuild();
-  for (const file of ["workbook.css", "workbook.js", "security.js"]) await copyFile(join(root, "src", file), join(out, file));
+  for (const file of ["workbook.css", "workbook.js", "security.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
@@ -206,6 +207,7 @@ try {
   await pruneExcludedContent({ out, base, url: config.url });
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
+  await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
   await pruneUnusedBranding({ out });
   await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
@@ -349,7 +351,7 @@ for (const record of manifest.files) {
   }
 }
 
-for (const file of ["workbook.css", "workbook.js", "security.js"]) await copyFile(join(root, "src", file), join(out, file));
+for (const file of ["workbook.css", "workbook.js", "security.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
 await mkdir(join(out, "assets"), { recursive: true });
 await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
 await writeFavicon();
@@ -373,6 +375,7 @@ const retiredArticles = await personalizePortfolio({ root, out, base });
 await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
 await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();
+await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
 const publishedPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
 await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "404.html"]);
 await pruneUnusedBranding({ out });

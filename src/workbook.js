@@ -9,6 +9,17 @@
   const initializedDrawings = new WeakSet();
   const startedDrawings = new WeakSet();
   const copyResets = new WeakMap();
+  // The writing archive owns its reading windows and uses a standalone document.
+  document.addEventListener("click", event => {
+    const anchor = event.target instanceof Element && event.target.closest("a[href]");
+    if (!anchor || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+      || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+    const url = new URL(anchor.href);
+    if (url.origin !== location.origin || url.pathname.replace(/\/$/, "") !== `${base}/crafts`) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    location.assign(url.href);
+  }, true);
   const drawingViewport = new IntersectionObserver(entries => {
     for (const entry of entries) {
       const figure = entry.target;
