@@ -6,6 +6,7 @@ import { parseFragment, serialize } from "parse5";
 export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc }) {
   const css = await readFile(join(root, "src", "about.css"), "utf8");
   const js = await readFile(join(root, "src", "about.js"), "utf8");
+  const security = await readFile(join(root, "src", "security.js"), "utf8");
   const version = value => createHash("sha256").update(value).digest("hex").slice(0, 8);
   const replacements = {
     base,
@@ -26,7 +27,15 @@ export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc
   await writeFile(join(out, "about", "index.html"), html);
   await writeFile(join(out, "about.css"), css);
   await writeFile(join(out, "about.js"), js);
-  for (const file of ["about-inter.woff2", "about-grid.webp", "about-profile-icon.png"]) {
+  await writeFile(join(out, "security.js"), security);
+  for (const file of [
+    "about-inter.woff2",
+    "about-grid.webp",
+    "about-profile-icon.png",
+    "about-experience-icon.png",
+    "wormhole-logo-gray.png",
+    "jiangsu-university-logo-gray.png"
+  ]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
   await copyFile(

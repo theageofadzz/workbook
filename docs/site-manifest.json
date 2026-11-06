@@ -20,9 +20,9 @@
       "file": "wxad12/index.html"
     },
     {
-      "route": "/interactive-design-in-ai",
-      "title": "使用 AI 制作交互动画的建议 · theageofadzz",
-      "file": "interactive-design-in-ai/index.html"
+      "route": "/gamestation",
+      "title": "一次3D交互实验",
+      "file": "gamestation/index.html"
     },
     {
       "route": "/small-p",
@@ -90,11 +90,6 @@
       "file": "shadcn/index.html"
     },
     {
-      "route": "/scroll-mock",
-      "title": "如何依靠 transform 模拟 iOS 原生滚动体验 · theageofadzz",
-      "file": "scroll-mock/index.html"
-    },
-    {
       "route": "/designing-depth",
       "title": "交互动画的层级设计 · theageofadzz",
       "file": "designing-depth/index.html"
@@ -115,39 +110,14 @@
       "file": "adui/index.html"
     },
     {
-      "route": "/circular-text",
-      "title": "画出完美的文字圆形环绕 UI · theageofadzz",
-      "file": "circular-text/index.html"
-    },
-    {
-      "route": "/conic-gradient",
-      "title": "用 motion/react 实现优雅的 conic-gradient 旋转动画 · theageofadzz",
-      "file": "conic-gradient/index.html"
-    },
-    {
       "route": "/functional-motion",
       "title": "Functional Motion: UI 组件库的动效设计细节 · theageofadzz",
       "file": "functional-motion/index.html"
     },
     {
-      "route": "/generative",
-      "title": "我的 CSS 生成艺术世界 · theageofadzz",
-      "file": "generative/index.html"
-    },
-    {
       "route": "/likes",
       "title": "制作点赞与投票动画 · theageofadzz",
       "file": "likes/index.html"
-    },
-    {
-      "route": "/trail",
-      "title": "用 react-spring 设计有“惯性”的交互动画 · theageofadzz",
-      "file": "trail/index.html"
-    },
-    {
-      "route": "/carousel",
-      "title": "转盘交互动画: 以关键参数，细化我们的感受 · theageofadzz",
-      "file": "carousel/index.html"
     },
     {
       "route": "/2023",

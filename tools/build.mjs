@@ -5,6 +5,7 @@ import { parse, parseFragment, serialize } from "parse5";
 import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
+import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
@@ -14,6 +15,7 @@ const assetVersion = async file => createHash("sha256")
   .slice(0, 8);
 const cssVersion = await assetVersion("workbook.css");
 const jsVersion = await assetVersion("workbook.js");
+const securityVersion = await assetVersion("security.js");
 const source = new URL(config.source);
 const base = config.basePath;
 const cache = join(root, ".cache", "reference");
@@ -26,6 +28,23 @@ const headerTitle = config.headerTitle || config.title;
 const headerClasses = "relative w-12 h-12 74:top-[0.15rem] 74:mr-2 74:w-10 74:h-10 opacity-80";
 const logoClasses = `${headerClasses} workbook-header-logo`;
 const homeLogoClasses = "size-1/2 workbook-home-logo";
+const securityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "script-src 'self' 'unsafe-inline'",
+  "script-src-attr 'none'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' data: blob: https:",
+  "font-src 'self' data: https:",
+  "connect-src 'self'",
+  "frame-src 'self' https:",
+  "worker-src 'self' blob:",
+  "form-action 'none'",
+  "frame-ancestors 'none'",
+  "upgrade-insecure-requests"
+].join("; ");
 
 async function writeFavicon() {
   const logo = join(root, "src", "assets", "intensea-logo.png");
@@ -160,6 +179,7 @@ async function refreshRuntimeLinks(files) {
       icon.parentNode = head;
       head.childNodes.push(icon);
     }
+    hardenDocument(document);
     await writeFile(path, serialize(document));
   }
 }
@@ -170,15 +190,18 @@ try {
 } catch {
   // Checked-in docs are a complete, ready-to-publish static build.
   await accessBuild();
-  for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
+  for (const file of ["workbook.css", "workbook.js", "security.js"]) await copyFile(join(root, "src", file), join(out, file));
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
-  const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
-  await personalizePortfolio({ root, out, base });
+  const retiredArticles = await personalizePortfolio({ root, out, base });
   await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
+  await pruneExcludedContent({ out, base, url: config.url });
+  const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
+  await pruneUnusedBranding({ out });
+  await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
   console.log("Using the checked-in static build. Run npm run sync to refresh the reference snapshot.");
   process.exit(0);
@@ -213,6 +236,36 @@ function walk(node, callback) {
   for (const child of node.childNodes || []) walk(child, callback);
 }
 
+function hardenDocument(document) {
+  let head;
+  walk(document, node => {
+    if (node.tagName === "head") head = node;
+    if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "target" && attr.value === "_blank")) {
+      const rel = node.attrs.find(attr => attr.name === "rel");
+      const values = new Set((rel?.value || "").split(/\s+/).filter(Boolean));
+      values.add("noopener");
+      values.add("noreferrer");
+      if (rel) rel.value = [...values].join(" ");
+      else node.attrs.push({ name: "rel", value: "noopener noreferrer" });
+    }
+  });
+  if (!head) throw new Error("Could not locate document head for security hardening.");
+  const hasCsp = head.childNodes.some(node =>
+    node.tagName === "meta"
+    && node.attrs?.some(attr =>
+      attr.name === "http-equiv" && attr.value.toLowerCase() === "content-security-policy"
+    )
+  );
+  if (hasCsp) return;
+  const security = parseFragment(
+    `<meta http-equiv="Content-Security-Policy" content="${securityPolicy}"><meta name="referrer" content="strict-origin-when-cross-origin"><meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"><script src="${base}/security.js?v=${securityVersion}" defer></script>`
+  ).childNodes;
+  for (const node of security.reverse()) {
+    node.parentNode = head;
+    head.childNodes.unshift(node);
+  }
+}
+
 function nextData(document) {
   let result;
   walk(document, node => {
@@ -221,23 +274,17 @@ function nextData(document) {
   return result;
 }
 
-function normalizeCrafts(data) {
-  for (const item of data.props?.pageProps?.dataSource || []) {
-    for (const key of ["posterUrl", "imageUrl", "videoUrl"]) {
-      if (item[key] && !item[key].startsWith("http") && !item[key].startsWith("/")) {
-        const url = new URL(item[key], `${config.source}/`).href;
-        item[key] = mapping.get(url) || url;
-      }
-    }
-  }
-}
-
 await mkdir(out, { recursive: true });
 const pages = [];
+const retiredContent = [];
 for (const record of manifest.files) {
   const input = join(cache, record.local);
   if (record.kind === "page") {
     const route = new URL(record.url).pathname.slice(source.pathname.length).replace(/\/$/, "") || "/";
+    if (isExcludedRoute(route)) {
+      retiredContent.push(rewrite(await readFile(input, "utf8")));
+      continue;
+    }
     const output = join(out, route === "/" ? "index.html" : `${route.slice(1)}/index.html`);
     let html = await readFile(input, "utf8");
     const document = parse(html);
@@ -249,9 +296,16 @@ for (const record of manifest.files) {
     });
     const script = nextData(document);
     const data = JSON.parse(script.childNodes.map(node => node.value || "").join(""));
-    normalizeCrafts(data);
     script.childNodes[0].value = JSON.stringify(data).replaceAll("<", "\\u003c");
     html = rewrite(serialize(document));
+    if (route === "/crafts") {
+      // The snapshot keeps large videos at their original host instead of
+      // downloading them into the static build.
+      html = html.replaceAll(
+        '"videoUrl":"crafts/',
+        `"videoUrl":"${config.source}/crafts/`
+      );
+    }
     html = html.replace(/(<title[^>]*>)(.*?)(<\/title>)/, (_, open, title, close) => `${open}${title === "设计垂点" || title === config.title ? config.title : `${title} · ${config.title}`}${close}`);
     html = html.replace(/(<meta name="description" content=")[^"]*"/, `$1${config.subtitle}"`);
     html = html.replace("</head>", `<link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"><script src="${base}/workbook.js?v=${jsVersion}" defer></script><meta name="theme-color" content="#f3f3f3"></head>`);
@@ -277,7 +331,7 @@ for (const record of manifest.files) {
   }
 }
 
-for (const file of ["workbook.css", "workbook.js"]) await copyFile(join(root, "src", file), join(out, file));
+for (const file of ["workbook.css", "workbook.js", "security.js"]) await copyFile(join(root, "src", file), join(out, file));
 await mkdir(join(out, "assets"), { recursive: true });
 await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
 await writeFavicon();
@@ -297,8 +351,12 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
   unavailableAssets: manifest.failures
 }, null, 2));
 await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
-await personalizePortfolio({ root, out, base });
+const retiredArticles = await personalizePortfolio({ root, out, base });
 await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
+await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();
-await refreshRuntimeLinks([...pages.map(page => page.file), "about/index.html", "404.html"]);
+const publishedPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
+await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "404.html"]);
+await pruneUnusedBranding({ out });
+await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);

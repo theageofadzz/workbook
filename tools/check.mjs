@@ -1,7 +1,9 @@
 import { readFile, access, readdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { parse } from "parse5";
+import { parse as parseJavaScript } from "acorn";
 import assert from "node:assert/strict";
+import { excludedRoutes, isExcludedRoute } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..", "docs");
 const manifest = JSON.parse(await readFile(join(root, "site-manifest.json"), "utf8"));
@@ -19,6 +21,9 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     for (const child of node.childNodes || []) visit(child);
     if (node.tagName === "script" && node.attrs?.some(attr => attr.name === "id" && attr.value === "__NEXT_DATA__")) {
       const data = JSON.parse(node.childNodes.map(child => child.value || "").join(""));
+      for (const route of excludedRoutes) {
+        assert(!data.props?.pageProps?.content?.code?.includes(`href:"${manifest.basePath}${route}`), `Excluded link in hydrated content: ${page.route}`);
+      }
       for (const item of data.props?.pageProps?.dataSource || []) {
         for (const key of ["imageUrl", "posterUrl", "videoUrl"]) {
           if (item[key]?.startsWith(`${manifest.basePath}/`)) urls.push(item[key]);
@@ -37,7 +42,37 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
   checked++;
 }
 assert.equal(missing.size, 0, `Missing local resources:\n${[...missing].join("\n")}`);
-assert(checked >= 30, "Expected all article pages and the crafts page");
+assert.equal(checked, manifest.pages.length + 1, "Expected every retained page and the profile page to be checked");
+assert(!manifest.pages.some(page => isExcludedRoute(page.route)), "Excluded pages must not be published");
+assert(manifest.pages.some(page => page.route === "/crafts"), "The legacy works page must remain published");
+for (const route of excludedRoutes) {
+  await assert.rejects(access(join(root, route.slice(1))), `Excluded page directory still exists: ${route}`);
+  for (const build of await readdir(join(root, "_next", "data"))) {
+    await assert.rejects(access(join(root, "_next", "data", build, `${route.slice(1)}.json`)), `Excluded client data still exists: ${route}`);
+  }
+}
+for (const build of await readdir(join(root, "_next", "static"))) {
+  if (build === "chunks") continue;
+  for (const file of ["_buildManifest.js", "_ssgManifest.js"]) {
+    const registry = await readFile(join(root, "_next", "static", build, file), "utf8");
+    for (const route of excludedRoutes) {
+      assert(!registry.includes(route) && !registry.includes(route.replace("/", "\\u002F")), `Excluded route ${route} still registered in ${file}`);
+    }
+  }
+}
+const aboutHTML = await readFile(join(root, "about", "index.html"), "utf8");
+assert.match(aboutHTML, /data-en="Creative Experiments">创意实验<\/h2>/);
+assert(!/profile-craft-links|>玩具<|CSS 生成艺术|转盘交互实验|环形文字实验|鼠标轨迹实验|滚动交互实验|色彩与渐变|个人博客文章/.test(aboutHTML), "The profile must not list the removed third-party experiments");
+assert.match(aboutHTML, /href="\/workbook\/gamestation\/"/, "Expected GameStation to open its internal project article");
+const aboutWorks = parse(aboutHTML);
+const worksItems = [];
+function inspectWorks(node, inWorks = false) {
+  if (node.tagName === "section" && node.attrs.some(attr => attr.name === "aria-labelledby" && attr.value === "works-title")) inWorks = true;
+  if (inWorks && node.tagName === "li") worksItems.push(node);
+  for (const child of node.childNodes || []) inspectWorks(child, inWorks);
+}
+inspectWorks(aboutWorks);
+assert.equal(worksItems.length, 1, "Expected only GameStation in the profile works section");
 assert.equal(config.title, "theageofadzz", "Expected the site to use the personal brand");
 assert.equal(config.headerTitle, "奥兹时代", "Expected the requested Chinese header name");
 assert.equal(config.browserTitle, "workbook of theageofadzz", "Expected the browser tab to use the requested title");
@@ -159,11 +194,59 @@ for (const heading of content.headings) {
 }
 // Exercise the stored component as Next does, without requiring a browser or React.
 const runtime = { jsxs: (tag, props) => ({ tag, props }) };
-const renderedEssay = Function("_jsx_runtime", content.code)(runtime).default();
+const articleClient = await readFile(join(root, "_next", "static", "chunks", "34ch75b_hd0t9.js"), "utf8");
+let compilerNode;
+function findCompiler(node) {
+  if (!node || typeof node !== "object") return;
+  if (node.type === "FunctionDeclaration" && node.id?.name === "i"
+    && articleClient.slice(node.start, node.end).includes('case "workbook:gamestation"')) compilerNode = node;
+  for (const value of Object.values(node)) {
+    if (Array.isArray(value)) value.forEach(findCompiler);
+    else if (value && typeof value === "object") findCompiler(value);
+  }
+}
+findCompiler(parseJavaScript(articleClient, { ecmaVersion: "latest" }));
+assert(compilerNode, "Expected precompiled personal articles compatible with the site security policy");
+const compileArticle = Function("n", "l", "s", `${articleClient.slice(compilerNode.start, compilerNode.end)};return i;`)(null, null, runtime);
+const renderedEssay = compileArticle(content.code).default();
 const renderedText = node => typeof node === "string" ? node : (node.props.children || []).map(renderedText).join("");
 assert.equal(renderedText(renderedEssay), nodeText(essayNode), "Expected static and hydrated article text to remain identical");
 const activeChunks = [...home.matchAll(/<script[^>]+src="([^"]+\/chunks\/[^"]+\.js)"/g)].map(match => match[1]);
 const activeSources = await Promise.all(activeChunks.map(url => readFile(join(root, url.slice(manifest.basePath.length)), "utf8")));
 assert(activeSources.some(source => source.includes(`title:${JSON.stringify(essay.title)}`) && source.includes("portfolio-cover")), "Expected the loaded homepage component to keep the new entry and cover after hydration");
 assert(articleHTML.includes("workbook-sidebar-logo"), "Expected the article sidebar to use Intensea branding");
+const project = JSON.parse(await readFile(new URL("../src/content/gamestation.json", import.meta.url), "utf8"));
+const projectHTML = await readFile(join(root, project.slug, "index.html"), "utf8");
+const projectNodes = [];
+function inspectProject(node) { projectNodes.push(node); for (const child of node.childNodes || []) inspectProject(child); }
+inspectProject(parse(projectHTML));
+const projectScript = projectNodes.find(node => node.attrs?.some(attr => attr.name === "id" && attr.value === "__NEXT_DATA__"));
+const projectData = JSON.parse(nodeText(projectScript));
+assert.deepEqual(projectData.props.pageProps.content.frontmatter, project);
+assert.deepEqual(
+  JSON.parse(await readFile(join(root, "_next", "data", projectData.buildId, `${project.slug}.json`), "utf8")),
+  projectData.props,
+  "GameStation must match during direct visits and client navigation"
+);
+const projectArticle = projectNodes.find(node => node.tagName === "article");
+assert(projectArticle, "Expected the complete GameStation project article");
+const renderedProject = compileArticle(projectData.props.pageProps.content.code).default();
+assert.equal(renderedText(renderedProject), nodeText(projectArticle), "GameStation hydration must keep the static article text");
+for (const heading of projectData.props.pageProps.content.headings) {
+  assert(projectNodes.some(node => node.tagName === "h2" && node.attrs.some(attr => attr.name === "id" && attr.value === heading.id)), `Missing project section ${heading.text}`);
+}
+assert(!projectHTML.includes('href="https://gamestation.cc/"') && !projectHTML.includes('href="https://github.com/theageofadzz/GameStation"'), "Project article must omit the removed preview and GitHub entry points");
+const walkthrough = projectNodes.find(node => node.tagName === "video");
+assert(walkthrough, "Expected an actual website walkthrough video");
+for (const name of ["autoplay", "muted", "loop", "playsinline", "controls"]) {
+  assert(walkthrough.attrs.some(attr => attr.name === name), `Walkthrough must retain ${name}`);
+}
+assert.equal(projectNodes.filter(node => node.tagName === "button" && node.attrs.some(attr => attr.name === "data-code-copy")).length, 4, "Expected four copyable code sections");
+assert(activeSources.some(source => source.includes(`title:${JSON.stringify(project.title)}`) && source.includes("gamestation-cover")), "Expected the hydrated homepage to use the project cover");
+await assert.rejects(access(join(root, "interactive-design-in-ai")), "The replaced AI article must be removed");
+for (const file of await readdir(root, { recursive: true })) {
+  if (!/\.(?:html|js|json)$/.test(file)) continue;
+  const source = await readFile(join(root, file), "utf8");
+  assert(!source.includes("使用 AI 制作交互动画的建议") && !source.includes("interactive-design-in-ai"), `Obsolete AI article content remains in ${file}`);
+}
 console.log(`Validated ${checked} pages, their local links and assets, and the GitHub Pages configuration.`);

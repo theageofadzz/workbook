@@ -4,6 +4,7 @@ import { mkdir, readFile, writeFile, access } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { parse } from "parse5";
+import { isExcludedRoute } from "./content-policy.mjs";
 
 const exec = promisify(execFile);
 const root = resolve(import.meta.dirname, "..");
@@ -12,7 +13,7 @@ const source = new URL(config.source);
 const cache = join(root, ".cache", "reference");
 const records = new Map();
 const queue = [];
-const routes = new Set(["/", "/crafts"]);
+const routes = new Set(["/"]);
 const failures = [];
 const sourcePath = source.pathname.replace(/\/$/, "");
 const textTypes = /\.(?:html|js|css|json|svg)$/i;
@@ -25,6 +26,8 @@ await mkdir(cache, { recursive: true });
 function enqueue(url, kind = "asset") {
   const value = new URL(url, `${config.source}/`);
   value.hash = "";
+  if (value.origin === source.origin && value.pathname.startsWith(`${sourcePath}/`)
+    && isExcludedRoute(value.pathname.slice(sourcePath.length))) return;
   if (!["https:", "http:"].includes(value.protocol)) return;
   const key = value.href;
   if (records.has(key)) return;
@@ -44,7 +47,7 @@ function routeFrom(url) {
     if (value.origin !== source.origin) return;
     if (value.pathname !== sourcePath && !value.pathname.startsWith(`${sourcePath}/`)) return;
     const route = value.pathname.slice(sourcePath.length).replace(/\/$/, "") || "/";
-    if (route.includes("_next") || route.includes(".") || route === "/crafts/CraftFooter") return;
+    if (route.includes("_next") || route.includes(".") || isExcludedRoute(route)) return;
     if (!/^\/(?:[a-zA-Z0-9-]+)?$/.test(route)) return;
     if (!routes.has(route)) {
       routes.add(route);
@@ -126,7 +129,6 @@ async function download(record) {
 }
 
 enqueue(`${config.source}/`, "page");
-enqueue(`${config.source}/crafts`, "page");
 let completed = 0;
 while (queue.length) {
   const batch = queue.splice(0, 8);
