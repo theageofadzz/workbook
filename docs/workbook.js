@@ -127,7 +127,7 @@
       anchor.setAttribute("aria-label", `关于 ${config.title}`);
     });
     const footer = [...document.querySelectorAll('[data-role="footer-item"]')];
-    const labels = ["文章首页", "作品", "GitHub 个人主页", `关于 ${config.title}`];
+    const labels = ["首页", "作品", "GitHub 个人主页", `关于 ${config.title}`];
     footer.forEach((anchor, index) => {
       if (!labels[index]) return;
       anchor.dataset.tooltip = labels[index];
