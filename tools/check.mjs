@@ -124,8 +124,8 @@ const favicon = await readFile(join(root, "assets", "intensea-favicon.png"));
 assert.equal(favicon.readUInt32BE(16), 64, "Expected a 64px favicon");
 assert.equal(favicon.readUInt32BE(20), 64, "Expected a square favicon");
 await access(join(root, "assets", "cicada-cursor.svg"));
-const cursor = await readFile(join(root, "assets", "cicada-cursor.png"));
-assert(cursor.readUInt32BE(16) <= 128 && cursor.readUInt32BE(20) <= 128, "Native cursor must fit browser size limits");
+const cursorStyles = await readFile(join(root, "cursor.css"), "utf8");
+assert(!/\bcursor\s*:/.test(cursorStyles), "Preview cursor styles must preserve the system cursor");
 assert(
   await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('config.browserTitle || "workbook of theageofadzz"')),
   "Expected client-side navigation to keep the requested browser title"
@@ -156,7 +156,7 @@ assert(
 );
 for (const page of [...manifest.pages.map(page => page.file), "about/index.html", "404.html"]) {
   const document = parse(await readFile(join(root, page), "utf8"));
-  assert.match(await readFile(join(root, page), "utf8"), /href="\/workbook\/cursor\.css\?v=[a-f0-9]{8}"/, `Expected the shared cursor on ${page}`);
+  assert.match(await readFile(join(root, page), "utf8"), /href="\/workbook\/cursor\.css\?v=[a-f0-9]{8}"/, `Expected the shared preview cursor styles on ${page}`);
   let title = "";
   let icon;
   let homeLink;
