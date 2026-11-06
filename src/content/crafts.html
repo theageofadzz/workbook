@@ -32,43 +32,19 @@
   <div class="writing-dock-backdrop" aria-hidden="true"></div>
 
   <dialog class="reading-window" data-reader aria-labelledby="reader-title">
-    <div class="reading-toolbar">
-      <span class="crafts-category" data-reader-category>文字</span>
-      <div class="reading-tools">
-        <button class="writing-icon-button" type="button" data-toggle-toc aria-label="文章目录" title="文章目录" aria-expanded="false" aria-controls="reader-toc" hidden>{{icon:list}}</button>
-        <div class="reading-font-tools" role="group" aria-label="阅读字号">
-          <button class="writing-icon-button" type="button" data-font-step="-1" aria-label="缩小字号" title="缩小字号">{{icon:minus}}</button>
-          <output class="reading-font-value" data-font-value aria-label="当前字号">17</output>
-          <button class="writing-icon-button" type="button" data-font-step="1" aria-label="放大字号" title="放大字号">{{icon:plus}}</button>
-        </div>
-        <button class="writing-icon-button" type="button" data-share-article aria-label="复制文章链接" title="复制文章链接">{{icon:link}}</button>
-        <span class="reading-toolbar-rule" aria-hidden="true"></span>
-        <button class="writing-icon-button reading-close" type="button" data-close-reader aria-label="关闭阅读窗口" title="关闭阅读窗口" autofocus>{{icon:x}}</button>
-      </div>
+    <button class="writing-icon-button reading-close" type="button" data-close-reader aria-label="关闭阅读窗口" title="关闭阅读窗口" autofocus>{{icon:x}}</button>
+    <div class="reading-scroll" data-reader-scroll tabindex="0" aria-label="文章正文">
+      <article class="reading-article preview-article">
+        <header>
+          <p class="preview-date"><time data-reader-date></time></p>
+          <h2 class="preview-title" id="reader-title"></h2>
+          <p class="preview-subtitle" data-reader-subtitle></p>
+        </header>
+        <img class="preview-cover" data-reader-cover alt="" hidden>
+        <div class="reading-body preview-body" data-reader-body></div>
+        <div class="preview-end" aria-hidden="true">· · ·</div>
+      </article>
     </div>
-    <div class="reading-layout">
-      <nav id="reader-toc" class="reading-toc" aria-label="文章目录" hidden></nav>
-      <div class="reading-scroll" data-reader-scroll tabindex="0" aria-label="文章正文">
-        <article class="reading-article">
-          <header class="reading-header">
-            <p class="reading-article-meta"><time data-reader-date></time><span aria-hidden="true">/</span><span data-reader-minutes></span></p>
-            <h2 id="reader-title"></h2>
-            <p class="reading-deck" data-reader-subtitle></p>
-            <div class="reading-byline"><img src="{{base}}/assets/cicada-avatar.webp" width="25" height="25" alt=""><span>cicada</span><span class="reading-original">centurypaw 原文</span></div>
-          </header>
-          <div class="reading-body" data-reader-body></div>
-          <footer class="reading-end">
-            <div class="reading-end-mark" aria-hidden="true">· · ·</div>
-            <div class="reading-pagination">
-              <button type="button" data-reader-previous><span>{{icon:arrow-left}} 上一篇</span><strong></strong></button>
-              <button type="button" data-reader-next><span>下一篇 {{icon:arrow-right}}</span><strong></strong></button>
-            </div>
-          </footer>
-        </article>
-      </div>
-    </div>
-    <footer class="reading-statusbar"><span data-reader-status role="status" aria-live="polite">cicada / centurypaw</span><span data-reader-percent>0%</span></footer>
-    <progress class="reading-progress" data-reader-progress aria-label="阅读进度" max="100" value="0"></progress>
   </dialog>
   <script type="application/json" id="crafts-content">{{data}}</script>
 </body>

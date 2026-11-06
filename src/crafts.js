@@ -17,23 +17,16 @@
   const dialog = document.querySelector("[data-reader]");
   const scroll = document.querySelector("[data-reader-scroll]");
   const body = document.querySelector("[data-reader-body]");
-  const toc = document.querySelector("#reader-toc");
-  const tocButton = document.querySelector("[data-toggle-toc]");
-  const status = document.querySelector("[data-reader-status]");
-  const previous = document.querySelector("[data-reader-previous]");
-  const next = document.querySelector("[data-reader-next]");
+  const cover = document.querySelector("[data-reader-cover]");
+  const assetBase = new URL(".", document.currentScript.src);
   let activeArticle = null;
   let returnFocus = null;
   let progressFrame = 0;
-  let shareReset;
-  let fontSize = 17;
   const positions = new Map();
   const storage = {
     get(key) { try { return sessionStorage.getItem(`workbook-writing:${key}`); } catch { return null; } },
     set(key, value) { try { sessionStorage.setItem(`workbook-writing:${key}`, String(value)); } catch {} }
   };
-  const storedSize = Number(storage.get("font-size"));
-  if (storedSize >= 15 && storedSize <= 22) fontSize = storedSize;
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const previews = new Map();
@@ -186,29 +179,9 @@
     return reset;
   }
 
-  function updateFont() {
-    dialog.style.setProperty("--reading-size", `${fontSize}px`);
-    document.querySelector("[data-font-value]").value = String(fontSize);
-    document.querySelector('[data-font-step="-1"]').disabled = fontSize <= 15;
-    document.querySelector('[data-font-step="1"]').disabled = fontSize >= 22;
-  }
-  document.querySelectorAll("[data-font-step]").forEach(button => {
-    button.addEventListener("click", () => {
-      fontSize = Math.min(22, Math.max(15, fontSize + Number(button.dataset.fontStep)));
-      updateFont();
-      storage.set("font-size", fontSize);
-      updateProgress();
-    });
-  });
-  updateFont();
-
   function updateProgress() {
     progressFrame = 0;
     if (!activeArticle || !dialog.open) return;
-    const max = scroll.scrollHeight - scroll.clientHeight;
-    const percent = Math.round(max > 0 ? Math.min(1, scroll.scrollTop / max) * 100 : 100);
-    document.querySelector("[data-reader-progress]").value = percent;
-    document.querySelector("[data-reader-percent]").textContent = `${percent}%`;
     positions.set(activeArticle.slug, scroll.scrollTop);
     storage.set(`position:${activeArticle.slug}`, scroll.scrollTop);
   }
@@ -219,53 +192,18 @@
     if (dialog.open && !progressFrame) progressFrame = requestAnimationFrame(updateProgress);
   }).observe(scroll);
 
-  function showToc(show) {
-    toc.hidden = !show;
-    tocButton.setAttribute("aria-expanded", String(show));
-  }
-  tocButton.addEventListener("click", () => showToc(toc.hidden));
-  toc.addEventListener("click", event => {
-    const link = event.target.closest("a");
-    if (!link) return;
-    event.preventDefault();
-    const target = document.getElementById(link.hash.slice(1));
-    showToc(false);
-    target?.scrollIntoView({ block: "start" });
-    scroll.focus({ preventScroll: true });
-  });
-
   function openArticle(article, pushHistory = true) {
     if (activeArticle) updateProgress();
     if (!dialog.open) returnFocus = document.activeElement;
     activeArticle = article;
-    clearTimeout(shareReset);
     document.querySelector("#reader-title").textContent = article.title;
-    document.querySelector("[data-reader-category]").textContent = article.category;
     document.querySelector("[data-reader-date]").textContent = article.publishedAt.replaceAll("-", ".");
     document.querySelector("[data-reader-date]").dateTime = article.publishedAt;
-    document.querySelector("[data-reader-minutes]").textContent = `${article.minutes} 分钟阅读`;
     document.querySelector("[data-reader-subtitle]").textContent = article.subtitle || article.description;
+    cover.hidden = !article.cover;
+    if (article.cover) cover.src = new URL(article.cover, assetBase).href;
+    else cover.removeAttribute("src");
     body.innerHTML = article.html;
-    toc.replaceChildren();
-    const label = document.createElement("p");
-    label.textContent = "文章目录";
-    toc.append(label);
-    for (const heading of article.headings) {
-      const link = document.createElement("a");
-      link.href = `#${heading.id}`;
-      link.textContent = heading.text;
-      link.dataset.level = heading.level;
-      toc.append(link);
-    }
-    tocButton.hidden = article.headings.length < 2;
-    showToc(false);
-    status.textContent = "cicada / centurypaw";
-    const index = displayArticles.indexOf(article);
-    for (const [button, item] of [[previous, displayArticles[index - 1]], [next, displayArticles[index + 1]]]) {
-      button.disabled = !item;
-      button.querySelector("strong").textContent = item?.title || (button === previous ? "已是第一篇" : "已是最后一篇");
-      button.dataset.slug = item?.slug || "";
-    }
     document.title = `${article.title} · theageofadzz`;
     if (pushHistory) {
       const url = new URL(location.href);
@@ -294,7 +232,6 @@
     document.documentElement.classList.remove("reading-open");
     activeArticle = null;
     refreshMotion();
-    showToc(false);
     document.title = "workbook of theageofadzz";
     returnFocus?.focus({ preventScroll: true });
   }
@@ -336,22 +273,6 @@
     if (!article) return;
     event.preventDefault();
     openArticle(article);
-  });
-  for (const button of [previous, next]) {
-    button.addEventListener("click", () => {
-      const article = bySlug.get(button.dataset.slug);
-      if (article) openArticle(article);
-    });
-  }
-  document.querySelector("[data-share-article]").addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(location.href);
-      status.textContent = "文章链接已复制";
-    } catch {
-      status.textContent = "请从地址栏复制文章链接";
-    }
-    clearTimeout(shareReset);
-    shareReset = setTimeout(() => { status.textContent = "cicada / centurypaw"; }, 2400);
   });
   function syncLocation() {
     const url = new URL(location.href);
