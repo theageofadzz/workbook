@@ -100,7 +100,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
               </div>
             </div>
             <span class="preview-scrollbar"><span></span></span>
-            <span class="preview-cursor">{{icon:mouse-pointer-2}}<span class="preview-wheel"><span></span></span></span>
+            <span class="preview-cursor">{{icon:mouse-pointer-2}}<span class="preview-cursor-label">cicada<span class="preview-wheel"><span></span></span></span></span>
           </div>
           <div class="crafts-caption"><h2>${escape(article.title)}</h2><div class="crafts-caption-meta"><time datetime="${article.publishedAt}">${article.publishedAt}</time><span class="crafts-category">${escape(article.category)}</span></div></div>
         </a>

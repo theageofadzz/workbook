@@ -50,6 +50,7 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     assert.match(html, /<h1>Crafts<\/h1>/, "Keep the original Crafts heading");
     assert.equal(writingData.gallery, undefined, "Only cicada articles should be published");
     assert.equal((html.match(/class="preview-cursor"/g) || []).length, imported.articles.length, "Every preview needs a browsing cursor");
+    assert.equal((html.match(/class="preview-cursor-label">cicada/g) || []).length, imported.articles.length, "Every cursor should display the complete cicada name");
     assert(!html.includes("preview-masthead"), "Preview headers should stay removed");
     assert.deepEqual(await readdir(join(root, "crafts")), ["index.html"], "Legacy crafts media should be removed");
     for (const build of await readdir(join(root, "_next", "data"))) {

@@ -51,12 +51,13 @@
   function sizePreview(frame) {
     const state = previews.get(frame);
     const sheet = frame.querySelector(".article-preview-sheet");
+    const cursor = frame.querySelector(".preview-cursor");
     const scale = frame.clientWidth / 480;
     if (!scale) return;
     frame.style.setProperty("--preview-scale", scale);
     frame.style.setProperty("--preview-sheet-height", `${Math.ceil(frame.clientHeight / scale)}px`);
     const distance = Math.max(0, sheet.scrollHeight - frame.clientHeight / scale);
-    const signature = `${frame.clientWidth}:${distance}`;
+    const signature = `${frame.clientWidth}:${distance}:${cursor.offsetWidth}:${cursor.offsetHeight}`;
     if (state.signature === signature) return;
     state.signature = signature;
     const fraction = state.animations?.[0]?.currentTime / state.duration || state.phase;
@@ -73,13 +74,16 @@
       [0, .7, .32], [.1, .72, .36], [.28, .65, .63], [.36, .62, .61],
       [.56, .73, .74], [.64, .7, .7], [.8, .59, .4], [.87, .62, .38], [1, .7, .32]
     ];
+    const cursorInset = 10;
+    const cursorTravelX = Math.max(0, frame.clientWidth - cursor.offsetWidth - cursorInset * 2);
+    const cursorTravelY = Math.max(0, frame.clientHeight - cursor.offsetHeight - cursorInset * 2);
     const wheelStops = [[0, 0], [.1, 0], [.19, 3], [.28, 0], [.36, 0], [.46, 3],
       [.56, 0], [.64, 0], [.72, -3], [.8, 0], [.87, 0], [.94, -3], [1, 0]];
     state.animations = [
       sheet.animate(frames(-distance), timing),
       frame.querySelector(".preview-scrollbar > span").animate(frames((frame.clientHeight - 24) * .83), timing),
-      frame.querySelector(".preview-cursor").animate(pointerStops.map(([offset, x, y]) => ({
-        transform: `translate(${frame.clientWidth * x}px, ${frame.clientHeight * y}px)`, offset, easing
+      cursor.animate(pointerStops.map(([offset, x, y]) => ({
+        transform: `translate(${cursorInset + cursorTravelX * x}px, ${cursorInset + cursorTravelY * y}px)`, offset, easing
       })), timing),
       frame.querySelector(".preview-wheel > span").animate(wheelStops.map(([offset, y]) => ({
         transform: `translateY(${y}px)`, offset
@@ -114,6 +118,7 @@
       sizePreview(frame);
       previewSize.observe(frame);
       previewSize.observe(frame.querySelector(".article-preview-sheet"));
+      previewSize.observe(frame.querySelector(".preview-cursor"));
       previewViewport.observe(frame);
     }
     reducedMotion.addEventListener("change", refreshMotion);
