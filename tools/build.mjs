@@ -298,6 +298,14 @@ for (const record of manifest.files) {
     const data = JSON.parse(script.childNodes.map(node => node.value || "").join(""));
     script.childNodes[0].value = JSON.stringify(data).replaceAll("<", "\\u003c");
     html = rewrite(serialize(document));
+    if (route === "/crafts") {
+      // The snapshot keeps large videos at their original host instead of
+      // downloading them into the static build.
+      html = html.replaceAll(
+        '"videoUrl":"crafts/',
+        `"videoUrl":"${config.source}/crafts/`
+      );
+    }
     html = html.replace(/(<title[^>]*>)(.*?)(<\/title>)/, (_, open, title, close) => `${open}${title === "设计垂点" || title === config.title ? config.title : `${title} · ${config.title}`}${close}`);
     html = html.replace(/(<meta name="description" content=")[^"]*"/, `$1${config.subtitle}"`);
     html = html.replace("</head>", `<link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"><script src="${base}/workbook.js?v=${jsVersion}" defer></script><meta name="theme-color" content="#f3f3f3"></head>`);
@@ -312,7 +320,6 @@ for (const record of manifest.files) {
     }
     pages.push({ route, title: html.match(/<title[^>]*>(.*?)<\/title>/)?.[1] || config.title, file: output.slice(out.length + 1) });
   } else {
-    if (record.local.startsWith("crafts/")) continue;
     if (record.originalLocal) await rm(join(out, record.originalLocal), { force: true });
     const output = join(out, record.local);
     await mkdir(dirname(output), { recursive: true });

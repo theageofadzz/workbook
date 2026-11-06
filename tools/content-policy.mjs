@@ -4,7 +4,6 @@ import { parse, serialize } from "parse5";
 import { parse as parseJavaScript } from "acorn";
 
 export const excludedRoutes = [
-  "/crafts",
   "/generative",
   "/carousel",
   "/circular-text",
@@ -70,7 +69,6 @@ function pruneJavaScript(source, collectRemoved) {
   for (const edit of edits.sort((a, b) => b.start - a.start)) {
     source = source.slice(0, edit.start) + edit.value + source.slice(edit.end);
   }
-  source = source.replaceAll('link:"/crafts"', 'link:"/about/#works-title"');
   return source === original ? source : pruneJavaScript(source, collectRemoved);
 }
 
@@ -115,11 +113,7 @@ function pruneDocument(source, base) {
       removeNode(card);
       return false;
     }
-    if (href.replace(/\/$/, "") === `${base}/crafts`) {
-      node.attrs.find(item => item.name === "href").value = `${base}/about/#works-title`;
-    } else {
-      node.attrs = node.attrs.filter(item => item.name !== "href");
-    }
+    node.attrs = node.attrs.filter(item => item.name !== "href");
   });
   return serialize(document);
 }

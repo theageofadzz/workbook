@@ -100,6 +100,67 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   border-radius: 5px;
   background: #fafafa;
 }
+.portfolio-computer {
+  position: relative;
+  width: 78%;
+  transform: translateY(3%);
+}
+.portfolio-computer-shell {
+  position: relative;
+  z-index: 1;
+  padding: 7px 7px 0;
+  border: 1px solid #d4d4d4;
+  border-radius: 5px;
+  background: #e9e9e9;
+  box-shadow: 0 4px 18px #00000014, 0 1px 1px #ffffffcc inset;
+}
+.portfolio-computer-screen {
+  aspect-ratio: 1.48;
+  border-color: #cfcfcf;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 0 0 2px #dedede, 0 2px 4px #0000000d inset;
+}
+.portfolio-computer-bezel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 14px;
+  color: #999;
+  font: 4px/1 monospace;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+}
+.portfolio-computer-bezel > i {
+  position: absolute;
+  right: 5px;
+  width: 3px;
+  height: 3px;
+  border: 1px solid #b5b5b5;
+  border-radius: 50%;
+}
+.portfolio-computer-neck {
+  position: relative;
+  z-index: 0;
+  width: 18%;
+  height: 15px;
+  margin: -1px auto 0;
+  border-right: 1px solid #d0d0d0;
+  border-bottom: 1px solid #d0d0d0;
+  border-left: 1px solid #d0d0d0;
+  background: #dedede;
+  box-shadow: 0 3px 5px #0000000a inset;
+}
+.portfolio-computer-base {
+  width: 48%;
+  height: 6px;
+  margin: auto;
+  border: 1px solid #cfcfcf;
+  border-radius: 2px 2px 50% 50%;
+  background: #e3e3e3;
+  box-shadow: 0 4px 8px #0000000a;
+}
 .portfolio-tv-toolbar {
   position: relative;
   display: flex;
@@ -158,6 +219,16 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   height: 17px;
   overflow: visible;
   filter: drop-shadow(0 1px 3px #00000059);
+}
+.portfolio-computer .portfolio-tv-cursor > svg { display: none; }
+.portfolio-computer .portfolio-tv-cursor::before {
+  content: "";
+  display: block;
+  width: 13px;
+  height: 16px;
+  clip-path: polygon(0 0, 100% 68%, 59% 72%, 43% 100%);
+  background: #fff;
+  filter: drop-shadow(0 1px 2px #00000059);
 }
 .portfolio-tv-cursor > span, .icon-browser-cursor > span {
   position: absolute;
@@ -525,6 +596,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   .gamestation-screen-cursor > svg { width: 10px; height: 11px; }
   .gamestation-cursor-name { top: 10px; left: 9px; font-size: 5px; }
   .portfolio-tv { width: 76%; }
+  .portfolio-computer { width: 82%; }
+  .portfolio-computer-shell { padding: 5px 5px 0; }
+  .portfolio-computer-bezel { height: 11px; }
+  .portfolio-computer-neck { height: 13px; }
   .portfolio-tv-body { padding: 6px 6px 0; border-radius: 9px; }
   .portfolio-tv-toolbar { height: 13px; padding: 0 5px; gap: 5px; }
   .portfolio-tv-viewport { height: calc(100% - 13px); }

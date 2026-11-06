@@ -44,6 +44,7 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
 assert.equal(missing.size, 0, `Missing local resources:\n${[...missing].join("\n")}`);
 assert.equal(checked, manifest.pages.length + 1, "Expected every retained page and the profile page to be checked");
 assert(!manifest.pages.some(page => isExcludedRoute(page.route)), "Excluded pages must not be published");
+assert(manifest.pages.some(page => page.route === "/crafts"), "The legacy works page must remain published");
 for (const route of excludedRoutes) {
   await assert.rejects(access(join(root, route.slice(1))), `Excluded page directory still exists: ${route}`);
   for (const build of await readdir(join(root, "_next", "data"))) {
@@ -54,7 +55,9 @@ for (const build of await readdir(join(root, "_next", "static"))) {
   if (build === "chunks") continue;
   for (const file of ["_buildManifest.js", "_ssgManifest.js"]) {
     const registry = await readFile(join(root, "_next", "static", build, file), "utf8");
-    assert(!registry.includes("/crafts") && !registry.includes("\\u002Fcrafts"), `Removed gallery still registered in ${file}`);
+    for (const route of excludedRoutes) {
+      assert(!registry.includes(route) && !registry.includes(route.replace("/", "\\u002F")), `Excluded route ${route} still registered in ${file}`);
+    }
   }
 }
 const aboutHTML = await readFile(join(root, "about", "index.html"), "utf8");

@@ -10,6 +10,11 @@
       "file": "index.html"
     },
     {
+      "route": "/crafts",
+      "title": "theageofadzz",
+      "file": "crafts/index.html"
+    },
+    {
       "route": "/wxad12",
       "title": "关于我和我的作品",
       "file": "wxad12/index.html"

@@ -133,7 +133,7 @@
         }
       }
       if (index === 1) {
-        const worksHref = `${base}/about/#works-title`;
+        const worksHref = `${base}/crafts/`;
         if (anchor.getAttribute("href") !== worksHref) anchor.setAttribute("href", worksHref);
       }
       if (index === 2 && anchor.href !== profile) {

@@ -45,6 +45,7 @@
 ## 作品浏览
 
 - [文章首页](https://theageofadzz.github.io/workbook/)：浏览设计记录、项目回顾与交互实验。
+- [作品](https://theageofadzz.github.io/workbook/crafts/)：浏览以前保留的交互作品与创意编程作品。
 - [关于 theageofadzz](https://theageofadzz.github.io/workbook/about/)：了解这个作品集。
 
 ## 内容与署名

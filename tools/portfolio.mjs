@@ -114,7 +114,12 @@ export async function personalizePortfolio({ root, out, base }) {
   const retiredContent = [];
   const compiledArticles = [];
   for (const entry of [
-    { name: "portfolio-design", cover: "portfolio-cover", sourceSlug: "wxad12" },
+    {
+      name: "portfolio-design",
+      cover: "portfolio-cover",
+      articleCover: "portfolio-article-cover",
+      sourceSlug: "wxad12"
+    },
     { name: "gamestation", cover: "gamestation-cover", sourceSlug: "interactive-design-in-ai" }
   ]) {
     const result = await personalizeArticle({ contentRoot, out, base, logoStudy, ...entry });
@@ -154,15 +159,27 @@ export async function personalizePortfolio({ root, out, base }) {
   return retiredContent;
 }
 
-async function personalizeArticle({ contentRoot, out, base, logoStudy, name, cover: coverName, sourceSlug }) {
+async function personalizeArticle({
+  contentRoot,
+  out,
+  base,
+  logoStudy,
+  name,
+  cover: coverName,
+  articleCover: articleCoverName = coverName,
+  sourceSlug
+}) {
   const frontmatter = JSON.parse(await readFile(join(contentRoot, `${name}.json`), "utf8"));
   const coverHTML = (await readFile(join(contentRoot, `${coverName}.html`), "utf8")).replaceAll("{{base}}", base).trim();
+  const articleCoverHTML = (await readFile(join(contentRoot, `${articleCoverName}.html`), "utf8"))
+    .replaceAll("{{base}}", base)
+    .trim();
   const cover = parseFragment(coverHTML).childNodes[0];
   let articleHTML = (await readFile(join(contentRoot, `${name}.html`), "utf8"))
     .replaceAll("{{base}}", base)
     .replaceAll("{{logoStudy}}", logoStudy)
     .replaceAll("{{description}}", frontmatter.description)
-    .replaceAll("{{cover}}", coverHTML).trim();
+    .replaceAll("{{cover}}", articleCoverHTML).trim();
   for (const [, icon] of articleHTML.matchAll(/\{\{icon:([a-z-]+)\}\}/g)) {
     const svg = await readFile(new URL(`../node_modules/lucide-static/icons/${icon}.svg`, import.meta.url), "utf8");
     articleHTML = articleHTML.replaceAll(`{{icon:${icon}}}`, svg.replace("<svg", '<svg aria-hidden="true"'));
