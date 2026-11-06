@@ -8,10 +8,12 @@ export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc
   const js = await readFile(join(root, "src", "about.js"), "utf8");
   const security = await readFile(join(root, "src", "security.js"), "utf8");
   const version = value => createHash("sha256").update(value).digest("hex").slice(0, 8);
+  const logoVersion = version(await readFile(join(root, "src", "assets", "intensea-logo.png")));
   const replacements = {
     base,
     browserTitle,
     favicon: faviconSrc,
+    logo: `${base}/assets/intensea-logo.png?v=${logoVersion}`,
     cssVersion: version(css),
     jsVersion: version(js)
   };

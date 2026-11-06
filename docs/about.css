@@ -35,7 +35,7 @@
   mix-blend-mode: multiply;
 }
 .workbook-profile { position: relative; isolation: isolate; }
-.profile-page { width: 100%; max-width: 864px; margin: 0 auto; padding: 26px 32px 64px; }
+.profile-page { width: 100%; max-width: 864px; margin: 0 auto; padding: 26px 32px 120px; }
 .profile-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; min-height: 54px; }
 .profile-brand { min-width: 0; }
 .profile-brand h1 { margin: 0; font-size: 28px; font-weight: 600; line-height: 30px; overflow-wrap: anywhere; }
@@ -101,8 +101,27 @@
 .profile-tags { display: flex; flex-wrap: wrap; gap: 4px; color: #626262; }
 .profile-tags > li { display: flex; align-items: center; min-height: 28px; padding: 4px 8px; border-radius: 6px; background: #eaeaea; }
 .profile-divider { margin: 16px 0; border: 0; border-top: 1px dashed #e1e1e1; }
+.profile-dock { position: fixed; z-index: 20; bottom: 8px; left: 50%; display: flex; height: 56px; border-radius: 999px; background: #fff9; box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a; transform: translate(-50%, -50%); backdrop-filter: blur(4px); animation: profile-dock-enter 500ms 200ms both; }
+.profile-dock-track { display: flex; align-items: flex-end; gap: 8px; padding: 8px; }
+.workbook-profile .profile-dock-track > a { position: relative; display: block; flex: none; color: #525252; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.profile-dock-track > a[aria-current]::before { position: absolute; bottom: -6px; left: 50%; width: 4px; height: 4px; border-radius: 50%; background: #e5e5e5; transform: translateX(-50%); content: ""; }
+.profile-dock-track > a::after { position: absolute; bottom: calc(100% + 15px); left: 50%; padding: 5px 9px; border-radius: 6px; background: #333; color: #fff; font: 11px/1.4 system-ui, sans-serif; white-space: nowrap; opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(4px); transition: opacity 140ms, transform 140ms; content: attr(data-tooltip); }
+.profile-dock-track > a:is(:hover, :focus-visible)::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+.profile-dock-item { position: relative; display: block; width: 40px; aspect-ratio: 1; border-radius: 50%; }
+.profile-dock-item::before { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(45deg, #f8f8f8, #e8e8e8, #f8f8f8, #e8e8e8); opacity: .95; content: ""; }
+.profile-dock-icon { position: absolute; z-index: 1; inset: 0; display: flex; align-items: center; justify-content: center; }
+.profile-dock :is(svg, img) { display: block; width: 50%; height: 50%; }
+.profile-dock svg { stroke-width: 2; }
+.profile-dock .profile-github-icon { stroke-width: 1.6; }
+.profile-dock img { object-fit: contain; filter: brightness(0) invert(32.16%); }
+.profile-dock-separator { flex: none; width: 1px; height: 36px; background: #e5e5e5; mask-image: linear-gradient(0deg, transparent, #fff 16px, #fff calc(100% - 16px), transparent); }
+.profile-dock-backdrop { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; height: clamp(80px, 10vh, 200px); pointer-events: none; backdrop-filter: blur(8px); mask-image: linear-gradient(to top, #000 15%, transparent); }
+@keyframes profile-dock-enter {
+  from { opacity: 0; filter: blur(2px); transform: translate(-50%, -50%) translateY(80px); }
+  to { opacity: 1; filter: blur(0); transform: translate(-50%, -50%) translateY(0); }
+}
 @media (max-width: 639px) {
-  .profile-page { padding: 26px 24px 40px; }
+  .profile-page { padding: 26px 24px 120px; }
   .profile-brand h1 { font-size: 24px; }
   .profile-brand p { max-width: 270px; font-size: 13px; }
   .profile-grid { grid-template-columns: minmax(0, 1fr); margin-top: 32px; }
@@ -113,4 +132,11 @@
 @media (max-width: 359px) {
   .profile-page { padding-right: 16px; padding-left: 16px; }
   .profile-brand h1 { font-size: 22px; }
+}
+@media (hover: none) {
+  .profile-dock-track > a::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile-dock { animation: none; }
+  .profile-dock-track > a::after { transition: none; }
 }
