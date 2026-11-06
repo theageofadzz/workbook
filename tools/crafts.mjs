@@ -56,7 +56,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     const { plainText, ...body } = await articleBody(join(contentRoot, entry.sourcePath));
     articles.push({ ...entry, ...body, searchText: `${entry.title} ${entry.category} ${plainText}` });
   }
-  // Keep the complete original gallery available as a second view.
+  // Append the complete original gallery after the new article previews.
   let gallery;
   let galleryDataPath;
   let galleryData;
@@ -81,7 +81,16 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
   const css = await readFile(join(root, "src", "crafts.css"), "utf8");
   const js = await readFile(join(root, "src", "crafts.js"), "utf8");
   const hash = source => createHash("sha256").update(source).digest("hex").slice(0, 8);
-  const categories = [...new Set(articles.map(article => article.category))];
+  function previewContent(article) {
+    const document = parseFragment(article.html);
+    const paragraphs = [];
+    walk(document, node => {
+      if (node.tagName === "p" && text(node).trim() && paragraphs.length < 6) {
+        paragraphs.push(`<p>${escape(text(node).trim())}</p>`);
+      }
+    });
+    return paragraphs.join("");
+  }
   const replacements = {
     base,
     browserTitle,
@@ -89,20 +98,28 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     logo: logoSrc,
     cssVersion: hash(css),
     jsVersion: hash(js),
-    articleCount: String(articles.length).padStart(2, "0"),
-    galleryCount: gallery.length,
-    categories: categories.map(category => `<button type="button" data-category="${escape(category)}" aria-pressed="false">${escape(category)}</button>`).join(""),
-    articles: articles.map((article, index) => `
-      <li class="writing-entry" data-category="${escape(article.category)}" data-slug="${article.slug}">
-        <a class="writing-link" href="?read=${article.slug}" data-open-article="${article.slug}" aria-haspopup="dialog">
-          <div class="writing-entry-meta"><span>${String(index + 1).padStart(2, "0")}</span><span>${escape(article.category)}</span><time datetime="${article.publishedAt}">${article.publishedAt.replaceAll("-", ".")}</time></div>
-          <div class="writing-entry-main">
-            <div class="writing-entry-copy"><h2>${escape(article.title)}</h2><p>${escape(article.description)}</p></div>
-            ${article.cover ? `<img class="writing-thumbnail" src="${base}/${article.cover}" alt="" width="100" height="112" loading="lazy" decoding="async">` : ""}
+    articles: articles.map(article => `
+      <article class="writing-entry" data-slug="${article.slug}">
+        <a class="writing-link crafts-card" href="?read=${article.slug}" data-open-article="${article.slug}" aria-haspopup="dialog" aria-label="阅读：${escape(article.title)}">
+          <div class="article-preview" aria-hidden="true">
+            <div class="article-preview-canvas">
+              <div class="article-preview-sheet">
+                <div class="preview-masthead"><img src="${logoSrc}" width="23" height="16" alt=""><span>theageofadzz.</span><span>${escape(article.category)}</span></div>
+                <div class="preview-article">
+                  <p class="preview-date">${article.publishedAt.replaceAll("-", ".")}</p>
+                  <div class="preview-title">${escape(article.title)}</div>
+                  <p class="preview-subtitle">${escape(article.subtitle || article.description)}</p>
+                  ${article.cover ? `<img class="preview-cover" src="${base}/${article.cover}" alt="" loading="lazy" decoding="async">` : ""}
+                  <div class="preview-body">${previewContent(article)}</div>
+                  <div class="preview-end">· · ·</div>
+                </div>
+              </div>
+            </div>
+            <span class="preview-scrollbar"><span></span></span>
           </div>
-          <div class="writing-entry-bottom"><span>${article.minutes} 分钟阅读</span><span class="writing-entry-arrow" aria-hidden="true">{{icon:arrow-up-right}}</span></div>
+          <div class="crafts-caption"><h2>${escape(article.title)}</h2><time datetime="${article.publishedAt}">${article.publishedAt}</time></div>
         </a>
-      </li>`).join(""),
+      </article>`).join(""),
     data: JSON.stringify({ articles, gallery }).replaceAll("<", "\\u003c")
   };
   let html = await readFile(join(root, "src", "content", "crafts.html"), "utf8");

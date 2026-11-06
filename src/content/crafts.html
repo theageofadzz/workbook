@@ -12,47 +12,11 @@
   <script src="{{base}}/crafts.js?v={{jsVersion}}" defer></script>
 </head>
 <body class="writing-page">
-  <header class="writing-masthead">
-    <a class="writing-brand" href="{{base}}/" aria-label="返回首页"><img src="{{logo}}" width="28" height="20" alt=""><span>theageofadzz.</span></a>
-    <a class="writing-about" href="{{base}}/about/">关于我 {{icon:arrow-up-right}}</a>
-  </header>
-
   <main class="writing-main">
     <header class="writing-heading">
-      <p class="writing-kicker">THE PERSONAL ARCHIVE</p>
-      <h1 data-view-title>Writing<span>.</span></h1>
-      <p class="writing-subtitle" data-view-subtitle>一些写下来的，和留下来的。</p>
+      <h1>Crafts</h1>
     </header>
-
-    <div class="writing-toolbar">
-      <div class="writing-tabs" role="tablist" aria-label="浏览内容">
-        <button id="writing-tab" type="button" role="tab" data-view="writing" aria-selected="true" aria-controls="writing-panel" tabindex="0">文字 <span>{{articleCount}}</span></button>
-        <button id="crafts-tab" type="button" role="tab" data-view="crafts" aria-selected="false" aria-controls="crafts-panel" tabindex="-1">影像 <span>{{galleryCount}}</span></button>
-      </div>
-      <div class="writing-search" role="search" data-search-container>
-        {{icon:search}}
-        <input type="search" data-search aria-label="搜索文章" placeholder="搜索文字" autocomplete="off">
-        <button class="writing-icon-button" type="button" data-clear-search aria-label="清空搜索" title="清空搜索" hidden>{{icon:x}}</button>
-      </div>
-    </div>
-
-    <section id="writing-panel" role="tabpanel" aria-labelledby="writing-tab">
-      <div class="writing-categories" aria-label="文章分类">
-        <button type="button" data-category="" aria-pressed="true">全部</button>
-        {{categories}}
-      </div>
-      <div class="writing-results" role="status" aria-live="polite" data-result-status></div>
-      <ol class="writing-list">{{articles}}</ol>
-      <div class="writing-empty" data-empty hidden>
-        {{icon:search}}
-        <p>没有找到这篇文字。</p>
-        <button type="button" data-reset-filters>查看全部文章 {{icon:arrow-right}}</button>
-      </div>
-      <footer class="writing-colophon"><span>文字来自 centurypaw</span><span>2020 — 2026 · theageofadzz.</span></footer>
-    </section>
-    <section id="crafts-panel" role="tabpanel" aria-labelledby="crafts-tab" hidden>
-      <div class="crafts-gallery" data-gallery></div>
-    </section>
+    <div class="crafts-gallery" data-gallery>{{articles}}</div>
     <noscript><p>请启用 JavaScript 以打开文章阅读窗口。</p></noscript>
   </main>
 

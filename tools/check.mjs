@@ -56,6 +56,8 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     assert(writingData, "Expected the standalone writing archive");
     const imported = JSON.parse(await readFile(new URL("../src/content/writing/manifest.json", import.meta.url), "utf8"));
     assert.equal(writingData.articles.length, imported.articles.length, "Every original essay must be available");
+    assert.equal((html.match(/class="article-preview"/g) || []).length, imported.articles.length, "Every essay needs an animated portrait preview");
+    assert.match(html, /<h1>Crafts<\/h1>/, "Keep the original Crafts heading");
     assert.equal(writingData.gallery.length, 59, "The original 59 crafts must remain available");
     const plainText = node => node.nodeName === "#text" ? node.value : (node.childNodes || []).map(plainText).join("");
     for (const article of writingData.articles) {

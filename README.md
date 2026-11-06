@@ -45,7 +45,7 @@
 ## 作品浏览
 
 - [文章首页](https://theageofadzz.github.io/workbook/)：浏览设计记录、项目回顾与交互实验。
-- [文字与作品](https://theageofadzz.github.io/workbook/crafts/)：浏览 centurypaw 的文章，点击后在悬浮窗口阅读；切换到「影像」可查看原有的 59 个作品。
+- [作品](https://theageofadzz.github.io/workbook/crafts/)：保留原有 Crafts 作品墙，centurypaw 文章以 3:4 竖版动态预览呈现，点击后在悬浮窗口阅读。原有的 59 个影像作品仍在同一作品墙中。
 - [关于 theageofadzz](https://theageofadzz.github.io/workbook/about/)：了解这个作品集。
 
 ## 文章更新
@@ -59,7 +59,7 @@ npm run check
 npm run dev
 ```
 
-导入需要已登录的 GitHub CLI。页面默认显示文字，支持分类和正文搜索；阅读窗口提供字号、目录、进度和文章链接，并在当前会话中记住阅读位置。生成后的静态网站位于 `docs/`，预览地址为 `http://127.0.0.1:4173/workbook/`。
+导入需要已登录的 GitHub CLI。文章卡片会缓慢浏览真实的标题、配图和正文，离开视口或打开阅读窗口后暂停动画；系统开启减少动态效果时显示静态预览。阅读窗口提供字号、目录、进度和文章链接，并在当前会话中记住阅读位置。生成后的静态网站位于 `docs/`，预览地址为 `http://127.0.0.1:4173/workbook/`。
 
 ## 内容与署名
 

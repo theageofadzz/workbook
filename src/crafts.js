@@ -7,15 +7,11 @@
   const body = document.querySelector("[data-reader-body]");
   const toc = document.querySelector("#reader-toc");
   const tocButton = document.querySelector("[data-toggle-toc]");
-  const search = document.querySelector("[data-search]");
-  const entries = [...document.querySelectorAll(".writing-entry")];
   const status = document.querySelector("[data-reader-status]");
   const previous = document.querySelector("[data-reader-previous]");
   const next = document.querySelector("[data-reader-next]");
-  let category = "";
   let activeArticle = null;
   let returnFocus = null;
-  let galleryInitialized = false;
   let progressFrame = 0;
   let shareReset;
   let fontSize = 17;
@@ -27,61 +23,41 @@
   const storedSize = Number(storage.get("font-size"));
   if (storedSize >= 15 && storedSize <= 22) fontSize = storedSize;
 
-  function filterArticles() {
-    const query = search.value.trim().toLocaleLowerCase();
-    let count = 0;
-    for (const entry of entries) {
-      const article = bySlug.get(entry.dataset.slug);
-      const visible = (!category || article.category === category)
-        && (!query || article.searchText.toLocaleLowerCase().replace(/\s+/g, "").includes(query.replace(/\s+/g, "")));
-      entry.hidden = !visible;
-      if (visible) count++;
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const previews = new Map();
+  const visibleVideos = new Set();
+  function refreshMotion() {
+    const playing = !document.hidden && !dialog.open && !reducedMotion.matches;
+    for (const state of previews.values()) {
+      for (const animation of state.animations || []) {
+        if (reducedMotion.matches) animation.currentTime = state.duration * .08;
+        if (playing && state.visible) animation.play();
+        else animation.pause();
+      }
     }
-    document.querySelector("[data-clear-search]").hidden = !search.value;
-    document.querySelector("[data-empty]").hidden = count !== 0;
-    document.querySelector("[data-result-status]").textContent = query || category ? `${count} 篇文字` : "";
-  }
-
-  function selectCategory(value) {
-    category = value;
-    document.querySelectorAll("[data-category][aria-pressed]").forEach(button => {
-      button.setAttribute("aria-pressed", String(button.dataset.category === value));
-    });
-    filterArticles();
-  }
-  search.addEventListener("input", filterArticles);
-  document.querySelector("[data-clear-search]").addEventListener("click", () => {
-    search.value = "";
-    filterArticles();
-    search.focus();
-  });
-  document.querySelector("[data-reset-filters]").addEventListener("click", () => {
-    search.value = "";
-    selectCategory("");
-    search.focus();
-  });
-  document.querySelectorAll("[data-category][aria-pressed]").forEach(button => {
-    button.addEventListener("click", () => selectCategory(button.dataset.category));
-  });
-
-  const galleryViewport = new IntersectionObserver(entries => {
-    for (const { target: video, isIntersecting } of entries) {
-      if (isIntersecting && !document.hidden && !document.querySelector("#crafts-panel").hidden
-        && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll("[data-gallery] video").forEach(video => {
+      if (playing && visibleVideos.has(video)) {
         if (!video.src) video.src = video.dataset.src;
         video.play().catch(() => {});
       } else video.pause();
+    });
+  }
+  const galleryViewport = new IntersectionObserver(entries => {
+    for (const { target: video, isIntersecting } of entries) {
+      if (isIntersecting) visibleVideos.add(video);
+      else visibleVideos.delete(video);
     }
+    refreshMotion();
   }, { rootMargin: "80px" });
 
   function initializeGallery() {
-    if (galleryInitialized) return;
-    galleryInitialized = true;
     const container = document.querySelector("[data-gallery]");
     const fragment = document.createDocumentFragment();
     for (const item of gallery) {
-      const figure = document.createElement("figure");
+      const figure = document.createElement("div");
       figure.className = "crafts-item";
+      const card = document.createElement("figure");
+      card.className = "crafts-card";
       const media = document.createElement("div");
       media.className = "crafts-item-media";
       media.style.setProperty("--craft-ratio", String(item.aspectRatio || 1));
@@ -109,45 +85,71 @@
       time.dateTime = item.date;
       time.textContent = item.date;
       caption.append(time);
-      figure.append(media, caption);
+      card.append(media, caption);
+      figure.append(card);
       fragment.append(figure);
     }
     container.append(fragment);
   }
 
-  function setView(view, updateHistory = true) {
-    const isWriting = view !== "crafts";
-    document.querySelector("#writing-panel").hidden = !isWriting;
-    document.querySelector("#crafts-panel").hidden = isWriting;
-    document.querySelector("[data-search-container]").hidden = !isWriting;
-    document.querySelector("[data-view-title]").innerHTML = `${isWriting ? "Writing" : "Crafts"}<span>.</span>`;
-    document.querySelector("[data-view-subtitle]").textContent = isWriting
-      ? "一些写下来的，和留下来的。" : "界面、动效，和一些小小的实验。";
-    document.querySelectorAll("[data-view]").forEach(button => {
-      const selected = button.dataset.view === (isWriting ? "writing" : "crafts");
-      button.setAttribute("aria-selected", String(selected));
-      button.tabIndex = selected ? 0 : -1;
-    });
-    if (!isWriting) initializeGallery();
-    else document.querySelectorAll("[data-gallery] video").forEach(video => video.pause());
-    if (updateHistory) {
-      const url = new URL(location.href);
-      if (isWriting) url.searchParams.delete("view");
-      else url.searchParams.set("view", "crafts");
-      history.replaceState(history.state, "", url);
-    }
+  function sizePreview(frame) {
+    const state = previews.get(frame);
+    const sheet = frame.querySelector(".article-preview-sheet");
+    const scale = frame.clientWidth / 480;
+    if (!scale) return;
+    frame.style.setProperty("--preview-scale", scale);
+    frame.style.setProperty("--preview-sheet-height", `${Math.ceil(frame.clientHeight / scale + 160)}px`);
+    const distance = Math.max(0, sheet.scrollHeight - frame.clientHeight / scale);
+    const signature = `${frame.clientWidth}:${distance}`;
+    if (state.signature === signature) return;
+    state.signature = signature;
+    const fraction = state.animations?.[0]?.currentTime / state.duration || .06;
+    state.animations?.forEach(animation => animation.cancel());
+    state.duration = Math.min(36000, 13000 + distance * 16);
+    const frames = amount => [
+      { transform: "translateY(0)", opacity: 0, offset: 0 },
+      { transform: "translateY(0)", opacity: 1, offset: .04 },
+      { transform: "translateY(0)", opacity: 1, offset: .14 },
+      { transform: `translateY(${amount}px)`, opacity: 1, offset: .84 },
+      { transform: `translateY(${amount}px)`, opacity: 1, offset: .95 },
+      { transform: `translateY(${amount}px)`, opacity: 0, offset: 1 }
+    ];
+    const timing = { duration: state.duration, iterations: Infinity, easing: "linear" };
+    state.animations = [
+      sheet.animate(frames(-distance), timing),
+      frame.querySelector(".preview-scrollbar > span").animate(frames((frame.clientHeight - 24) * .83), timing)
+    ];
+    for (const animation of state.animations) animation.currentTime = fraction * state.duration;
+    refreshMotion();
   }
-  const tabs = [...document.querySelectorAll("[data-view]")];
-  for (const tab of tabs) {
-    tab.addEventListener("click", () => setView(tab.dataset.view));
-    tab.addEventListener("keydown", event => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      const target = event.key === "Home" ? tabs[0] : event.key === "End" ? tabs.at(-1)
-        : tabs[(tabs.indexOf(tab) + 1) % tabs.length];
-      target.click();
-      target.focus();
+  function initializeWall() {
+    initializeGallery();
+    const wall = document.querySelector("[data-gallery]");
+    const layout = new ResizeObserver(entries => {
+      for (const { target: card } of entries) {
+        card.parentElement.style.gridRowEnd = `span ${Math.ceil(card.getBoundingClientRect().height) + 12}`;
+      }
     });
+    for (const card of wall.querySelectorAll(".crafts-card")) {
+      card.parentElement.style.gridRowEnd = `span ${Math.ceil(card.getBoundingClientRect().height) + 12}`;
+      layout.observe(card);
+    }
+    wall.classList.add("is-masonry");
+    const previewViewport = new IntersectionObserver(entries => {
+      for (const { target, isIntersecting } of entries) previews.get(target).visible = isIntersecting;
+      refreshMotion();
+    });
+    const previewSize = new ResizeObserver(entries => {
+      for (const { target } of entries) sizePreview(target.closest(".article-preview"));
+    });
+    for (const frame of wall.querySelectorAll(".article-preview")) {
+      previews.set(frame, { visible: false });
+      sizePreview(frame);
+      previewSize.observe(frame);
+      previewSize.observe(frame.querySelector(".article-preview-sheet"));
+      previewViewport.observe(frame);
+    }
+    reducedMotion.addEventListener("change", refreshMotion);
   }
 
   function updateFont() {
@@ -240,6 +242,7 @@
     }
     document.documentElement.classList.add("reading-open");
     if (!dialog.open) dialog.showModal();
+    refreshMotion();
     // Layout must settle before restoring a saved position inside the reading window.
     const targetPosition = positions.get(article.slug) ?? Number(storage.get(`position:${article.slug}`)) ?? 0;
     requestAnimationFrame(() => {
@@ -255,6 +258,7 @@
     dialog.close();
     document.documentElement.classList.remove("reading-open");
     activeArticle = null;
+    refreshMotion();
     showToc(false);
     document.title = "workbook of theageofadzz";
     returnFocus?.focus({ preventScroll: true });
@@ -317,19 +321,11 @@
   function syncLocation() {
     const url = new URL(location.href);
     const article = bySlug.get(url.searchParams.get("read"));
-    setView(article ? "writing" : url.searchParams.get("view"), false);
     if (article) openArticle(article, false);
     else dismissWindow();
   }
   window.addEventListener("popstate", syncLocation);
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) document.querySelectorAll("[data-gallery] video").forEach(video => video.pause());
-    else if (!document.querySelector("#crafts-panel").hidden) {
-      document.querySelectorAll("[data-gallery] video").forEach(video => {
-        galleryViewport.unobserve(video);
-        galleryViewport.observe(video);
-      });
-    }
-  });
+  document.addEventListener("visibilitychange", refreshMotion);
+  initializeWall();
   syncLocation();
 })();
