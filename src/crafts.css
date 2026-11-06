@@ -24,7 +24,6 @@ html.reading-open { overflow: hidden; }
 .writing-page [hidden] { display: none !important; }
 .writing-page :is(button, a, input):focus-visible { outline: 2px solid #777; outline-offset: 5px; }
 .writing-page svg { display: block; width: 18px; height: 18px; stroke-width: 1.5; flex: none; }
-.writing-dock img { display: block; object-fit: contain; filter: brightness(0) invert(40%); }
 .writing-main { max-width: 1440px; margin: 0 auto; padding: 0 64px 120px; }
 .writing-heading { margin: 160px 0 72px; text-align: center; }
 .writing-heading h1 { margin: 0; font: 600 48px/1.1 Georgia, "Songti SC", serif; color: #080808; }
@@ -55,14 +54,23 @@ html.reading-open { overflow: hidden; }
 .crafts-caption-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
 .crafts-caption-meta time { flex: none; margin: 0; }
 .crafts-category { display: inline-flex; align-items: center; flex: none; min-height: 19px; padding: 0 7px; border: 1px solid #ddd; border-radius: 999px; color: #777; background: #f3f3f3; font-size: 10px; line-height: 1.6; white-space: nowrap; }
-.writing-dock { position: fixed; z-index: 4; bottom: 24px; left: 50%; display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid #ffffffb3; border-radius: 40px; background: #f9f9f9ba; box-shadow: 0 6px 22px #0000000a, 0 1px 3px #00000006; transform: translateX(-50%); backdrop-filter: blur(16px); }
-.writing-dock > a { position: relative; display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; color: #666; background: linear-gradient(135deg, #fafafa, #eaeaea, #f6f6f6); }
-.writing-dock > a[aria-current]::before { position: absolute; bottom: -5px; width: 3px; height: 3px; border-radius: 50%; background: #b2b2b2; content: ""; }
-.writing-dock > a:hover { color: #252525; }
-.writing-dock > a:hover img { filter: brightness(0) invert(14.51%); }
-.writing-dock svg { width: 21px; height: 21px; stroke-width: 1.7; }
-.writing-dock img { width: 22px; height: 16px; }
-.writing-dock-separator { width: 1px; height: 24px; margin: 0 1px; background: #dedede; }
+.writing-dock { position: fixed; z-index: 20; bottom: 8px; left: 50%; display: flex; height: 56px; border-radius: 999px; background: #fff9; box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a; transform: translate(-50%, -50%); backdrop-filter: blur(4px); animation: writing-dock-enter 500ms 200ms both; }
+.writing-dock-track { display: flex; align-items: flex-end; gap: 8px; padding: 8px; }
+.writing-dock-track > a { position: relative; display: block; flex: none; color: #525252; }
+.writing-dock-track > a[aria-current]::before { position: absolute; bottom: -6px; left: 50%; width: 4px; height: 4px; border-radius: 50%; background: #e5e5e5; transform: translateX(-50%); content: ""; }
+.writing-dock-item { position: relative; display: block; width: 40px; aspect-ratio: 1; border-radius: 50%; }
+.writing-dock-item::before { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(45deg, #f8f8f8, #e8e8e8, #f8f8f8, #e8e8e8); opacity: .95; content: ""; }
+.writing-dock-icon { position: absolute; z-index: 1; inset: 0; display: flex; align-items: center; justify-content: center; }
+.writing-dock :is(svg, img) { display: block; width: 50%; height: 50%; }
+.writing-dock svg { stroke-width: 2; }
+.writing-dock .writing-github-icon { stroke-width: 1.6; }
+.writing-dock img { object-fit: contain; filter: brightness(0) invert(32.16%); }
+.writing-dock-separator { flex: none; width: 1px; height: 36px; background: #e5e5e5; mask-image: linear-gradient(0deg, transparent, #fff 16px, #fff calc(100% - 16px), transparent); }
+.writing-dock-backdrop { position: fixed; z-index: 10; right: 0; bottom: 0; left: 0; height: clamp(80px, 10vh, 200px); pointer-events: none; backdrop-filter: blur(8px); mask-image: linear-gradient(to top, #000 15%, transparent); }
+@keyframes writing-dock-enter {
+  from { opacity: 0; filter: blur(2px); transform: translate(-50%, -50%) translateY(80px); }
+  to { opacity: 1; filter: blur(0); transform: translate(-50%, -50%) translateY(0); }
+}
 .writing-icon-button { display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: #777; }
 .writing-icon-button:hover { background: #e9e9e9; color: #222; }
 .writing-icon-button:disabled:hover { background: none; }
@@ -158,7 +166,6 @@ html.reading-open { overflow: hidden; }
   .crafts-caption-meta { gap: 5px; }
   .crafts-caption-meta time { font-size: 9px; }
   .crafts-category { min-height: 17px; padding: 0 4px; font-size: 9px; }
-  .writing-dock { bottom: max(20px, env(safe-area-inset-bottom)); gap: 7px; padding: 7px; }
   .reading-window { --reading-gutter: 24px; }
   .reading-article { padding: 24px var(--reading-gutter); }
   .reading-article::before { left: 12px; }
@@ -179,5 +186,6 @@ html.reading-open { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .writing-page *, .writing-page *::before, .writing-page *::after { scroll-behavior: auto !important; transition: none !important; }
+  .writing-dock { animation: none; }
   .preview-cursor { visibility: hidden; }
 }

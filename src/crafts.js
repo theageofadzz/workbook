@@ -119,6 +119,73 @@
     reducedMotion.addEventListener("change", refreshMotion);
   }
 
+  function initializeDock() {
+    const track = document.querySelector("[data-dock-track]");
+    const items = [...track.querySelectorAll("a")].map(anchor => ({
+      anchor, element: anchor.querySelector(".writing-dock-item"), size: 40, target: 40, velocity: 0
+    }));
+    const hover = matchMedia("(hover: hover) and (pointer: fine)");
+    let frame = 0;
+    let lastTime = 0;
+    function render(time) {
+      const steps = Math.ceil(Math.min(64, lastTime ? time - lastTime : 16.667));
+      lastTime = time;
+      let moving = false;
+      for (const item of items) {
+        // Match the homepage's React Spring defaults with one millisecond steps.
+        for (let step = 0; step < steps; step++) {
+          item.velocity += (170 * (item.target - item.size) - 26 * item.velocity) / 1000;
+          item.size += item.velocity / 1000;
+        }
+        if (Math.abs(item.target - item.size) < .01 && Math.abs(item.velocity) < .01) {
+          item.size = item.target;
+          item.velocity = 0;
+        } else moving = true;
+        item.element.style.width = `${item.size}px`;
+      }
+      frame = moving ? requestAnimationFrame(render) : 0;
+      if (!moving) lastTime = 0;
+    }
+    function setTargets(clientX = null) {
+      for (const item of items) {
+        const rect = item.anchor.getBoundingClientRect();
+        const distance = clientX === null ? Infinity : Math.abs(clientX - rect.left - rect.width / 2);
+        item.target = reducedMotion.matches ? 40 : 40 + Math.min(40, Math.max(0, 60 - distance));
+        if (reducedMotion.matches || document.hidden) {
+          item.size = item.target;
+          item.velocity = 0;
+          item.element.style.width = `${item.size}px`;
+        }
+      }
+      if (reducedMotion.matches || document.hidden) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        lastTime = 0;
+      } else if (!frame) frame = requestAnimationFrame(render);
+    }
+    const reset = () => setTargets();
+    track.addEventListener("pointermove", event => {
+      if (hover.matches && event.pointerType !== "touch") setTargets(event.clientX);
+    });
+    track.addEventListener("pointerleave", reset);
+    track.addEventListener("pointercancel", reset);
+    track.addEventListener("focusin", event => {
+      const anchor = event.target.closest("a");
+      if (!anchor?.matches(":focus-visible")) return;
+      const rect = anchor.getBoundingClientRect();
+      setTargets(rect.left + rect.width / 2);
+    });
+    track.addEventListener("focusout", event => {
+      if (!track.contains(event.relatedTarget)) reset();
+    });
+    hover.addEventListener("change", reset);
+    reducedMotion.addEventListener("change", reset);
+    window.addEventListener("blur", reset);
+    window.addEventListener("resize", reset);
+    document.addEventListener("visibilitychange", reset);
+    return reset;
+  }
+
   function updateFont() {
     dialog.style.setProperty("--reading-size", `${fontSize}px`);
     document.querySelector("[data-font-value]").value = String(fontSize);
@@ -208,6 +275,7 @@
       else history.pushState({ ...history.state, writingReader: true }, "", url);
     }
     document.documentElement.classList.add("reading-open");
+    resetDock();
     if (!dialog.open) dialog.showModal();
     refreshMotion();
     // Layout must settle before restoring a saved position inside the reading window.
@@ -293,6 +361,7 @@
   }
   window.addEventListener("popstate", syncLocation);
   document.addEventListener("visibilitychange", refreshMotion);
+  const resetDock = initializeDock();
   initializeWall();
   syncLocation();
 })();
