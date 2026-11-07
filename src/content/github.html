@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{browserTitle}}</title>
+  <meta name="description" content="cicada / theageofadzz 的 GitHub 个人主页与公开项目。">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="{{favicon}}" type="image/png">
+  <link rel="stylesheet" href="{{base}}/about.css?v={{profileCSSVersion}}">
+  <link rel="stylesheet" href="{{base}}/github.css?v={{cssVersion}}">
+  <script src="{{base}}/about.js?v={{profileJSVersion}}" defer></script>
+  <script src="{{base}}/github.js?v={{jsVersion}}" defer></script>
+</head>
+<body class="workbook-profile github-page">
+  <div class="profile-background" aria-hidden="true"></div>
+  <main class="github-main">
+    <header class="github-header"><h1>{{icon:github}}GitHub</h1><span>@{{username}}</span></header>
+    <div class="github-layout">
+      <aside class="github-profile" aria-label="GitHub 个人资料">
+        <img class="github-avatar" src="{{base}}/assets/github-avatar.png" width="320" height="320" alt="cicada 的 GitHub 头像" fetchpriority="high">
+        <div class="github-profile-name"><h2>{{name}}</h2><p>{{username}}</p></div>
+        <p class="github-bio">{{bio}}</p>
+        <div class="github-profile-stats"><span>{{icon:users}}<b>{{followers}}</b> 关注者</span><span>{{icon:star}}<b>{{stars}}</b> Stars</span></div>
+        <p class="github-source">GitHub 公开资料<br><time>{{updated}}</time></p>
+      </aside>
+      <section class="github-content" aria-label="GitHub 项目">
+        <div data-repository-list>
+          <nav class="github-tabs" aria-label="GitHub 视图">
+            <a href="?tab=overview" data-tab="overview" aria-current="page">{{icon:book-open}}概览</a>
+            <a href="?tab=repositories" data-tab="repositories">{{icon:folder-git-2}}仓库<span class="github-count">{{repoCount}}</span></a>
+          </nav>
+          <form class="github-search" role="search">
+            <label class="github-search-field">{{icon:search}}<input type="search" aria-label="搜索仓库" placeholder="搜索仓库…" data-repo-search></label>
+            <select aria-label="筛选编程语言" data-language-filter><option value="">全部语言</option>{{languages}}</select>
+          </form>
+          <div class="github-section-heading"><h2 data-list-title>公开项目</h2><span data-result-count aria-live="polite">{{repoCount}} 个仓库</span></div>
+          <div class="github-repositories" data-repositories>{{repositories}}</div>
+          <p class="github-empty" data-empty hidden>没有找到匹配的仓库。</p>
+        </div>
+        <article class="github-detail" data-repository-detail hidden>
+          <header class="github-detail-heading">
+            <button type="button" class="github-icon-button" data-back aria-label="返回仓库列表" title="返回仓库列表">{{icon:arrow-left}}</button>
+            <h2 data-repository-title tabindex="-1"></h2><span class="github-visibility">公开</span>
+          </header>
+          <p class="github-detail-description" data-repository-description></p>
+          <div class="github-detail-meta" data-repository-meta></div>
+          <div class="github-readme-heading">{{icon:book-open}}<h3>README</h3></div>
+          <div class="github-readme" data-readme></div>
+        </article>
+      </section>
+    </div>
+  </main>
+{{dock}}
+  <script type="application/json" id="github-data">{{data}}</script>
+</body>
+</html>

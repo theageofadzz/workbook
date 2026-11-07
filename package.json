@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "node tools/serve.mjs",
     "sync": "node tools/sync.mjs",
+    "sync:github": "node tools/sync-github.mjs",
     "import:writing": "node tools/import-writing.mjs",
     "optimize": "node tools/optimize.mjs",
     "build": "node tools/build.mjs",

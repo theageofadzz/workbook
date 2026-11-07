@@ -6,6 +6,7 @@ import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
 import { writeCraftsPage } from "./crafts.mjs";
+import { writeGitHubPage } from "./github.mjs";
 import { writeCursorAssets } from "./cursor.mjs";
 import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets, useStandaloneNavigation } from "./content-policy.mjs";
 
@@ -83,6 +84,8 @@ async function brandClientHeader() {
       `${open}${JSON.stringify(headerTitle)}${close}`
     );
     if (source.includes('"data-role":"footer-item"')) {
+      branded = branded.replaceAll('link:"https://codepen.io/aragakey"', 'link:"/github"')
+        .replaceAll('link:"https://jiangyijie27.github.io/aragakey/"', 'link:"/about"');
       branded = branded.replace(homeComponent, (_, factory) =>
         `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(homeLogoClasses)}})`
       );
@@ -128,6 +131,7 @@ async function refreshRuntimeLinks(files) {
   for (const file of files) {
     const path = join(out, file);
     const document = parse(await readFile(path, "utf8"));
+    let footerIndex = 0;
     const crafts = normalizeCrafts(document);
     if (crafts) {
       await writeFile(
@@ -137,6 +141,24 @@ async function refreshRuntimeLinks(files) {
     }
     let hasIcon = false;
     walk(document, node => {
+      if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {
+        const index = footerIndex++;
+        const destination = [`${base}/`, `${base}/crafts/`, `${base}/github/`, `${base}/about/`][index];
+        const label = ["首页", "作品", "GitHub 个人主页", `关于 ${config.title}`][index];
+        if (destination) {
+          node.attrs = node.attrs.filter(attr => !["href", "target", "rel", "aria-label", "data-tooltip"].includes(attr.name));
+          node.attrs.push({ name: "href", value: destination }, { name: "aria-label", value: label }, { name: "data-tooltip", value: label });
+        }
+        if (index === 2) {
+          walk(node, mark => {
+            if (mark.tagName !== "svg") return;
+            const icon = parseFragment('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="size-1/2 text-neutral-600 workbook-github-icon" aria-hidden="true"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.8A5.3 5.3 0 0 0 18.7 5a5 5 0 0 0-.1-3.6S17.4 1 15 2.8a13.4 13.4 0 0 0-6 0C6.6 1 5.4 1.4 5.4 1.4A5 5 0 0 0 5.3 5a5.3 5.3 0 0 0-1.5 3.7c0 5.3 3.1 6.5 6.1 6.8A3.4 3.4 0 0 0 9 18.1V22"/></svg>').childNodes[0];
+            icon.parentNode = mark.parentNode;
+            const siblings = mark.parentNode.childNodes;
+            siblings.splice(siblings.indexOf(mark), 1, icon);
+          });
+        }
+      }
       if (node.tagName === "title" && node.parentNode?.tagName === "head") {
         node.childNodes = [{ nodeName: "#text", value: browserTitle, parentNode: node }];
       }
@@ -228,7 +250,8 @@ try {
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
   await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
-  await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "404.html"]);
+  await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
+  await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);
   await pruneUnusedBranding({ out });
   await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
   await writeFile(join(out, "config.json"), JSON.stringify(config, null, 2));
@@ -396,8 +419,9 @@ await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
 await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();
 await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
+await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
 const publishedPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
-await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "404.html"]);
+await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);
 await pruneUnusedBranding({ out });
 await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
 console.log(`Built ${pages.length + 1} pages for ${config.url}/`);

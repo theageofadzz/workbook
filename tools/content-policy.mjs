@@ -12,7 +12,7 @@ export const excludedRoutes = [
   "/conic-gradient"
 ];
 const excludedSlugs = new Set(excludedRoutes.map(route => route.slice(1)));
-export const standaloneRoutes = ["/crafts"];
+export const standaloneRoutes = ["/crafts", "/github", "/about"];
 
 export function isExcludedRoute(route) {
   return excludedSlugs.has(route.replace(/^\/+/, "").split(/[/?#]/)[0]);
@@ -45,20 +45,38 @@ function removeNode(node) {
 export function useStandaloneNavigation(source, base) {
   if (!source.includes('"data-role":"footer-item"')) return source;
   const edits = [];
+  let footerLink;
   walkJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
     if (node.type !== "CallExpression" || node.arguments.length < 2) return;
     const props = node.arguments[1];
     if (props.type !== "ObjectExpression"
       || !props.properties.some(property => property.key?.value === "data-role" && property.value?.value === "footer-item")) return;
     const href = props.properties.find(property => property.key?.name === "href")?.value;
-    if (href?.type !== "Identifier") return;
-    const condition = standaloneRoutes.map(route => `${href.name}===${JSON.stringify(route)}`).join("||");
+    const link = href?.type === "Identifier" ? href : props.properties.find(property => property.key?.value === "aria-label")?.value;
+    if (link?.type !== "Identifier") return;
+    footerLink = link.name;
+    const condition = standaloneRoutes.map(route => `${link.name}===${JSON.stringify(route)}`).join("||");
     const component = node.arguments[0];
+    const fallback = component.type === "ConditionalExpression" ? component.alternate : component;
     edits.push(
-      { start: component.start, end: component.end, value: `${condition}?"a":${source.slice(component.start, component.end)}` },
-      { start: href.start, end: href.end, value: `${condition}?${JSON.stringify(base)}+${href.name}+"/":${href.name}` }
+      { start: component.start, end: component.end, value: `${condition}?"a":${source.slice(fallback.start, fallback.end)}` },
+      { start: href.start, end: href.end, value: `${condition}?${JSON.stringify(base)}+${link.name}+"/":${link.name}` }
     );
   });
+  if (footerLink) {
+    walkJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
+      if (node.type !== "CallExpression" || node.arguments[0]?.value !== "div") return;
+      const props = node.arguments[1];
+      if (props?.type !== "ObjectExpression"
+        || !props.properties.some(property => property.key?.name === "className" && property.value?.value === "absolute-full flex items-center justify-center z-10")) return;
+      const child = props.properties.find(property => property.key?.name === "children")?.value;
+      if (child?.type !== "Identifier") return;
+      const factory = source.slice(node.callee.start, node.callee.end);
+      const path = "M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.8A5.3 5.3 0 0 0 18.7 5a5 5 0 0 0-.1-3.6S17.4 1 15 2.8a13.4 13.4 0 0 0-6 0C6.6 1 5.4 1.4 5.4 1.4A5 5 0 0 0 5.3 5a5.3 5.3 0 0 0-1.5 3.7c0 5.3 3.1 6.5 6.1 6.8A3.4 3.4 0 0 0 9 18.1V22";
+      const icon = `(${factory})("svg",{viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.6,strokeLinecap:"round",strokeLinejoin:"round",className:"size-1/2 text-neutral-600 workbook-github-icon","aria-hidden":!0,children:(${factory})("path",{d:${JSON.stringify(path)}})})`;
+      edits.push({ start: child.start, end: child.end, value: `${footerLink}==="/github"?${icon}:${child.name}` });
+    });
+  }
   for (const edit of edits.sort((a, b) => b.start - a.start)) {
     source = source.slice(0, edit.start) + edit.value + source.slice(edit.end);
   }
@@ -220,7 +238,7 @@ export async function pruneExcludedContent({ out, base, url, retiredContent = []
     await writeFile(path, pruneDocument(source, base));
   }
   await writeFile(join(out, "sitemap.xml"),
-    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...manifest.pages.map(page => page.route), "/about"].map(route => `<url><loc>${url}${route === "/" ? "/" : `${route}/`}</loc></url>`).join("")}</urlset>`
+    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...manifest.pages.map(page => page.route), "/about", "/github"].map(route => `<url><loc>${url}${route === "/" ? "/" : `${route}/`}</loc></url>`).join("")}</urlset>`
   );
 
   const retainedText = [];

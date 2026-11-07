@@ -10,7 +10,7 @@ const manifest = JSON.parse(await readFile(join(root, "site-manifest.json"), "ut
 const config = JSON.parse(await readFile(join(root, "config.json"), "utf8"));
 let checked = 0;
 const missing = new Set();
-for (const page of [...manifest.pages, { route: "/about", file: "about/index.html" }]) {
+for (const page of [...manifest.pages, { route: "/about", file: "about/index.html" }, { route: "/github", file: "github/index.html" }]) {
   const html = await readFile(join(root, page.file), "utf8");
   const document = parse(html);
   const urls = [];
@@ -77,7 +77,7 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
   checked++;
 }
 assert.equal(missing.size, 0, `Missing local resources:\n${[...missing].join("\n")}`);
-assert.equal(checked, manifest.pages.length + 1, "Expected every retained page and the profile page to be checked");
+assert.equal(checked, manifest.pages.length + 2, "Expected every retained page and both profile pages to be checked");
 assert(!manifest.pages.some(page => isExcludedRoute(page.route)), "Excluded pages must not be published");
 assert(manifest.pages.some(page => page.route === "/crafts"), "The legacy works page must remain published");
 for (const route of excludedRoutes) {
@@ -113,8 +113,8 @@ assert.equal(config.headerTitle, "奥兹时代", "Expected the requested Chinese
 assert.equal(config.browserTitle, "workbook of theageofadzz", "Expected the browser tab to use the requested title");
 assert.equal(config.repository, "https://github.com/theageofadzz/workbook");
 assert(
-  await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('const profile = "https://github.com/theageofadzz"')),
-  "Expected the footer GitHub link to point to the profile"
+  await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('const profile = `${base}/github/`')),
+  "Expected the footer GitHub link to stay within the website"
 );
 await access(join(root, ".nojekyll"));
 await access(join(root, "about", "index.html"));
@@ -151,10 +151,10 @@ assert(
   "Expected the React navigation to render the personal home logo during hydration"
 );
 assert(
-  brandedChunkSources.some(source => /==="\/crafts"\?"a":/.test(source)),
+  brandedChunkSources.some(source => /==="\/crafts"(?:\|\|[^?]+)?\?"a":/.test(source)),
   "Expected works navigation to load the standalone page without prefetching retired Next data"
 );
-for (const page of [...manifest.pages.map(page => page.file), "about/index.html", "404.html"]) {
+for (const page of [...manifest.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]) {
   const document = parse(await readFile(join(root, page), "utf8"));
   assert.match(await readFile(join(root, page), "utf8"), /href="\/workbook\/cursor\.css\?v=[a-f0-9]{8}"/, `Expected the shared preview cursor styles on ${page}`);
   let title = "";
@@ -162,7 +162,15 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
   let homeLink;
   let homeLogo;
   let homeTriangle = false;
+  let footerIndex = 0;
   function inspect(node, inHomeLink = false) {
+    if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {
+      const index = footerIndex++;
+      if (index === 2) {
+        assert.equal(node.attrs.find(attr => attr.name === "href")?.value, `${manifest.basePath}/github/`, `Expected an internal GitHub profile link in ${page}`);
+        assert(!node.attrs.some(attr => attr.name === "target"), `The GitHub navigation must not open another tab in ${page}`);
+      }
+    }
     if (node.tagName === "title" && node.parentNode?.tagName === "head") title = node.childNodes.map(child => child.value || "").join("");
     if (node.tagName === "link" && node.attrs?.some(attr => attr.name === "rel" && attr.value === "icon")) icon = node.attrs.find(attr => attr.name === "href")?.value;
     if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")
@@ -183,6 +191,33 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
     assert.equal(homeTriangle, false, `Expected the triangle home icon to be removed from ${page}`);
   }
 }
+const githubHTML = await readFile(join(root, "github", "index.html"), "utf8");
+const githubSource = JSON.parse(await readFile(new URL("../src/content/github.json", import.meta.url), "utf8"));
+const githubDocument = parse(githubHTML);
+let githubData;
+function inspectGitHub(node) {
+  if (node.tagName === "script" && node.attrs?.some(attr => attr.name === "id" && attr.value === "github-data")) {
+    githubData = JSON.parse(node.childNodes.map(child => child.value || "").join(""));
+  }
+  for (const child of node.childNodes || []) inspectGitHub(child);
+}
+inspectGitHub(githubDocument);
+assert.equal(githubData.user.login, "theageofadzz");
+assert.equal(githubData.repos.length, githubSource.repos.length);
+assert(githubData.repos.some(repo => repo.name === "GameStation"), "The internal profile must include GameStation");
+for (const repo of githubData.repos) {
+  const fragment = parse(repo.readme);
+  function inspectReadme(node) {
+    assert(!["script", "style", "iframe", "object", "embed", "form"].includes(node.tagName), `Unsafe README element in ${repo.name}`);
+    for (const { name, value } of node.attrs || []) {
+      assert(!name.startsWith("on") && name !== "style", `Unsafe README attribute in ${repo.name}`);
+      if (["href", "src"].includes(name)) assert(/^(?:https:\/\/|\/workbook\/|#)/.test(value), `Unsafe README URL in ${repo.name}`);
+    }
+    for (const child of node.childNodes || []) inspectReadme(child);
+  }
+  inspectReadme(fragment);
+}
+assert(!/<iframe\b/.test(githubHTML), "GitHub must remain readable without a blocked remote iframe");
 const homepage = parse(home);
 let headerLogo;
 let headerTitle;

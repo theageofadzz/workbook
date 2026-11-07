@@ -23,7 +23,7 @@
     toggle.title = action;
     toggle.setAttribute("aria-pressed", String(english));
   }
-  toggle.addEventListener("click", () => setLanguage(!english));
+  toggle?.addEventListener("click", () => setLanguage(!english));
 
   function initializeDock() {
     const track = document.querySelector("[data-dock-track]");
