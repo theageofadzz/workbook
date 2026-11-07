@@ -79,6 +79,7 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
 assert.equal(missing.size, 0, `Missing local resources:\n${[...missing].join("\n")}`);
 assert.equal(checked, manifest.pages.length + 2, "Expected every retained page and both profile pages to be checked");
 assert(!manifest.pages.some(page => isExcludedRoute(page.route)), "Excluded pages must not be published");
+assert(isExcludedRoute("/new-reference-article"), "Future reference imports must not publish additional routes");
 assert(manifest.pages.some(page => page.route === "/crafts"), "The legacy works page must remain published");
 for (const route of excludedRoutes) {
   await assert.rejects(access(join(root, route.slice(1))), `Excluded page directory still exists: ${route}`);
@@ -90,8 +91,21 @@ for (const build of await readdir(join(root, "_next", "static"))) {
   if (build === "chunks") continue;
   for (const file of ["_buildManifest.js", "_ssgManifest.js"]) {
     const registry = await readFile(join(root, "_next", "static", build, file), "utf8");
+    const routes = [];
+    function inspectRegistry(node) {
+      if (!node || typeof node !== "object") return;
+      if (node.type === "Property" && typeof node.key?.value === "string") routes.push(node.key.value);
+      if (node.type === "ArrayExpression") {
+        routes.push(...node.elements.filter(item => typeof item?.value === "string").map(item => item.value));
+      }
+      for (const value of Object.values(node)) {
+        if (Array.isArray(value)) value.forEach(inspectRegistry);
+        else if (value && typeof value === "object") inspectRegistry(value);
+      }
+    }
+    inspectRegistry(parseJavaScript(registry, { ecmaVersion: "latest" }));
     for (const route of [...excludedRoutes, ...standaloneRoutes]) {
-      assert(!registry.includes(route) && !registry.includes(route.replace("/", "\\u002F")), `Excluded route ${route} still registered in ${file}`);
+      assert(!routes.includes(route), `Excluded route ${route} still registered in ${file}`);
     }
   }
 }
@@ -233,17 +247,25 @@ function findHeaderLogo(node) {
 findHeaderLogo(homepage);
 assert.equal(headerTitle?.childNodes.map(child => child.value || "").join(""), "奥兹时代", "Expected the Chinese header name before JavaScript loads");
 assert(headerTitle.attrs.some(attr => attr.name === "class" && attr.value.includes("font-[Weixin]")), "Expected the original Chinese header font");
-assert(
-  brandedChunkSources.some(source => /"h1",\{className:"relative -left-px font-\[Weixin\][^"]*",children:"奥兹时代"/.test(source)),
-  "Expected React to keep the Chinese header name and original font during hydration"
-);
 assert.equal(headerLogo?.tagName, "img", "Expected the personal logo in the static homepage, without JavaScript");
 assert.match(
   headerLogo.attrs.find(attr => attr.name === "src")?.value || "",
   /^\/workbook\/assets\/intensea-logo\.png\?v=[a-f0-9]{8}$/,
   "Expected a versioned personal logo image"
 );
-assert.match(home, /_next\/static\/chunks\/[^"]+-workbook-[a-f0-9]{8}\.js/, "Expected the branded client header to have a new asset URL");
+assert(!home.includes("__NEXT_DATA__") && !home.includes("TURBOPACK"), "The homepage must never hydrate reference content");
+assert(!/<script[^>]+src="[^"]*\/_next\//.test(home), "The homepage must not load the retired client application");
+const homepageEntries = [];
+function inspectHome(node) {
+  const slug = node.attrs?.find(attr => attr.name === "data-home-entry")?.value;
+  if (slug) homepageEntries.push(slug);
+  for (const child of node.childNodes || []) inspectHome(child);
+}
+inspectHome(homepage);
+assert.deepEqual(homepageEntries, ["wxad12", "gamestation"], "Only the two personal entries belong on the homepage");
+assert(!home.includes("wxad.design") && !home.includes("Aragakey") && !home.includes("aragakey"), "The homepage must not retain reference-site content or links");
+assert(!/小 p[：:]|Figma Make|微广|制作有趣的界面/.test(home), "Reference entries must also be removed from the animated miniature homepage");
+await assert.rejects(access(join(root, "_next", "static", "chunks", "2ka_qt01g8-f4.js")), "The retired homepage client must be removed");
 assert.match(home, /href="\/workbook\/workbook\.css\?v=[a-f0-9]{8}"/, "Expected versioned site styles");
 assert.match(home, /src="\/workbook\/workbook\.js\?v=[a-f0-9]{8}"/, "Expected a cache-busted branding script");
 const essay = JSON.parse(await readFile(new URL("../src/content/portfolio-design.json", import.meta.url), "utf8"));
@@ -289,9 +311,9 @@ const compileArticle = Function("n", "l", "s", `${articleClient.slice(compilerNo
 const renderedEssay = compileArticle(content.code).default();
 const renderedText = node => typeof node === "string" ? node : (node.props.children || []).map(renderedText).join("");
 assert.equal(renderedText(renderedEssay), nodeText(essayNode), "Expected static and hydrated article text to remain identical");
-const activeChunks = [...home.matchAll(/<script[^>]+src="([^"]+\/chunks\/[^"]+\.js)"/g)].map(match => match[1]);
-const activeSources = await Promise.all(activeChunks.map(url => readFile(join(root, url.slice(manifest.basePath.length)), "utf8")));
-assert(activeSources.some(source => source.includes(`title:${JSON.stringify(essay.title)}`) && source.includes("portfolio-cover")), "Expected the loaded homepage component to keep the new entry and cover after hydration");
+assert.throws(() => compileArticle("unrecognized legacy article"), /Unknown workbook article/, "The article runtime must never evaluate unrecognized reference content");
+assert(!articleClient.includes("return Function(...Object.keys(r),e)"), "The legacy dynamic article compiler must be removed");
+assert(home.includes("portfolio-cover") && home.includes("gamestation-cover"), "Keep both personal animated homepage covers");
 assert(articleHTML.includes("workbook-sidebar-logo"), "Expected the article sidebar to use Intensea branding");
 const project = JSON.parse(await readFile(new URL("../src/content/gamestation.json", import.meta.url), "utf8"));
 const projectHTML = await readFile(join(root, project.slug, "index.html"), "utf8");
@@ -320,11 +342,11 @@ for (const name of ["autoplay", "muted", "loop", "playsinline", "controls"]) {
   assert(walkthrough.attrs.some(attr => attr.name === name), `Walkthrough must retain ${name}`);
 }
 assert.equal(projectNodes.filter(node => node.tagName === "button" && node.attrs.some(attr => attr.name === "data-code-copy")).length, 4, "Expected four copyable code sections");
-assert(activeSources.some(source => source.includes(`title:${JSON.stringify(project.title)}`) && source.includes("gamestation-cover")), "Expected the hydrated homepage to use the project cover");
 await assert.rejects(access(join(root, "interactive-design-in-ai")), "The replaced AI article must be removed");
 for (const file of await readdir(root, { recursive: true })) {
   if (!/\.(?:html|js|json)$/.test(file)) continue;
   const source = await readFile(join(root, file), "utf8");
   assert(!source.includes("使用 AI 制作交互动画的建议") && !source.includes("interactive-design-in-ai"), `Obsolete AI article content remains in ${file}`);
+  assert(!/小 p[：:]|Figma Make 的使用建议|制作有趣的界面：朋友圈广告年度评选/.test(source), `Removed reference article content remains in ${file}`);
 }
 console.log(`Validated ${checked} pages, their local links and assets, and the GitHub Pages configuration.`);

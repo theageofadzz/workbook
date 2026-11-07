@@ -7,6 +7,7 @@ import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
 import { writeCraftsPage } from "./crafts.mjs";
 import { writeGitHubPage } from "./github.mjs";
+import { writeHomePage } from "./home.mjs";
 import { writeCursorAssets } from "./cursor.mjs";
 import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets, useStandaloneNavigation } from "./content-policy.mjs";
 
@@ -105,6 +106,10 @@ async function brandClientHeader() {
     branded = branded.replace(
       /(\(0,\w+\.jsx\)\("title",\{children:)("theageofadzz"|et\.title)(\}\))/,
       (_, open, _title, close) => `${open}${JSON.stringify(browserTitle)}${close}`
+    );
+    branded = branded.replace(
+      /name:"description",content:"abc [^"]*"/,
+      `name:"description",content:${JSON.stringify(config.subtitle)}`
     );
     const alreadyBranded = source.includes(`src:${JSON.stringify(logoSrc)}`)
       || source.includes(`href:${JSON.stringify(faviconSrc)}`)
@@ -256,6 +261,7 @@ try {
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
   const retiredArticles = await personalizePortfolio({ root, out, base });
+  await writeHomePage({ root, out, base, title: config.title });
   await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
   await pruneExcludedContent({ out, base, url: config.url });
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
@@ -426,6 +432,7 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
 }, null, 2));
 await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
 const retiredArticles = await personalizePortfolio({ root, out, base });
+await writeHomePage({ root, out, base, title: config.title });
 await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
 await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();

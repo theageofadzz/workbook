@@ -66,24 +66,6 @@ function visitJavaScript(node, visit) {
   }
 }
 
-function replaceFeaturedItem(source, frontmatter, cover, sourceSlug) {
-  let featured;
-  visitJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
-    if (node.type !== "ObjectExpression") return;
-    const slug = node.properties.find(property => property.key?.name === "slug");
-    const children = node.properties.find(property => property.key?.name === "children");
-    if ([frontmatter.slug, sourceSlug].includes(slug?.value.value) && children) featured = { node, children };
-  });
-  if (!featured) throw new Error("Could not find the featured portfolio entry.");
-  const { node, children } = featured;
-  const factory = children.value.callee?.expressions?.at(-1) || children.value.callee;
-  if (factory?.type !== "MemberExpression") throw new Error("Unexpected featured cover factory.");
-  const runtime = source.slice(factory.object.start, factory.object.end);
-  const replacement = `{${Object.entries(frontmatter).filter(([key]) => key !== "comments")
-    .map(([key, value]) => `${key}:${JSON.stringify(value)}`).join(",")},children:${reactNode(cover, runtime)}}`;
-  return source.slice(0, node.start) + replacement + source.slice(node.end);
-}
-
 function updateByline(container, frontmatter) {
   walk(container, node => {
     if (node.tagName === "span" && node.childNodes.every(child => child.nodeName === "#text")
@@ -140,20 +122,21 @@ export async function personalizePortfolio({ root, out, base }) {
   let compiler;
   visitJavaScript(parseJavaScript(client, { ecmaVersion: "latest" }), node => {
     if (node.type === "FunctionDeclaration" && node.id?.name === "i"
-      && client.slice(node.start, node.end).includes("return Function(...Object.keys(r),e)")) compiler = node;
+      && /return Function\(\.\.\.Object\.keys\(r\),e\)|case "workbook:/.test(client.slice(node.start, node.end))) compiler = node;
   });
   if (!compiler) throw new Error("Could not find the article compiler.");
   const precompiled = compiledArticles.map(({ token, code }) =>
     `case ${JSON.stringify(token)}:return(function(_jsx_runtime){${code}})(s);`
   ).join("");
-  const replacement = `function i(e,t){switch(e){${precompiled}}let r={React:n,ReactDOM:l,_jsx_runtime:s,...t};return Function(...Object.keys(r),e)(...Object.values(r))}`;
+  const replacement = `function i(e,t){switch(e){${precompiled}}throw new Error("Unknown workbook article")}`;
   client = client.slice(0, compiler.start) + replacement + client.slice(compiler.end);
   client = client.replace(
     'Z[6]===Symbol.for("react.memo_cache_sentinel")?(c=(0,t.jsx)("meta",{name:"author",content:"Aragakey."}),Z[6]=c):c=Z[6]',
-    'c=(0,t.jsx)("meta",{name:"author",content:et.author||"Aragakey."})'
+    'c=(0,t.jsx)("meta",{name:"author",content:et.author||"cicada@github"})'
   );
+  client = client.replace('content:et.author||"Aragakey."', 'content:et.author||"cicada@github"');
   client = client.replace('children:[$,K,U,V,J]', 'children:[$,K,U,V,et.comments===!1?null:J]');
-  if (!client.includes('content:et.author||"Aragakey."') || !client.includes("et.comments===!1?null:J")) {
+  if (!client.includes('content:et.author||"cicada@github"') || !client.includes("et.comments===!1?null:J")) {
     throw new Error("Could not personalize the article metadata and discussion section.");
   }
   await writeFile(articleChunk, client);
@@ -177,7 +160,6 @@ async function personalizeArticle({
     .replaceAll("{{base}}", base)
     .replaceAll("{{cursor}}", cursorMarkup)
     .trim();
-  const cover = parseFragment(coverHTML).childNodes[0];
   let articleHTML = (await readFile(join(contentRoot, `${name}.html`), "utf8"))
     .replaceAll("{{base}}", base)
     .replaceAll("{{logoStudy}}", logoStudy)
@@ -257,12 +239,6 @@ async function personalizeArticle({
     await rm(join(out, sourceSlug), { recursive: true, force: true });
     await rm(join(out, "_next", "data", data.buildId, `${sourceSlug}.json`), { force: true });
   }
-
-  const chunks = join(out, "_next", "static", "chunks");
-  const homepageChunk = join(chunks, "2ka_qt01g8-f4.js");
-  const clientHome = await readFile(homepageChunk, "utf8");
-  retiredContent.push(clientHome);
-  await writeFile(homepageChunk, replaceFeaturedItem(clientHome, frontmatter, cover, sourceSlug));
 
   const manifestPath = join(out, "site-manifest.json");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));

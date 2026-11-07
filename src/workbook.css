@@ -226,7 +226,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .portfolio-mini-visual { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; min-width: 0; border: 1px solid #dedede; border-radius: 50%; }
 .portfolio-mini-code { flex-direction: column; gap: 3px; font: 2.9px/1.4 monospace; color: #858585; }
 .portfolio-mini-code span { white-space: nowrap; }
-.portfolio-mini-p { font: 500 33px/1 Weixin, sans-serif; color: #737373; }
 .portfolio-tv-article-page { padding: 13px 25px 28px; animation: portfolio-tv-article-scroll var(--tv-cycle) ease-in-out infinite; }
 .portfolio-mini-article-brand { display: flex; align-items: center; gap: 4px; margin-bottom: 15px; font: 500 5px/1.4 Weixin, sans-serif; }
 .portfolio-tv-article-page h4 { font-size: 9px; }

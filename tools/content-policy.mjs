@@ -9,13 +9,36 @@ export const excludedRoutes = [
   "/circular-text",
   "/trail",
   "/scroll-mock",
-  "/conic-gradient"
+  "/conic-gradient",
+  "/small-p",
+  "/making-fun-interfaces",
+  "/figma-make",
+  "/springen2",
+  "/wxad11",
+  "/svg-liquid-glass",
+  "/quality-of-ui",
+  "/spross",
+  "/springen",
+  "/making-fluid-interfaces",
+  "/deng",
+  "/drawer",
+  "/shadcn",
+  "/designing-depth",
+  "/bm",
+  "/wxad",
+  "/adui",
+  "/functional-motion",
+  "/likes",
+  "/2023",
+  "/font-family"
 ];
 const excludedSlugs = new Set(excludedRoutes.map(route => route.slice(1)));
-export const standaloneRoutes = ["/crafts", "/github", "/about"];
+export const standaloneRoutes = ["/", "/crafts", "/github", "/about"];
+const personalSlugs = new Set(["", "crafts", "github", "about", "wxad12", "gamestation", "interactive-design-in-ai"]);
 
 export function isExcludedRoute(route) {
-  return excludedSlugs.has(route.replace(/^\/+/, "").split(/[/?#]/)[0]);
+  const slug = route.replace(/^\/+/, "").split(/[/?#]/)[0];
+  return excludedSlugs.has(slug) || (!personalSlugs.has(slug) && !slug.startsWith("_") && !slug.startsWith("["));
 }
 
 export function isRetiredClientRoute(route) {
@@ -60,7 +83,7 @@ export function useStandaloneNavigation(source, base) {
     const fallback = component.type === "ConditionalExpression" ? component.alternate : component;
     edits.push(
       { start: component.start, end: component.end, value: `${condition}?"a":${source.slice(fallback.start, fallback.end)}` },
-      { start: href.start, end: href.end, value: `${condition}?${JSON.stringify(base)}+${link.name}+"/":${link.name}` }
+      { start: href.start, end: href.end, value: `${condition}?${JSON.stringify(base)}+${link.name}+(${link.name}==="/"? "":"/"):${link.name}` }
     );
   });
   if (footerLink) {
@@ -178,13 +201,14 @@ export async function pruneExcludedContent({ out, base, url, retiredContent = []
     }
   };
   for (const source of retiredContent) collectAssets(source);
-  for (const page of manifest.pages.filter(page => isExcludedRoute(page.route))) {
+  const removedPages = manifest.pages.filter(page => isExcludedRoute(page.route));
+  for (const page of removedPages) {
     collectAssets(await readFile(join(out, page.file), "utf8"));
   }
   manifest.pages = manifest.pages.filter(page => !isExcludedRoute(page.route));
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 
-  for (const route of excludedRoutes) {
+  for (const route of new Set([...excludedRoutes, ...removedPages.map(page => page.route)])) {
     await rm(join(out, route.slice(1)), { recursive: true, force: true });
   }
   const dataRoot = join(out, "_next", "data");
@@ -193,6 +217,10 @@ export async function pruneExcludedContent({ out, base, url, retiredContent = []
     for (const file of await readdir(join(dataRoot, build))) {
       if (!file.endsWith(".json")) continue;
       const path = join(dataRoot, build, file);
+      if (isExcludedRoute(file === "index.json" ? "/" : `/${file.slice(0, -5)}`)) {
+        await rm(path);
+        continue;
+      }
       const data = JSON.parse(await readFile(path, "utf8"));
       if (prunePageData(data, base)) await writeFile(path, JSON.stringify(data));
     }

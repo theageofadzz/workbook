@@ -22,46 +22,20 @@
 
 - **克制的视觉基调**：黑色品牌标识搭配浅灰纸感背景，以细腻颗粒、柔和阴影和充足留白构建安静的阅读氛围。
 - **清晰的内容层级**：首页以宽松的文章列表呈现作品，动态封面和简洁标题帮助快速浏览；文章页围绕正文、目录与演示内容组织阅读节奏。
-- **轻量的交互表达**：固定在页面底部的圆形快捷导航提供首页、作品和个人主页入口；悬停提示与细微动效让操作保持直观。
+- **轻量的交互表达**：固定在页面底部的圆形快捷导航提供首页、作品、GitHub 和关于入口；悬停放大、底部模糊与页面过渡让操作保持连贯。
 - **适配不同屏幕**：桌面端强调内容的横向呼吸感，移动端调整标题、封面和导航位置，让长文与作品卡片都易于阅读。
 
 ## 代表项目
 
-### 交互与体验
-
 - [关于我和我的作品](https://theageofadzz.github.io/workbook/wxad12/)：去繁留简，从留白、黑白配色、文字层级与 Intensea 标识出发，记录这个作品集的设计思路。
 - [一次3D交互实验](https://theageofadzz.github.io/workbook/gamestation/)：尝试把实体游戏盘搬入数字世界，想让鼠标变成人的手一般与虚拟世界交互。[在线体验](https://gamestation.cc/)。
-- [制作有趣的界面：朋友圈广告年度评选 2025](https://theageofadzz.github.io/workbook/making-fun-interfaces/)：从入场、投票到结果公布，记录如何用速度、碰撞和节奏为评选体验增加活力。
-- [一类叫作“跳跃”的 UI 动效](https://theageofadzz.github.io/workbook/springen/)：总结输入框、头像、折叠面板等组件在状态切换时连贯、舒适的动效表达。
-- [一类叫作“发芽”的 UI 组件](https://theageofadzz.github.io/workbook/spross/)：围绕气泡提示、对话框、抽屉和全局提醒，探索浮层组件之间一致的行为与反馈。
-
-### 设计系统与创作
-
-- [回顾：制作微信广告设计语言 AD UI](https://theageofadzz.github.io/workbook/adui/)：记录设计语言从字体与动效规范，到组件体验和团队协作方式的实践。
-- [回顾：制作微信广告官网](https://theageofadzz.github.io/workbook/wxad/)：回顾官网及案例内容的设计与建设，呈现一个长期迭代的网站项目。
-- [制作流畅界面](https://theageofadzz.github.io/workbook/making-fluid-interfaces/)：结合实际项目，讨论如何让界面动效自然、清楚，并服务于操作本身。
-- [小 p：一次关于 AI 的交互实验](https://theageofadzz.github.io/workbook/small-p/)：通过从协作角色到桌面体验的不同尝试，探索 AI 产品可以如何与人一起创作。
 
 ## 作品浏览
 
-- [文章首页](https://theageofadzz.github.io/workbook/)：浏览设计记录、项目回顾与交互实验。
+- [文章首页](https://theageofadzz.github.io/workbook/)：两篇个人文章，分别介绍作品集的设计与 GameStation 的交互实验。
 - [作品](https://theageofadzz.github.io/workbook/crafts/)：沿用 Crafts 作品墙风格，仅展示 cicada 在 centurypaw 的文章。新旧文章随机交错，以带鼠标上下浏览效果的 3:4 竖版预览呈现，点击后打开 3:4 阅读卡片。
 - [关于 theageofadzz](https://theageofadzz.github.io/workbook/about/)：了解这个作品集。
-
-## 文章更新
-
-`src/content/writing/` 保存从 `theageofadzz/centurypaw` 导入的原文、分类和日期，`manifest.json` 记录导入时的来源版本。正文在构建时整理为阅读内容，文章的原始文字和视频保留。
-
-```sh
-npm run import:writing
-npm run build
-npm run check
-npm run dev
-```
-
-导入需要已登录的 GitHub CLI。文章预览中的鼠标和正文同步上下浏览，停顿后回看；离开视口或打开阅读卡片后暂停动画，系统开启减少动态效果时显示静态预览。全站模拟浏览动画共用白边黑色箭头与深色 cicada 标签，实际鼠标保留系统原生样式，触屏设备保留原生触控行为。文章在每次打开页面时随机排列，日期和分类仍显示在卡片下方。3:4 阅读卡片直接沿用预览动画中的纯白背景、日期、衬线标题、灰色正文与留白，展示同一张封面和完整原文，并在当前会话中记住阅读位置。旧 Crafts 的作品、数据和媒体不再发布。生成后的静态网站位于 `docs/`，预览地址为 `http://127.0.0.1:4173/workbook/`。
-
-作品页底部导航沿用首页的尺寸、圆形渐变按钮、底部模糊和上滑淡入效果，并采用相同的 40–80px 距离放大与弹簧参数。触屏和减少动态效果模式保留固定大小的按钮。
+- [站内 GitHub](https://theageofadzz.github.io/workbook/github/)：在作品集内浏览个人主页、公开仓库与项目介绍。
 
 ## 内容与署名
 
