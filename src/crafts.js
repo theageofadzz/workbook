@@ -30,6 +30,44 @@
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const previews = new Map();
+  function initializeSplitText() {
+    const heading = document.querySelector("[data-split-text]");
+    if (!heading) return;
+    const text = heading.textContent;
+    heading.classList.add("split-text");
+    heading.setAttribute("aria-label", text);
+    heading.textContent = "";
+    for (const [index, character] of [...text].entries()) {
+      if (character === " ") {
+        const space = document.createElement("span");
+        space.className = "split-text__space";
+        space.setAttribute("aria-hidden", "true");
+        heading.append(space);
+        continue;
+      }
+      const wrapper = document.createElement("span");
+      const letter = document.createElement("span");
+      wrapper.className = "split-text__char-wrap";
+      letter.className = "split-text__char";
+      letter.textContent = character;
+      letter.setAttribute("aria-hidden", "true");
+      letter.style.setProperty("--split-delay", `${index * 70}ms`);
+      wrapper.append(letter);
+      heading.append(wrapper);
+    }
+    const show = () => heading.classList.add("is-visible");
+    if (reducedMotion.matches) {
+      show();
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      show();
+      observer.disconnect();
+    }, { rootMargin: "-100px", threshold: .1 });
+    observer.observe(heading);
+  }
+
   function refreshMotion() {
     const playing = !document.hidden && !dialog.open && !reducedMotion.matches;
     for (const state of previews.values()) {
@@ -283,6 +321,7 @@
   window.addEventListener("popstate", syncLocation);
   document.addEventListener("visibilitychange", refreshMotion);
   const resetDock = initializeDock();
+  initializeSplitText();
   initializeWall();
   syncLocation();
 })();

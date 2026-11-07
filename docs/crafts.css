@@ -27,6 +27,29 @@ html.reading-open { overflow: hidden; }
 .writing-main { max-width: 1440px; margin: 0 auto; padding: 0 64px 120px; }
 .writing-heading { margin: 160px 0 72px; text-align: center; }
 .writing-heading h1 { margin: 0; font: 600 48px/1.1 Georgia, "Songti SC", serif; color: #080808; }
+.split-text { display: inline-flex; align-items: baseline; }
+.split-text__char-wrap { display: inline-block; vertical-align: bottom; }
+.split-text__char {
+  display: inline-block;
+  transform: translate3d(0, 115%, 0);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.split-text.is-visible .split-text__char {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  transition:
+    transform 850ms cubic-bezier(.22, 1, .36, 1),
+    opacity 550ms ease-out;
+  transition-delay: var(--split-delay, 0ms);
+}
+.split-text.is-visible:hover .split-text__char {
+  transform: translate3d(0, -0.12em, 0);
+  transition-duration: 300ms;
+  transition-delay: calc(var(--split-delay, 0ms) * .15);
+}
+.split-text__space { display: inline-block; width: .28em; }
 .crafts-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 12px; }
 .crafts-gallery.is-masonry { grid-auto-rows: 1px; row-gap: 0; }
 .writing-entry { min-width: 0; margin: 0; }
@@ -125,4 +148,10 @@ html.reading-open { overflow: hidden; }
   .writing-page *, .writing-page *::before, .writing-page *::after { scroll-behavior: auto !important; transition: none !important; }
   .writing-dock { animation: none; }
   .preview-cursor { visibility: hidden; }
+  .split-text__char,
+  .split-text.is-visible .split-text__char,
+  .split-text.is-visible:hover .split-text__char {
+    transform: none;
+    opacity: 1;
+  }
 }

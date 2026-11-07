@@ -47,7 +47,7 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     const imported = JSON.parse(await readFile(new URL("../src/content/writing/manifest.json", import.meta.url), "utf8"));
     assert.equal(writingData.articles.length, imported.articles.length, "Every original essay must be available");
     assert.equal((html.match(/class="article-preview"/g) || []).length, imported.articles.length, "Every essay needs an animated portrait preview");
-    assert.match(html, /<h1>Crafts<\/h1>/, "Keep the original Crafts heading");
+    assert.match(html, /<h1(?:\s[^>]*)?>Crafts<\/h1>/, "Keep the original Crafts heading");
     assert.equal(writingData.gallery, undefined, "Only cicada articles should be published");
     assert.equal((html.match(/class="preview-cursor"/g) || []).length, imported.articles.length, "Every preview needs a browsing cursor");
     assert.equal((html.match(/class="cicada-pointer"/g) || []).length, imported.articles.length, "Every preview should use the shared cicada pointer");
