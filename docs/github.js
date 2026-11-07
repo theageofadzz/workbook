@@ -46,9 +46,14 @@
   }
 
   function navigate(url) {
-    history.pushState({}, "", url);
-    render(true);
-    window.scrollTo({ top: 0, behavior: "instant" });
+    if (url.href === location.href) return;
+    const update = () => {
+      history.pushState({}, "", url);
+      render(true);
+      window.scrollTo({ top: 0, behavior: "instant" });
+    };
+    if (window.WorkbookMotion) window.WorkbookMotion.change(update, document.querySelector(".github-content"));
+    else update();
   }
 
   document.addEventListener("click", event => {
@@ -64,6 +69,9 @@
   document.querySelector(".github-search").addEventListener("submit", event => event.preventDefault());
   search.addEventListener("input", filter);
   language.addEventListener("change", filter);
-  window.addEventListener("popstate", () => render(true));
+  window.addEventListener("popstate", () => {
+    if (window.WorkbookMotion) window.WorkbookMotion.change(() => render(true), document.querySelector(".github-content"));
+    else render(true);
+  });
   render();
 })();

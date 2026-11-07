@@ -116,6 +116,21 @@ html.reading-open { overflow: hidden; }
 }
 .reading-window[open] { display: flex; flex-direction: column; }
 .reading-window::backdrop { background: #3939392e; backdrop-filter: blur(5px); }
+@media (prefers-reduced-motion: no-preference) {
+  .reading-window[open] { animation: reading-enter 300ms cubic-bezier(.22, 1, .36, 1) both; }
+  .reading-window[open]::backdrop { animation: reading-shade-in 240ms ease both; }
+  .reading-window.is-closing { animation: reading-leave 160ms ease both; }
+  .reading-window.is-closing::backdrop { animation: reading-shade-out 160ms ease both; }
+}
+@keyframes reading-enter {
+  from { opacity: 0; transform: translateY(12px) scale(.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes reading-leave {
+  to { opacity: 0; transform: translateY(6px) scale(.985); }
+}
+@keyframes reading-shade-in { from { opacity: 0; } }
+@keyframes reading-shade-out { to { opacity: 0; } }
 .reading-close { position: absolute; z-index: 2; top: 7px; right: 7px; }
 .reading-scroll { flex: 1; min-width: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c8c8c8 transparent; outline: none; }
 .reading-article { min-height: 100%; }

@@ -22,6 +22,7 @@
   let activeArticle = null;
   let returnFocus = null;
   let progressFrame = 0;
+  let readerCloseTimer = 0;
   const positions = new Map();
   const storage = {
     get(key) { try { return sessionStorage.getItem(`workbook-writing:${key}`); } catch { return null; } },
@@ -231,6 +232,9 @@
   }).observe(scroll);
 
   function openArticle(article, pushHistory = true) {
+    clearTimeout(readerCloseTimer);
+    readerCloseTimer = 0;
+    dialog.classList.remove("is-closing");
     if (activeArticle) updateProgress();
     if (!dialog.open) returnFocus = document.activeElement;
     activeArticle = article;
@@ -263,17 +267,27 @@
   }
 
   function dismissWindow() {
-    if (!dialog.open) return;
+    if (!dialog.open || readerCloseTimer) return;
     updateProgress();
-    body.querySelectorAll("iframe").forEach(frame => frame.remove());
-    dialog.close();
-    document.documentElement.classList.remove("reading-open");
-    activeArticle = null;
-    refreshMotion();
-    document.title = "workbook of theageofadzz";
-    returnFocus?.focus({ preventScroll: true });
+    const finish = () => {
+      readerCloseTimer = 0;
+      body.querySelectorAll("iframe").forEach(frame => frame.remove());
+      dialog.close();
+      dialog.classList.remove("is-closing");
+      document.documentElement.classList.remove("reading-open");
+      activeArticle = null;
+      refreshMotion();
+      document.title = "workbook of theageofadzz";
+      returnFocus?.focus({ preventScroll: true });
+    };
+    if (reducedMotion.matches) finish();
+    else {
+      dialog.classList.add("is-closing");
+      readerCloseTimer = setTimeout(finish, 160);
+    }
   }
   function closeReader() {
+    if (readerCloseTimer || !dialog.open) return;
     dismissWindow();
     if (history.state?.writingReader) history.back();
     else {

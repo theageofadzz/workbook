@@ -20,6 +20,8 @@ const cssVersion = await assetVersion("workbook.css");
 const jsVersion = await assetVersion("workbook.js");
 const securityVersion = await assetVersion("security.js");
 const cursorVersion = await assetVersion("cursor.css");
+const transitionCSSVersion = await assetVersion("page-transitions.css");
+const transitionJSVersion = await assetVersion("page-transitions.js");
 const source = new URL(config.source);
 const base = config.basePath;
 const cache = join(root, ".cache", "reference");
@@ -229,6 +231,15 @@ async function refreshRuntimeLinks(files) {
       style.parentNode = head;
       head.childNodes.push(style);
     }
+    head.childNodes = head.childNodes.filter(node => !node.attrs?.some(attr =>
+      ["src", "href"].includes(attr.name) && /\/page-transitions\.(?:css|js)(?:\?|$)/.test(attr.value)
+    ));
+    const transitions = parseFragment(
+      `<link rel="stylesheet" href="${base}/page-transitions.css?v=${transitionCSSVersion}"><script src="${base}/page-transitions.js?v=${transitionJSVersion}"></script>`
+    ).childNodes;
+    for (const node of transitions) node.parentNode = head;
+    const firstScript = head.childNodes.findIndex(node => node.tagName === "script");
+    head.childNodes.splice(firstScript < 0 ? head.childNodes.length : firstScript, 0, ...transitions);
     hardenDocument(document);
     await writeFile(path, serialize(document));
   }
@@ -240,7 +251,7 @@ try {
 } catch {
   // Checked-in docs are a complete, ready-to-publish static build.
   await accessBuild();
-  for (const file of ["workbook.css", "workbook.js", "security.js", "cursor.css", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
+  for (const file of ["workbook.css", "workbook.js", "security.js", "cursor.css", "page-transitions.css", "page-transitions.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
@@ -394,7 +405,7 @@ for (const record of manifest.files) {
   }
 }
 
-for (const file of ["workbook.css", "workbook.js", "security.js", "cursor.css", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
+for (const file of ["workbook.css", "workbook.js", "security.js", "cursor.css", "page-transitions.css", "page-transitions.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
 await mkdir(join(out, "assets"), { recursive: true });
 await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
 await writeFavicon();

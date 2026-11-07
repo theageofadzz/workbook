@@ -1,0 +1,82 @@
+@view-transition { navigation: auto; }
+
+:root {
+  --page-motion-ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+:is(.footer-animation, .profile-dock, .writing-dock) {
+  view-transition-name: workbook-dock;
+}
+
+:is(.profile-dock-backdrop, .writing-dock-backdrop, #__next > div > .fixed.bottom-0) {
+  view-transition-name: workbook-dock-blur;
+}
+
+html[data-page-visit="internal"] :is(.footer-animation, .profile-dock, .writing-dock) {
+  animation: none !important;
+  transform: translate(-50%, -50%);
+}
+
+::view-transition-group(*) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--page-motion-ease);
+}
+
+::view-transition-old(root) { animation: page-content-out 180ms ease both; }
+::view-transition-new(root) { animation: page-content-in 340ms var(--page-motion-ease) both; }
+::view-transition-old(workbook-content) { animation: page-content-out 180ms ease both; }
+::view-transition-new(workbook-content) { animation: page-content-in 340ms var(--page-motion-ease) both; }
+::view-transition-old(workbook-content),
+::view-transition-new(workbook-content) {
+  height: 100%;
+  object-fit: none;
+  object-position: top left;
+}
+
+::view-transition-group(workbook-dock),
+::view-transition-group(workbook-dock-blur) {
+  z-index: 1;
+}
+
+::view-transition-old(workbook-dock),
+::view-transition-new(workbook-dock),
+::view-transition-old(workbook-dock-blur),
+::view-transition-new(workbook-dock-blur) {
+  animation-duration: 180ms;
+}
+
+:root[data-page-local]::view-transition-old(root) {
+  display: none;
+}
+
+:root[data-page-local]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@keyframes page-content-out {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes page-content-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-page-enter] :where(
+    .profile-page, .writing-main, .github-main, .workbook-about > main,
+    #__next > div > .mx-auto,
+    #__next > div > div > .max-w-\[800px\]
+  ) {
+    animation: page-content-in 340ms var(--page-motion-ease) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
