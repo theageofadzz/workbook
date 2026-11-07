@@ -33,6 +33,7 @@ export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc
   for (const file of [
     "about-inter.woff2",
     "about-grid.webp",
+    "cicada-avatar.png",
     "about-profile-icon.png",
     "about-experience-icon.png",
     "wormhole-logo-gray.png",
