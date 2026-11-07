@@ -127,7 +127,7 @@
   .profile-grid { grid-template-columns: minmax(0, 1fr); margin-top: 32px; }
   .profile-grid > * { grid-area: auto; }
   .profile-card { padding: 24px; min-height: auto; }
-  .profile-portrait { aspect-ratio: 1.25; }
+  .profile-portrait { width: 100%; aspect-ratio: 1.25; }
 }
 @media (max-width: 359px) {
   .profile-page { padding-right: 16px; padding-left: 16px; }
