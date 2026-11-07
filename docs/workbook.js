@@ -9,6 +9,65 @@
   const initializedDrawings = new WeakSet();
   const startedDrawings = new WeakSet();
   const copyResets = new WeakMap();
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const splitTextViewport = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add("is-visible");
+      splitTextViewport.unobserve(entry.target);
+    }
+  }, { rootMargin: "0px 0px -100px 0px", threshold: .1 });
+
+  function resetSplitText(element) {
+    if (!element) return;
+    element.removeAttribute("data-split-text-ready");
+    element.classList.remove("workbook-split-text", "is-visible");
+  }
+
+  function initializeSplitText(element) {
+    if (!element || element.dataset.splitTextReady === "true") return;
+    const text = element.textContent;
+    if (!text.trim()) return;
+    element.dataset.splitTextReady = "true";
+    element.dataset.splitText = "rise";
+    element.classList.add("workbook-split-text");
+    element.setAttribute("aria-label", text);
+    const textNodes = [];
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+    let characterIndex = 0;
+    for (const node of textNodes) {
+      const fragment = document.createDocumentFragment();
+      for (const character of [...node.nodeValue]) {
+        if (character === " ") {
+          const space = document.createElement("span");
+          space.className = "workbook-split-text__space";
+          space.textContent = character;
+          space.setAttribute("aria-hidden", "true");
+          fragment.append(space);
+          characterIndex++;
+          continue;
+        }
+        const wrapper = document.createElement("span");
+        const letter = document.createElement("span");
+        wrapper.className = "workbook-split-text__char-wrap";
+        letter.className = "workbook-split-text__char";
+        letter.textContent = character;
+        letter.setAttribute("aria-hidden", "true");
+        letter.style.setProperty("--split-delay", `${characterIndex * 70}ms`);
+        wrapper.append(letter);
+        fragment.append(wrapper);
+        characterIndex++;
+      }
+      node.replaceWith(fragment);
+    }
+    if (reducedMotion.matches || !("IntersectionObserver" in window)) {
+      element.classList.add("is-visible");
+      return;
+    }
+    splitTextViewport.observe(element);
+  }
+
   // The writing archive owns its reading windows and uses a standalone document.
   document.addEventListener("click", event => {
     const anchor = event.target instanceof Element && event.target.closest("a[href]");
@@ -99,9 +158,17 @@
       ["设计垂点", "Workbook", config.title, headerTitle].includes(node.textContent.trim())
     );
     if (heading) {
-      if (heading.textContent !== headerTitle) heading.textContent = headerTitle;
+      if (heading.textContent !== headerTitle) {
+        heading.textContent = headerTitle;
+        resetSplitText(heading);
+      }
       const subtitle = heading.nextElementSibling;
-      if (subtitle && subtitle.textContent.trim() !== config.subtitle) subtitle.textContent = config.subtitle;
+      if (subtitle && subtitle.textContent.trim() !== config.subtitle) {
+        subtitle.textContent = config.subtitle;
+        resetSplitText(subtitle);
+      }
+      initializeSplitText(heading);
+      initializeSplitText(subtitle);
       const brandGroup = heading.parentElement;
       const mark = brandGroup?.previousElementSibling;
       if (mark?.tagName.toLowerCase() === "svg") {

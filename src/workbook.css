@@ -32,6 +32,28 @@ a[aria-label="访问 Aragakey 个人主页"]::after {
   /* Match the adjacent neutral-600 icons (#525252). */
   filter: brightness(0) invert(32.16%);
 }
+.workbook-split-text__char-wrap { display: inline-block; vertical-align: bottom; }
+.workbook-split-text__char {
+  display: inline-block;
+  transform: translate3d(0, 115%, 0);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.workbook-split-text.is-visible .workbook-split-text__char {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  transition:
+    transform 850ms cubic-bezier(.22, 1, .36, 1),
+    opacity 550ms ease-out;
+  transition-delay: var(--split-delay, 0ms);
+}
+.workbook-split-text.is-visible:hover .workbook-split-text__char {
+  transform: translate3d(0, -0.12em, 0);
+  transition-duration: 300ms;
+  transition-delay: calc(var(--split-delay, 0ms) * .15);
+}
+.workbook-split-text__space { display: inline-block; width: .28em; }
 [data-role="footer-item"] { position: relative; }
 [data-role="footer-item"]::after {
   content: attr(data-tooltip);
@@ -577,6 +599,13 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto !important; }
   [data-role="footer-item"]::after { transition: none; }
+  .workbook-split-text__char,
+  .workbook-split-text.is-visible .workbook-split-text__char,
+  .workbook-split-text.is-visible:hover .workbook-split-text__char {
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
   .portfolio-cover *, .gamestation-cover * { animation: none !important; }
   .portfolio-tv-cursor { transform: translate(23%, 42%); }
   .gamestation-screen-cursor { transform: translate(72%, 70%); }
