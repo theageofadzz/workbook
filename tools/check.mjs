@@ -123,7 +123,16 @@ for (const build of await readdir(join(root, "_next", "static"))) {
   }
 }
 const aboutHTML = await readFile(join(root, "about", "index.html"), "utf8");
+const aboutCSS = await readFile(join(root, "about.css"), "utf8");
 assert.match(aboutHTML, /data-en="Creative Experiments">创意实验<\/h2>/);
+assert.match(aboutHTML, /href="\/workbook\/weather-recreation\/" data-en="Weather motion">天气动效<\/a>/, "Expected the weather experiment to open its article");
+assert.equal((aboutHTML.match(/class="profile-column"/g) || []).length, 2, "Expected the profile cards to flow in two content-sized columns");
+assert.match(aboutHTML, /<img src="\/workbook\/assets\/cicada-avatar\.jpg" width="2316" height="3088"/, "Keep the portrait's original dimensions");
+assert.doesNotMatch(
+  aboutCSS,
+  /\.profile-(?:identity|intro|works|experience|skills|experiments)\s*\{[^}]*\bmin-height\s*:/,
+  "Profile cards must size to their content"
+);
 assert(!/profile-craft-links|>玩具<|CSS 生成艺术|转盘交互实验|环形文字实验|鼠标轨迹实验|滚动交互实验|色彩与渐变|个人博客文章/.test(aboutHTML), "The profile must not list the removed third-party experiments");
 assert.match(aboutHTML, /href="\/workbook\/gamestation\/"/, "Expected GameStation to open its internal project article");
 const aboutWorks = parse(aboutHTML);

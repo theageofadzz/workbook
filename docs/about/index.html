@@ -7,7 +7,7 @@
   <link rel="icon" href="/workbook/assets/intensea-favicon.png?v=3e8080c6" type="image/png">
   <link rel="preload" href="/workbook/assets/about-inter.woff2" as="font" type="font/woff2" crossorigin="">
   <link rel="stylesheet" href="/workbook/workbook.css?v=005a62b2">
-  <link rel="stylesheet" href="/workbook/about.css?v=cbbdc498">
+  <link rel="stylesheet" href="/workbook/about.css?v=b2c116e8">
   <link rel="stylesheet" href="/workbook/page-transitions.css?v=d4d44576"><script src="/workbook/page-transitions.js?v=894bea41"></script><script src="/workbook/about.js?v=7feb20b8" defer=""></script>
 <link rel="stylesheet" href="/workbook/cursor.css?v=e75d4cd0"></head>
 <body class="workbook-profile">
@@ -31,28 +31,23 @@
     </header>
 
     <div class="profile-grid">
-      <section class="profile-card profile-identity" aria-labelledby="identity-title">
-        <div class="profile-icon"><img src="/workbook/assets/about-profile-icon.png" width="20" height="20" alt="" aria-hidden="true"></div>
-        <h2 id="identity-title" data-en="Cicada（yenicee）">严采桦</h2>
-        <ul class="profile-meta">
-          <li><span data-en="Design Engineer">设计工程师</span> @<span class="profile-company" data-en="wormhole technology">虫洞科技</span></li>
-          <li>WeChat@theageofadzz</li>
-          <li>2003-10-14; <span data-en="Guangzhou, China">中国广州</span></li>
-        </ul>
-      </section>
+      <div class="profile-column">
+        <section class="profile-card profile-identity" aria-labelledby="identity-title">
+          <div class="profile-icon"><img src="/workbook/assets/about-profile-icon.png" width="20" height="20" alt="" aria-hidden="true"></div>
+          <h2 id="identity-title" data-en="Cicada（yenicee）">严采桦</h2>
+          <ul class="profile-meta">
+            <li><span data-en="Design Engineer">设计工程师</span> @<span class="profile-company" data-en="wormhole technology">虫洞科技</span></li>
+            <li>WeChat@theageofadzz</li>
+            <li>2003-10-14; <span data-en="Guangzhou, China">中国广州</span></li>
+          </ul>
+        </section>
 
-      <section class="profile-card profile-intro" aria-label="个人介绍" data-label-en="About me">
-        <p data-en="No artistic talent.">没有艺术细胞。</p>
-      </section>
+        <section class="profile-card profile-intro" aria-label="个人介绍" data-label-en="About me">
+          <p data-en="No artistic talent.">没有艺术细胞。</p>
+        </section>
 
-      <figure class="profile-portrait" aria-label="cicada 的个人头像" data-label-en="Cicada's personal avatar">
-        <div class="profile-portrait-frame">
-          <img src="/workbook/assets/cicada-avatar.jpg" width="2316" height="3088" alt="cicada 的个人照片头像" data-alt-en="Cicada's personal portrait avatar" fetchpriority="high" decoding="async">
-        </div>
-      </figure>
-
-      <section class="profile-card profile-works" aria-labelledby="works-title">
-        <div class="profile-icon"><svg class="lucide lucide-pencil-ruler" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <section class="profile-card profile-works" aria-labelledby="works-title">
+          <div class="profile-icon"><svg class="lucide lucide-pencil-ruler" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
   <path d="M13 7 8.7 2.7a2.41 2.41 0 0 0-3.4 0L2.7 5.3a2.41 2.41 0 0 0 0 3.4L7 13"></path>
   <path d="m8 6 2-2"></path>
   <path d="m18 16 2-2"></path>
@@ -60,73 +55,97 @@
   <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
   <path d="m15 5 4 4"></path>
 </svg></div>
-        <h2 id="works-title" data-en="Works">作品</h2>
-        <ul class="profile-links">
-          <li>
-            <div class="profile-link-main">
-              <svg class="lucide lucide-gamepad-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <h2 id="works-title" data-en="Works">作品</h2>
+          <ul class="profile-links">
+            <li>
+              <div class="profile-link-main">
+                <svg class="lucide lucide-gamepad-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
   <line x1="6" x2="10" y1="11" y2="11"></line>
   <line x1="8" x2="8" y1="9" y2="13"></line>
   <line x1="15" x2="15.01" y1="12" y2="12"></line>
   <line x1="18" x2="18.01" y1="10" y2="10"></line>
   <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"></path>
 </svg>
-              <a href="/workbook/gamestation/" data-en="GameStation">GameStation</a>
-            </div>
-          </li>
-        </ul>
-      </section>
+                <a href="/workbook/gamestation/" data-en="GameStation">GameStation</a>
+              </div>
+            </li>
+          </ul>
+        </section>
 
-      <section class="profile-card profile-experience" aria-labelledby="experience-title">
-        <div class="profile-icon"><img src="/workbook/assets/about-experience-icon.png" width="20" height="20" alt="" aria-hidden="true"></div>
-        <h2 id="experience-title" data-en="Experience">经历</h2>
-        <ul class="profile-links profile-experience-list">
-          <li>
-            <div class="profile-link-main">
-              <img class="profile-experience-logo" src="/workbook/assets/wormhole-logo-gray.png" width="16" height="16" alt="">
-              <span class="profile-experience-name" data-en="wormhole technology">虫洞科技</span>
-            </div>
-            <span class="profile-detail">2026 - now</span>
-          </li>
-          <li>
-            <div class="profile-link-main">
-              <img class="profile-experience-logo" src="/workbook/assets/jiangsu-university-logo-gray.png" width="16" height="16" alt="">
-              <a href="https://www.ujs.edu.cn/" target="_blank" rel="noopener noreferrer" data-en="Jiangsu University - English Language and Literature">江苏大学 - 英语语言文学</a>
-            </div>
-            <span class="profile-detail">2022 - 2026</span>
-          </li>
-        </ul>
-      </section>
+        <section class="profile-card profile-experience" aria-labelledby="experience-title">
+          <div class="profile-icon"><img src="/workbook/assets/about-experience-icon.png" width="20" height="20" alt="" aria-hidden="true"></div>
+          <h2 id="experience-title" data-en="Experience">经历</h2>
+          <ul class="profile-links profile-experience-list">
+            <li>
+              <div class="profile-link-main">
+                <img class="profile-experience-logo" src="/workbook/assets/wormhole-logo-gray.png" width="16" height="16" alt="">
+                <span class="profile-experience-name" data-en="wormhole technology">虫洞科技</span>
+              </div>
+              <span class="profile-detail">2026 - now</span>
+            </li>
+            <li>
+              <div class="profile-link-main">
+                <img class="profile-experience-logo" src="/workbook/assets/jiangsu-university-logo-gray.png" width="16" height="16" alt="">
+                <a href="https://www.ujs.edu.cn/" target="_blank" rel="noopener noreferrer" data-en="Jiangsu University - English Language and Literature">江苏大学 - 英语语言文学</a>
+              </div>
+              <span class="profile-detail">2022 - 2026</span>
+            </li>
+          </ul>
+        </section>
 
-      <section class="profile-card profile-skills" aria-labelledby="skills-title">
-        <div class="profile-icon"><svg class="lucide lucide-laptop-minimal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-  <rect width="18" height="12" x="3" y="4" rx="2" ry="2"></rect>
-  <line x1="2" x2="22" y1="20" y2="20"></line>
-</svg></div>
-        <h2 id="skills-title" data-en="Skills">技能</h2>
-        <ul class="profile-tags" aria-label="前端技术" data-label-en="Frontend technologies">
-          <li>react</li>
-          <li>javascript</li>
-          <li>next.js</li>
-          <li>css</li>
-          <li>svg</li>
-          <li>node.js</li>
-        </ul>
-        <hr class="profile-divider">
-        <ul class="profile-tags" aria-label="设计与创作" data-label-en="Design and creative work">
-          <li data-en="motion design">动效设计</li>
-          <li data-en="creative coding">创意编程</li>
-        </ul>
-      </section>
-
-      <section class="profile-card profile-experiments" aria-labelledby="experiments-title">
-        <div class="profile-icon"><svg class="lucide lucide-lightbulb" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <section class="profile-card profile-experiments" aria-labelledby="experiments-title">
+          <div class="profile-icon"><svg class="lucide lucide-lightbulb" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
   <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
   <path d="M9 18h6"></path>
   <path d="M10 22h4"></path>
 </svg></div>
-        <h2 id="experiments-title" data-en="Creative Experiments">创意实验</h2>
-      </section>
+          <h2 id="experiments-title" data-en="Creative Experiments">创意实验</h2>
+          <ul class="profile-links">
+            <li>
+              <div class="profile-link-main">
+                <svg class="lucide lucide-cloud-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <path d="M12 2v2"></path>
+  <path d="m4.93 4.93 1.41 1.41"></path>
+  <path d="M20 12h2"></path>
+  <path d="m19.07 4.93-1.41 1.41"></path>
+  <path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"></path>
+  <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path>
+</svg>
+                <a href="/workbook/weather-recreation/" data-en="Weather motion">天气动效</a>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="profile-column">
+        <figure class="profile-portrait" aria-label="cicada 的个人头像" data-label-en="Cicada's personal avatar">
+          <div class="profile-portrait-frame">
+            <img src="/workbook/assets/cicada-avatar.jpg" width="2316" height="3088" alt="cicada 的个人照片头像" data-alt-en="Cicada's personal portrait avatar" fetchpriority="high" decoding="async">
+          </div>
+        </figure>
+
+        <section class="profile-card profile-skills" aria-labelledby="skills-title">
+          <div class="profile-icon"><svg class="lucide lucide-laptop-minimal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <rect width="18" height="12" x="3" y="4" rx="2" ry="2"></rect>
+  <line x1="2" x2="22" y1="20" y2="20"></line>
+</svg></div>
+          <h2 id="skills-title" data-en="Skills">技能</h2>
+          <ul class="profile-tags" aria-label="前端技术" data-label-en="Frontend technologies">
+            <li>react</li>
+            <li>javascript</li>
+            <li>next.js</li>
+            <li>css</li>
+            <li>svg</li>
+            <li>node.js</li>
+          </ul>
+          <hr class="profile-divider">
+          <ul class="profile-tags" aria-label="设计与创作" data-label-en="Design and creative work">
+            <li data-en="motion design">动效设计</li>
+            <li data-en="creative coding">创意编程</li>
+          </ul>
+        </section>
+      </div>
     </div>
     <footer class="site-footer" data-site-footer="">
   <p>没有艺术细胞。</p>

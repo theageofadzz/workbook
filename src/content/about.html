@@ -26,82 +26,94 @@
     </header>
 
     <div class="profile-grid">
-      <section class="profile-card profile-identity" aria-labelledby="identity-title">
-        <div class="profile-icon"><img src="{{base}}/assets/about-profile-icon.png" width="20" height="20" alt="" aria-hidden="true"></div>
-        <h2 id="identity-title" data-en="Cicada（yenicee）">严采桦</h2>
-        <ul class="profile-meta">
-          <li><span data-en="Design Engineer">设计工程师</span> @<span class="profile-company" data-en="wormhole technology">虫洞科技</span></li>
-          <li>WeChat@theageofadzz</li>
-          <li>2003-10-14; <span data-en="Guangzhou, China">中国广州</span></li>
-        </ul>
-      </section>
+      <div class="profile-column">
+        <section class="profile-card profile-identity" aria-labelledby="identity-title">
+          <div class="profile-icon"><img src="{{base}}/assets/about-profile-icon.png" width="20" height="20" alt="" aria-hidden="true"></div>
+          <h2 id="identity-title" data-en="Cicada（yenicee）">严采桦</h2>
+          <ul class="profile-meta">
+            <li><span data-en="Design Engineer">设计工程师</span> @<span class="profile-company" data-en="wormhole technology">虫洞科技</span></li>
+            <li>WeChat@theageofadzz</li>
+            <li>2003-10-14; <span data-en="Guangzhou, China">中国广州</span></li>
+          </ul>
+        </section>
 
-      <section class="profile-card profile-intro" aria-label="个人介绍" data-label-en="About me">
-        <p data-en="No artistic talent.">没有艺术细胞。</p>
-      </section>
+        <section class="profile-card profile-intro" aria-label="个人介绍" data-label-en="About me">
+          <p data-en="No artistic talent.">没有艺术细胞。</p>
+        </section>
 
-      <figure class="profile-portrait" aria-label="cicada 的个人头像" data-label-en="Cicada's personal avatar">
-        <div class="profile-portrait-frame">
-          <img src="{{base}}/assets/cicada-avatar.jpg" width="2316" height="3088" alt="cicada 的个人照片头像" data-alt-en="Cicada's personal portrait avatar" fetchpriority="high" decoding="async">
-        </div>
-      </figure>
+        <section class="profile-card profile-works" aria-labelledby="works-title">
+          <div class="profile-icon">{{icon:pencil-ruler}}</div>
+          <h2 id="works-title" data-en="Works">作品</h2>
+          <ul class="profile-links">
+            <li>
+              <div class="profile-link-main">
+                {{icon:gamepad-2}}
+                <a href="{{base}}/gamestation/" data-en="GameStation">GameStation</a>
+              </div>
+            </li>
+          </ul>
+        </section>
 
-      <section class="profile-card profile-works" aria-labelledby="works-title">
-        <div class="profile-icon">{{icon:pencil-ruler}}</div>
-        <h2 id="works-title" data-en="Works">作品</h2>
-        <ul class="profile-links">
-          <li>
-            <div class="profile-link-main">
-              {{icon:gamepad-2}}
-              <a href="{{base}}/gamestation/" data-en="GameStation">GameStation</a>
-            </div>
-          </li>
-        </ul>
-      </section>
+        <section class="profile-card profile-experience" aria-labelledby="experience-title">
+          <div class="profile-icon"><img src="{{base}}/assets/about-experience-icon.png" width="20" height="20" alt="" aria-hidden="true"></div>
+          <h2 id="experience-title" data-en="Experience">经历</h2>
+          <ul class="profile-links profile-experience-list">
+            <li>
+              <div class="profile-link-main">
+                <img class="profile-experience-logo" src="{{base}}/assets/wormhole-logo-gray.png" width="16" height="16" alt="">
+                <span class="profile-experience-name" data-en="wormhole technology">虫洞科技</span>
+              </div>
+              <span class="profile-detail">2026 - now</span>
+            </li>
+            <li>
+              <div class="profile-link-main">
+                <img class="profile-experience-logo" src="{{base}}/assets/jiangsu-university-logo-gray.png" width="16" height="16" alt="">
+                <a href="https://www.ujs.edu.cn/" target="_blank" rel="noopener noreferrer" data-en="Jiangsu University - English Language and Literature">江苏大学 - 英语语言文学</a>
+              </div>
+              <span class="profile-detail">2022 - 2026</span>
+            </li>
+          </ul>
+        </section>
 
-      <section class="profile-card profile-experience" aria-labelledby="experience-title">
-        <div class="profile-icon"><img src="{{base}}/assets/about-experience-icon.png" width="20" height="20" alt="" aria-hidden="true"></div>
-        <h2 id="experience-title" data-en="Experience">经历</h2>
-        <ul class="profile-links profile-experience-list">
-          <li>
-            <div class="profile-link-main">
-              <img class="profile-experience-logo" src="{{base}}/assets/wormhole-logo-gray.png" width="16" height="16" alt="">
-              <span class="profile-experience-name" data-en="wormhole technology">虫洞科技</span>
-            </div>
-            <span class="profile-detail">2026 - now</span>
-          </li>
-          <li>
-            <div class="profile-link-main">
-              <img class="profile-experience-logo" src="{{base}}/assets/jiangsu-university-logo-gray.png" width="16" height="16" alt="">
-              <a href="https://www.ujs.edu.cn/" target="_blank" rel="noopener noreferrer" data-en="Jiangsu University - English Language and Literature">江苏大学 - 英语语言文学</a>
-            </div>
-            <span class="profile-detail">2022 - 2026</span>
-          </li>
-        </ul>
-      </section>
+        <section class="profile-card profile-experiments" aria-labelledby="experiments-title">
+          <div class="profile-icon">{{icon:lightbulb}}</div>
+          <h2 id="experiments-title" data-en="Creative Experiments">创意实验</h2>
+          <ul class="profile-links">
+            <li>
+              <div class="profile-link-main">
+                {{icon:cloud-sun}}
+                <a href="{{base}}/weather-recreation/" data-en="Weather motion">天气动效</a>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </div>
 
-      <section class="profile-card profile-skills" aria-labelledby="skills-title">
-        <div class="profile-icon">{{icon:laptop-minimal}}</div>
-        <h2 id="skills-title" data-en="Skills">技能</h2>
-        <ul class="profile-tags" aria-label="前端技术" data-label-en="Frontend technologies">
-          <li>react</li>
-          <li>javascript</li>
-          <li>next.js</li>
-          <li>css</li>
-          <li>svg</li>
-          <li>node.js</li>
-        </ul>
-        <hr class="profile-divider">
-        <ul class="profile-tags" aria-label="设计与创作" data-label-en="Design and creative work">
-          <li data-en="motion design">动效设计</li>
-          <li data-en="creative coding">创意编程</li>
-        </ul>
-      </section>
+      <div class="profile-column">
+        <figure class="profile-portrait" aria-label="cicada 的个人头像" data-label-en="Cicada's personal avatar">
+          <div class="profile-portrait-frame">
+            <img src="{{base}}/assets/cicada-avatar.jpg" width="2316" height="3088" alt="cicada 的个人照片头像" data-alt-en="Cicada's personal portrait avatar" fetchpriority="high" decoding="async">
+          </div>
+        </figure>
 
-      <section class="profile-card profile-experiments" aria-labelledby="experiments-title">
-        <div class="profile-icon">{{icon:lightbulb}}</div>
-        <h2 id="experiments-title" data-en="Creative Experiments">创意实验</h2>
-      </section>
+        <section class="profile-card profile-skills" aria-labelledby="skills-title">
+          <div class="profile-icon">{{icon:laptop-minimal}}</div>
+          <h2 id="skills-title" data-en="Skills">技能</h2>
+          <ul class="profile-tags" aria-label="前端技术" data-label-en="Frontend technologies">
+            <li>react</li>
+            <li>javascript</li>
+            <li>next.js</li>
+            <li>css</li>
+            <li>svg</li>
+            <li>node.js</li>
+          </ul>
+          <hr class="profile-divider">
+          <ul class="profile-tags" aria-label="设计与创作" data-label-en="Design and creative work">
+            <li data-en="motion design">动效设计</li>
+            <li data-en="creative coding">创意编程</li>
+          </ul>
+        </section>
+      </div>
     </div>
     {{footer}}
   </main>
