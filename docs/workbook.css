@@ -668,6 +668,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .weather-attribution > a:last-child { display: inline-block; margin-top: 10px; }
 .weather-source-browse { max-width: 100%; }
 .weather-source-browse video { display: block; width: 100%; height: auto; aspect-ratio: 55 / 42; border: 1px solid #e1e1e1; border-radius: 4px; background: #fff; }
+.weather-source-browse > figcaption { text-align: center; }
 .weather-code-details { margin: 28px 0 36px; border-top: 1px solid #dcdcdc; border-bottom: 1px solid #dcdcdc; }
 .weather-code-details > summary { padding: 16px 0; color: #525252; font-size: 14px; cursor: pointer; }
 .weather-code-details > p { margin: 0 0 18px; color: #737373; font-size: 13px; line-height: 1.8; }
