@@ -13,6 +13,7 @@ import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetire
 
 const root = resolve(import.meta.dirname, "..");
 const config = JSON.parse(await readFile(join(root, "site.config.json"), "utf8"));
+const footer = (await readFile(join(root, "src", "content", "site-footer.html"), "utf8")).trim();
 const assetVersion = async file => createHash("sha256")
   .update(await readFile(join(root, "src", file)))
   .digest("hex")
@@ -66,6 +67,10 @@ async function writeFavicon() {
     create: { width: 64, height: 64, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } }
   }).composite([{ input: silhouette, left: 4, top: 15 }]).png().toBuffer();
   await writeFile(join(out, "assets", "intensea-favicon.png"), favicon);
+}
+
+async function writeNotFoundPage() {
+  await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a>${footer}</main></body></html>`);
 }
 
 async function brandClientHeader() {
@@ -260,14 +265,15 @@ try {
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
-  const retiredArticles = await personalizePortfolio({ root, out, base });
-  await writeHomePage({ root, out, base, title: config.title });
-  await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
+  await writeNotFoundPage();
+  const retiredArticles = await personalizePortfolio({ root, out, base, footer });
+  await writeHomePage({ root, out, base, title: config.title, footer });
+  await writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer });
   await pruneExcludedContent({ out, base, url: config.url });
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
-  await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
-  await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
+  await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
+  await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);
   await pruneUnusedBranding({ out });
   await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
@@ -430,14 +436,14 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
   externalMedia: manifest.externalMedia,
   unavailableAssets: manifest.failures
 }, null, 2));
-await writeFile(join(out, "404.html"), `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>页面未找到 · ${config.title}</title><link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"></head><body class="workbook-about"><main><p class="eyebrow">404</p><h1>这一页暂时不在。</h1><p class="lead">继续探索其他作品与设计记录。</p><a class="back" href="${base}/">← 返回作品集</a></main></body></html>`);
-const retiredArticles = await personalizePortfolio({ root, out, base });
-await writeHomePage({ root, out, base, title: config.title });
-await writeAboutPage({ root, out, base, browserTitle, faviconSrc });
+await writeNotFoundPage();
+const retiredArticles = await personalizePortfolio({ root, out, base, footer });
+await writeHomePage({ root, out, base, title: config.title, footer });
+await writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer });
 await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();
-await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
-await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc });
+await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
+await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
 const publishedPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
 await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);
 await pruneUnusedBranding({ out });

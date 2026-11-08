@@ -48,7 +48,7 @@ function cleanReadme(source, repository, base, names) {
   return serialize(document);
 }
 
-export async function writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc }) {
+export async function writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer }) {
   const snapshot = JSON.parse(await readFile(join(root, "src", "content", "github.json"), "utf8"));
   const names = new Set(snapshot.repos.map(repo => repo.name));
   const repos = snapshot.repos.map(repo => ({ ...repo, readme: cleanReadme(repo.readme, repo, base, names) }));
@@ -65,6 +65,7 @@ export async function writeGitHubPage({ root, out, base, browserTitle, faviconSr
   html = html.replaceAll("{{dock}}", dock);
   const totalStars = repos.reduce((total, repo) => total + repo.stars, 0);
   const replacements = {
+    footer,
     base, browserTitle, favicon: faviconSrc, logo: logoSrc,
     cssVersion: hash(css), jsVersion: hash(js),
     profileCSSVersion: hash(profileCSS), profileJSVersion: hash(profileJS),

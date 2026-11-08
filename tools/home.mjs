@@ -1,6 +1,6 @@
 import { readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parse, serialize } from "parse5";
+import { parse, parseFragment, serialize } from "parse5";
 
 const attr = (node, name) => node.attrs?.find(item => item.name === name)?.value;
 function walk(node, visit) {
@@ -12,14 +12,24 @@ function remove(node) {
   siblings.splice(siblings.indexOf(node), 1);
 }
 
-export async function writeHomePage({ root, out, base, title }) {
+export async function writeHomePage({ root, out, base, title, footer }) {
   const entries = await Promise.all(["weather-recreation", "portfolio-design", "gamestation"].map(async name =>
     JSON.parse(await readFile(join(root, "src", "content", `${name}.json`), "utf8"))
   ));
   const allowed = new Set(entries.map(entry => `${base}/${entry.slug}`));
   const document = parse(await readFile(join(out, "index.html"), "utf8"));
   const retained = [];
+  let footerCount = 0;
   walk(document, node => {
+    if ((node.tagName === "footer" && attr(node, "data-site-footer") !== undefined)
+      || (node.tagName === "div" && attr(node, "class") === "mt-20 flex flex-col items-center")) {
+      const replacement = parseFragment(footer).childNodes.find(child => child.tagName === "footer");
+      replacement.parentNode = node.parentNode;
+      const siblings = node.parentNode.childNodes;
+      siblings.splice(siblings.indexOf(node), 1, replacement);
+      footerCount++;
+      return false;
+    }
     if (node.tagName === "body" && attr(node, "data-workbook-home") === undefined) {
       node.attrs.push({ name: "data-workbook-home", value: "" });
     }
@@ -68,6 +78,7 @@ export async function writeHomePage({ root, out, base, title }) {
   if (retained.join(",") !== entries.map(entry => entry.slug).join(",")) {
     throw new Error("The homepage must contain the configured personal entries, in order.");
   }
+  if (footerCount !== 1) throw new Error("The homepage must contain one shared contact footer.");
   await writeFile(join(out, "index.html"), serialize(document));
   const chunks = join(out, "_next", "static", "chunks");
   for (const file of await readdir(chunks)) {

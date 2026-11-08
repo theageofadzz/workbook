@@ -82,7 +82,7 @@ function updateByline(container, frontmatter) {
   });
 }
 
-export async function personalizePortfolio({ root, out, base }) {
+export async function personalizePortfolio({ root, out, base, footer }) {
   const contentRoot = join(root, "src", "content");
   const logoStudy = await readFile(join(root, "src", "assets", "intensea-golden-ratio.svg"), "utf8");
   await writeFile(join(out, "assets", "intensea-golden-ratio.svg"), logoStudy);
@@ -122,7 +122,7 @@ export async function personalizePortfolio({ root, out, base }) {
       templateSlug: "wxad12"
     }
   ]) {
-    const result = await personalizeArticle({ contentRoot, out, base, logoStudy, ...entry });
+    const result = await personalizeArticle({ contentRoot, out, base, logoStudy, footer, ...entry });
     retiredContent.push(...result.retiredContent);
     compiledArticles.push(result.compiled);
   }
@@ -164,6 +164,7 @@ async function personalizeArticle({
   contentRoot,
   out,
   base,
+  footer,
   logoStudy,
   name,
   cover: coverName,
@@ -179,6 +180,7 @@ async function personalizeArticle({
     .replaceAll("{{cursor}}", cursorMarkup)
     .trim();
   let articleHTML = (await readFile(join(contentRoot, `${name}.html`), "utf8"))
+    .replaceAll("{{footer}}", footer)
     .replaceAll("{{base}}", base)
     .replaceAll("{{logoStudy}}", logoStudy)
     .replaceAll("{{cursor}}", cursorMarkup)

@@ -413,18 +413,20 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   color: #525252;
   line-height: 1.9;
 }
-.portfolio-essay-footer {
+.site-footer {
   display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-top: 72px;
-  padding-top: 24px;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 72px 0 0;
+  padding: 24px 0 0;
   border-top: 1px solid #d4d4d4;
-  font-size: 13px;
   color: #737373;
+  font: 13px/1.9 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-align: center;
+  letter-spacing: 0;
 }
-.portfolio-essay-footer a:hover { color: #262626; text-decoration: underline; text-underline-offset: 4px; }
+.site-footer > p { margin: 0; }
 .gamestation-cover {
   --game-cycle: 20s;
   position: relative;
@@ -663,7 +665,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .weather-table th { color: #737373; font-weight: 500; }
 .weather-table td code { font-size: 12px; }
 .weather-essay .weather-sources { color: #858585; font-size: 13px; line-height: 1.9; }
-.weather-essay .portfolio-essay-footer { flex-wrap: wrap; }
 .weather-essay .weather-attribution { line-height: 1.85; }
 .weather-attribution > a:last-child { display: inline-block; margin-top: 10px; }
 .weather-source-browse { max-width: 100%; }

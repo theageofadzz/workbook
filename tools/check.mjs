@@ -190,7 +190,9 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
   let homeLogo;
   let homeTriangle = false;
   let footerIndex = 0;
+  const contactFooters = [];
   function inspect(node, inHomeLink = false) {
+    if (node.tagName === "footer" && node.attrs?.some(attr => attr.name === "data-site-footer")) contactFooters.push(node);
     if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {
       const index = footerIndex++;
       if (index === 2) {
@@ -210,6 +212,13 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
     for (const child of node.childNodes || []) inspect(child, inHomeLink);
   }
   inspect(document);
+  assert.equal(contactFooters.length, 1, `Expected one shared contact footer in ${page}`);
+  assert.deepEqual(
+    contactFooters[0].childNodes.filter(node => node.tagName === "p").map(node => node.childNodes.map(child => child.value || "").join("")),
+    ["没有艺术细胞。", "wechat：theageofadzz", "欢迎与我联系！"],
+    `Expected the same three footer lines in ${page}`
+  );
+  assert(!/<footer[^>]+class="portfolio-essay-footer"/.test(await readFile(join(root, page), "utf8")), `Retired article footer links remain in ${page}`);
   assert.equal(title, "workbook of theageofadzz", `Unexpected browser title in ${page}`);
   assert.match(icon || "", /^\/workbook\/assets\/intensea-favicon\.png\?v=[a-f0-9]{8}$/, `Unexpected favicon in ${page}`);
   if (homeLink) {
@@ -386,9 +395,11 @@ for (const heading of tutorialData.props.pageProps.content.headings) {
   assert(tutorialNodes.some(node => node.tagName === "h2" && node.attrs.some(attr => attr.name === "id" && attr.value === heading.id)), `Missing tutorial section ${heading.text}`);
 }
 assert(home.includes("weather-tutorial-cover") && home.includes(tutorial.title), "The homepage must include the new tutorial and its circular GIF cover");
-assert(tutorialHTML.includes("我觉得图形你已经复刻了") && tutorialHTML.includes("我的意思打开后显示 gif"), "The tutorial must document the user's visual and preview corrections");
+assert(tutorialHTML.includes("我觉得图形你已经复刻了"), "The tutorial must document the user's animation correction");
+assert(!tutorialHTML.includes("列表有信息，打开后看动画") && !tutorialHTML.includes("我的意思打开后显示 gif") && !tutorialHTML.includes("weather-preview.mp4"), "The removed preview section must not return");
+assert(!tutorialData.props.pageProps.content.headings.some(heading => heading.id === "作品列表与纯净预览"), "The table of contents must omit the removed preview section");
 assert(tutorialHTML.includes("assets/works/weather.gif"), "The tutorial must retain the finished animation");
-for (const name of ["align", "layers", "type", "gif", "preview", "check"]) {
+for (const name of ["align", "layers", "type", "gif", "check"]) {
   const study = tutorialNodes.find(node => node.tagName === "video"
     && node.attrs.some(attr => attr.name === "src" && attr.value.endsWith(`/weather-${name}.mp4`)));
   assert(study, `Missing animated implementation study: ${name}`);

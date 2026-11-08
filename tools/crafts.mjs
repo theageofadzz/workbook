@@ -48,7 +48,7 @@ async function articleBody(path) {
   return { html: serialize(document).trim(), plainText, headings, minutes: Math.max(1, Math.ceil(plainText.length / 350)) };
 }
 
-export async function writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc }) {
+export async function writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer }) {
   const contentRoot = join(root, "src", "content", "writing");
   const snapshot = JSON.parse(await readFile(join(contentRoot, "manifest.json"), "utf8"));
   const { works } = JSON.parse(await readFile(join(root, "src", "content", "works.json"), "utf8"));
@@ -79,6 +79,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     return paragraphs.join("");
   }
   const replacements = {
+    footer,
     base,
     browserTitle,
     favicon: faviconSrc,
