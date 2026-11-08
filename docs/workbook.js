@@ -179,11 +179,10 @@
     for (const entry of entries) {
       if (!entry.target.isConnected) {
         conversationViewport.unobserve(entry.target);
+        conversations.get(entry.target)?.finish();
         continue;
       }
-      if (!entry.isIntersecting) continue;
-      conversationViewport.unobserve(entry.target);
-      conversations.get(entry.target)?.play();
+      conversations.get(entry.target)?.setVisible(entry.isIntersecting);
     }
   }, { threshold: .35 });
 
@@ -195,16 +194,19 @@
       const avatar = figure.querySelector(".weather-conversation-avatar");
       let animations = [];
       let sequence = 0;
+      let replayTimer = 0;
+      let inView = false;
       function finish() {
         sequence++;
+        clearTimeout(replayTimer);
+        replayTimer = 0;
         figure.classList.remove("is-pending");
         animations.forEach(animation => animation.cancel());
         animations = [];
       }
       function play() {
-        conversationViewport.unobserve(figure);
         finish();
-        if (reducedMotion.matches) return;
+        if (!figure.isConnected || !inView || document.hidden || reducedMotion.matches) return;
         figure.classList.add("is-pending");
         const current = sequence;
         animations.push(typing.animate([
@@ -230,25 +232,32 @@
         ], { delay: 900, duration: 560, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "both" });
         animations.push(arrival);
         arrival.finished.then(() => {
-          if (sequence === current) finish();
+          if (sequence !== current) return;
+          finish();
+          replayTimer = setTimeout(play, 30_000);
         }).catch(() => {});
       }
-      conversations.set(figure, { play, finish });
+      conversations.set(figure, {
+        play,
+        finish,
+        setVisible(visible) {
+          if (inView === visible) return;
+          inView = visible;
+          play();
+        }
+      });
       figure.classList.add("is-initialized");
-      figure.querySelector("[data-conversation-replay]").addEventListener("click", play);
-      if (!reducedMotion.matches) {
-        figure.classList.add("is-pending");
-        conversationViewport.observe(figure);
-      }
+      if (!reducedMotion.matches) figure.classList.add("is-pending");
+      conversationViewport.observe(figure);
     });
   }
-  reducedMotion.addEventListener("change", () => {
-    if (!reducedMotion.matches) return;
+  function refreshConversations() {
     document.querySelectorAll("[data-weather-conversation]").forEach(figure => {
-      conversationViewport.unobserve(figure);
-      conversations.get(figure)?.finish();
+      conversations.get(figure)?.play();
     });
-  });
+  }
+  reducedMotion.addEventListener("change", refreshConversations);
+  document.addEventListener("visibilitychange", refreshConversations);
 
   document.addEventListener("click", async event => {
     const button = event.target instanceof Element && event.target.closest("[data-code-copy]");

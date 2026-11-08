@@ -603,8 +603,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
   grid-column: 1;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
-  height: 28px;
+  height: 18px;
   color: #858585;
   font: 12px/1.5 ui-monospace, monospace;
 }
@@ -635,10 +634,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 }
 .weather-message p { margin: 0; }
 .weather-conversation-avatar { grid-column: 2; grid-row: 2; display: block; width: 32px; height: 32px; margin-top: 3px; border: 1px solid #d5d5d5; border-radius: 50%; object-fit: cover; }
-.weather-conversation-replay { display: none; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #858585; cursor: pointer; }
-.weather-conversation.is-initialized .weather-conversation-replay { display: grid; }
-.weather-conversation-replay:hover { background: #e5e5e5; color: #404040; }
-.weather-conversation-replay svg { width: 14px; height: 14px; }
 .weather-typing {
   position: absolute;
   top: 0;
@@ -715,7 +710,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
     transition: none;
   }
   .portfolio-cover *, .gamestation-cover * { animation: none !important; }
-  .weather-conversation.is-initialized .weather-conversation-replay { display: none; }
   .portfolio-tv-cursor { transform: translate(23%, 42%); }
   .gamestation-screen-cursor { transform: translate(72%, 70%); }
 }
