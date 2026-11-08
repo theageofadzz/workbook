@@ -98,7 +98,11 @@ export async function personalizePortfolio({ root, out, base }) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
   await writeWeatherFrames({ root, out });
-  for (const file of ["weather-x-browse.mp4", "weather-x-browse.webp"]) {
+  for (const file of [
+    "weather-x-browse.mp4", "weather-x-browse.webp",
+    ...["align", "layers", "type", "gif", "preview", "check"].flatMap(name =>
+      [`weather-${name}.mp4`, `weather-${name}.webp`])
+  ]) {
     await copyFile(join(root, "src", "assets", "articles", file), join(out, "assets", "articles", file));
   }
   const retiredContent = [];

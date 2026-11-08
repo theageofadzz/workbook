@@ -6,6 +6,10 @@
 
   <h2 id="从参考到明确目标">先把画面对齐</h2>
   <p>我的要求是保留原作的构图、配色、字体和手绘质感。先看雨伞的位置与大小，再看右侧面板、底部文字和图形之间的距离。</p>
+  <figure class="weather-demo weather-explainer">
+    <video data-weather-study src="{{base}}/assets/articles/weather-align.mp4" poster="{{base}}/assets/articles/weather-align.webp" width="1120" height="840" muted loop playsinline preload="none" aria-label="动画解析：固定 518 像素画布，鼠标选中雨伞并拖到记录坐标，再核对右侧面板"></video>
+    <figcaption>操作示意 · 固定画布、拖动对齐、核对位置</figcaption>
+  </figure>
   <p>实现时固定一块 <code>518 × 518</code> 的画布，把画面分成纸面、衣服、雨伞、人物、色块、天气和预报七层。每层记录位置与尺寸，屏幕变大时整体缩放。原有的线条和颗粒保存在图像素材里，再由 Canvas 按顺序合成。</p>
 
   <h2 id="从图形相似到运动相似">图形像了，动作还要像</h2>
@@ -18,9 +22,9 @@
     <img class="weather-conversation-avatar" src="{{base}}/assets/cicada-avatar.webp" width="32" height="32" alt="" aria-hidden="true" loading="lazy" decoding="async">
   </figure>
   <p>这次反馈把重点转向了动作：伞怎样展开，图块什么时候移动，温度与云朵怎样一起变化。</p>
-  <figure class="weather-frames">
-    <img src="{{base}}/assets/articles/weather-frames.webp" width="984" height="652" alt="复刻版六个时间点的画面，展示雨伞、云朵和温度面板的变化" loading="lazy" decoding="async">
-    <figcaption>复刻版关键帧 · 从左至右、从上至下：0.00、0.64、1.28、1.92、2.56、3.20 秒</figcaption>
+  <figure class="weather-demo weather-explainer">
+    <video data-weather-study src="{{base}}/assets/articles/weather-layers.mp4" poster="{{base}}/assets/articles/weather-layers.webp" width="1120" height="840" muted loop playsinline preload="none" aria-label="动画解析：鼠标开关七个实际图层，拖动共享时间轴，再展示从图集裁帧和 Canvas 合成"></video>
+    <figcaption>操作示意 · 图层开关、共用帧号、图集裁帧</figcaption>
   </figure>
   <p>成品保存了 48 帧，每帧播放 80 毫秒，3.84 秒循环一次。同一图层的帧排成一张“图集”，像一页连环画；代码按帧号取图，再放回画布。</p>
   <p>七层共用同一个播放时间，这样伞、天气卡片和预报图形就能同步。素材全部加载后才播放，切走页面时暂停，回来后继续。</p>
@@ -62,10 +66,18 @@
   <h2 id="把署名与语言融进画面">调整署名和文字</h2>
   <p>画面与动作确认后，我把复刻版底部署名改成 <em>cicada</em>，要求保留原来的字体风格。原作作者的署名在本文开头单独说明。</p>
   <p>“雨”的文字最后保留四种写法：<strong>雨、rain、あめ、비</strong>。去掉重复的繁体项后，再调整基线与间距。文字写入画面素材，保持与手绘图形一致的质感。</p>
+  <figure class="weather-demo weather-explainer">
+    <video data-weather-study src="{{base}}/assets/articles/weather-type.mp4" poster="{{base}}/assets/articles/weather-type.webp" width="1120" height="840" muted loop playsinline preload="none" aria-label="动画解析：鼠标选中署名，改为 cicada，删除重复的繁体项，放大检查文字基线和间距"></video>
+    <figcaption>操作示意 · 修改署名、删除重复项、对齐文字</figcaption>
+  </figure>
 
   <h2 id="导出干净的循环gif">做成自动循环的 GIF</h2>
   <p>HTML 负责分层播放，作品页面使用导出的 <code>weather.gif</code>。导出时按每帧 80 毫秒取图，编码为无限循环的 GIF，再检查颜色和首尾衔接。</p>
   <p>我要求去掉进度条和多余界面，所以展示时只放一个图片元素，让 GIF 自己循环。</p>
+  <figure class="weather-demo weather-explainer">
+    <video data-weather-study src="{{base}}/assets/articles/weather-gif.mp4" poster="{{base}}/assets/articles/weather-gif.webp" width="1120" height="840" muted loop playsinline preload="none" aria-label="动画解析：选择 48 帧，设为每帧 80 毫秒和无限循环，导出后以图片元素展示"></video>
+    <figcaption>操作示意 · 48 帧、每帧 80 毫秒、无限循环</figcaption>
+  </figure>
 
   <h2 id="作品列表与纯净预览">列表有信息，打开后看动画</h2>
   <figure class="weather-conversation" data-weather-conversation aria-label="我的对话：关于作品预览">
@@ -78,10 +90,18 @@
   </figure>
   <p>最终，作品列表显示名称 <em>weather</em> 和日期。点击后打开弹层，里面只放 GIF；关闭按钮在画面外围右上角，并保留打开、关闭动画。</p>
   <p>代码用 <code>dialog.showModal()</code> 打开预览。关闭时先播放退出动画，再隐藏弹层，并把焦点还给作品入口。点击遮罩或按 Escape 也可以关闭。</p>
+  <figure class="weather-demo weather-explainer">
+    <video data-weather-study src="{{base}}/assets/articles/weather-preview.mp4" poster="{{base}}/assets/articles/weather-preview.webp" width="1120" height="840" muted loop playsinline preload="none" aria-label="动画解析：鼠标点击作品入口，弹层显示纯 GIF，点击外围关闭按钮，退出后焦点回到入口"></video>
+    <figcaption>操作示意 · 打开预览、外围关闭、回到入口</figcaption>
+  </figure>
 
   <h2 id="怎样验证复刻是否到位">最后怎么检查</h2>
   <p>先把参考和复刻版放到相同尺寸，对比伞的轮廓、色块、文字位置；再正常播放，检查动作节奏与循环衔接。“像素级”是这次的对齐目标，我们没有做逐帧零误差测量。</p>
   <p>最后检查网页：GIF 是否加载、弹层有没有多余文字、关闭按钮是否挡住画面，以及手机端是否正常。构建、链接和素材检查均通过。</p>
+  <figure class="weather-demo weather-explainer">
+    <video data-weather-study src="{{base}}/assets/articles/weather-check.mp4" poster="{{base}}/assets/articles/weather-check.webp" width="1120" height="840" muted loop playsinline preload="none" aria-label="动画解析：鼠标拖动同尺寸对照分隔线、查看关键帧，再检查手机端布局和素材"></video>
+    <figcaption>操作示意 · 同尺寸对照、逐帧检查、手机端检查</figcaption>
+  </figure>
   <figure class="weather-demo">
     <picture>
       <source media="(prefers-reduced-motion: reduce)" srcset="{{base}}/assets/works/weather.webp">

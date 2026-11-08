@@ -1,0 +1,7 @@
+assets/
+motion-data.js
+weather-tutorial-master.mp4
+renders/
+snapshots/
+.hyperframes/
+*.log

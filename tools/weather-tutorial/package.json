@@ -1,0 +1,13 @@
+{
+  "name": "weather-tutorial-motion",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.9.22 preview",
+    "check": "npx --yes hyperframes@0.9.22 check",
+    "prepare": "node prepare.mjs ../..",
+    "render": "npx --yes hyperframes@0.9.22 render --fps 24 --workers 2 --quality looks --output weather-tutorial-master.mp4",
+    "export": "node export.mjs weather-tutorial-master.mp4 ../..",
+    "publish": "npx --yes hyperframes@0.9.22 publish"
+  }
+}

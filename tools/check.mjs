@@ -387,7 +387,22 @@ for (const heading of tutorialData.props.pageProps.content.headings) {
 }
 assert(home.includes("weather-tutorial-cover") && home.includes(tutorial.title), "The homepage must include the new tutorial and its circular GIF cover");
 assert(tutorialHTML.includes("我觉得图形你已经复刻了") && tutorialHTML.includes("我的意思打开后显示 gif"), "The tutorial must document the user's visual and preview corrections");
-assert(tutorialHTML.includes("assets/works/weather.gif") && tutorialHTML.includes("assets/articles/weather-frames.webp"), "The tutorial needs the actual animation and a keyframe study");
+assert(tutorialHTML.includes("assets/works/weather.gif"), "The tutorial must retain the finished animation");
+for (const name of ["align", "layers", "type", "gif", "preview", "check"]) {
+  const study = tutorialNodes.find(node => node.tagName === "video"
+    && node.attrs.some(attr => attr.name === "src" && attr.value.endsWith(`/weather-${name}.mp4`)));
+  assert(study, `Missing animated implementation study: ${name}`);
+  for (const attribute of ["data-weather-study", "muted", "loop", "playsinline"]) {
+    assert(study.attrs.some(attr => attr.name === attribute), `Missing ${attribute} on ${name}`);
+  }
+  assert(!study.attrs.some(attr => attr.name === "controls" || attr.name === "autoplay"), "Implementation studies use viewport playback without controls");
+  assert(study.attrs.some(attr => attr.name === "preload" && attr.value === "none"), "Offscreen studies must not preload their video data");
+  const poster = `assets/articles/weather-${name}.webp`;
+  assert(study.attrs.some(attr => attr.name === "poster" && attr.value.endsWith(poster)), "Each study needs a static fallback");
+  const metadata = await sharp(join(root, poster)).metadata();
+  assert.equal(metadata.width, 1120);
+  assert.equal(metadata.height, 840);
+}
 const contactSheet = await sharp(join(root, "assets", "articles", "weather-frames.webp")).metadata();
 assert.equal(contactSheet.width, 984);
 assert.equal(contactSheet.height, 652);

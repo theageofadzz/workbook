@@ -9,6 +9,7 @@
   const initializedDrawings = new WeakSet();
   const startedDrawings = new WeakSet();
   const conversations = new WeakMap();
+  const weatherStudies = new WeakMap();
   const copyResets = new WeakMap();
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const splitTextViewport = new IntersectionObserver(entries => {
@@ -259,6 +260,44 @@
   reducedMotion.addEventListener("change", refreshConversations);
   document.addEventListener("visibilitychange", refreshConversations);
 
+  const weatherStudyViewport = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.target.isConnected) {
+        entry.target.pause();
+        weatherStudyViewport.unobserve(entry.target);
+        continue;
+      }
+      const state = weatherStudies.get(entry.target);
+      if (!state) continue;
+      state.visible = entry.isIntersecting;
+      state.sync();
+    }
+  }, { threshold: .25 });
+
+  function initializeWeatherStudies() {
+    document.querySelectorAll("video[data-weather-study]").forEach(video => {
+      if (weatherStudies.has(video)) return;
+      const state = {
+        visible: false,
+        sync() {
+          if (!video.isConnected || !state.visible || document.hidden || reducedMotion.matches) {
+            video.pause();
+            return;
+          }
+          video.muted = true;
+          video.play().catch(() => {});
+        }
+      };
+      weatherStudies.set(video, state);
+      weatherStudyViewport.observe(video);
+    });
+  }
+  function refreshWeatherStudies() {
+    document.querySelectorAll("video[data-weather-study]").forEach(video => weatherStudies.get(video)?.sync());
+  }
+  reducedMotion.addEventListener("change", refreshWeatherStudies);
+  document.addEventListener("visibilitychange", refreshWeatherStudies);
+
   document.addEventListener("click", async event => {
     const button = event.target instanceof Element && event.target.closest("[data-code-copy]");
     if (!button) return;
@@ -326,6 +365,7 @@
     if (!fullBranding) return;
     initializeMotionStudies();
     initializeConversations();
+    initializeWeatherStudies();
     document.title = config.browserTitle || "workbook of theageofadzz";
     document.querySelectorAll("h2 a").forEach(anchor => {
       if (anchor.textContent === "设计垂点") anchor.textContent = config.title;
