@@ -20,6 +20,7 @@ const assetVersion = async file => createHash("sha256")
   .slice(0, 8);
 const cssVersion = await assetVersion("workbook.css");
 const jsVersion = await assetVersion("workbook.js");
+const scrollExpandVersion = await assetVersion("scroll-expand.js");
 const securityVersion = await assetVersion("security.js");
 const cursorVersion = await assetVersion("cursor.css");
 const transitionCSSVersion = await assetVersion("page-transitions.css");
@@ -261,18 +262,18 @@ try {
 } catch {
   // Checked-in docs are a complete, ready-to-publish static build.
   await accessBuild();
-  for (const file of ["workbook.css", "workbook.js", "security.js", "cursor.css", "page-transitions.css", "page-transitions.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
+  for (const file of ["workbook.css", "workbook.js", "scroll-expand.js", "security.js", "cursor.css", "page-transitions.css", "page-transitions.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
   await mkdir(join(out, "assets"), { recursive: true });
   await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
   await writeFavicon();
   await writeNotFoundPage();
-  const retiredArticles = await personalizePortfolio({ root, out, base, footer });
+  const retiredArticles = await personalizePortfolio({ root, out, base, footer, scrollExpandVersion });
   await writeHomePage({ root, out, base, title: config.title, footer });
   await writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer });
   await pruneExcludedContent({ out, base, url: config.url });
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
-  await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
+  await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer, scrollExpandVersion });
   await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);
   await pruneUnusedBranding({ out });
@@ -394,7 +395,7 @@ for (const record of manifest.files) {
     html = rewrite(serialize(document));
     html = html.replace(/(<title[^>]*>)(.*?)(<\/title>)/, (_, open, title, close) => `${open}${title === "设计垂点" || title === config.title ? config.title : `${title} · ${config.title}`}${close}`);
     html = html.replace(/(<meta name="description" content=")[^"]*"/, `$1${config.subtitle}"`);
-    html = html.replace("</head>", `<link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"><script src="${base}/workbook.js?v=${jsVersion}" defer></script><meta name="theme-color" content="#f3f3f3"></head>`);
+    html = html.replace("</head>", `<link rel="stylesheet" href="${base}/workbook.css?v=${cssVersion}"><script src="${base}/scroll-expand.js?v=${scrollExpandVersion}" defer></script><script src="${base}/workbook.js?v=${jsVersion}" defer></script><meta name="theme-color" content="#f3f3f3"></head>`);
     await mkdir(dirname(output), { recursive: true });
     await writeFile(output, html);
     const transformed = parse(html);
@@ -417,7 +418,7 @@ for (const record of manifest.files) {
   }
 }
 
-for (const file of ["workbook.css", "workbook.js", "security.js", "cursor.css", "page-transitions.css", "page-transitions.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
+for (const file of ["workbook.css", "workbook.js", "scroll-expand.js", "security.js", "cursor.css", "page-transitions.css", "page-transitions.js", "grid.svg"]) await copyFile(join(root, "src", file), join(out, file));
 await mkdir(join(out, "assets"), { recursive: true });
 await copyFile(join(root, "src", "assets", "intensea-logo.png"), join(out, "assets", "intensea-logo.png"));
 await writeFavicon();
@@ -437,12 +438,12 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
   unavailableAssets: manifest.failures
 }, null, 2));
 await writeNotFoundPage();
-const retiredArticles = await personalizePortfolio({ root, out, base, footer });
+const retiredArticles = await personalizePortfolio({ root, out, base, footer, scrollExpandVersion });
 await writeHomePage({ root, out, base, title: config.title, footer });
 await writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer });
 await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();
-await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
+await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer, scrollExpandVersion });
 await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
 const publishedPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
 await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);

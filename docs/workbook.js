@@ -298,6 +298,11 @@
   reducedMotion.addEventListener("change", refreshWeatherStudies);
   document.addEventListener("visibilitychange", refreshWeatherStudies);
 
+  function initializeScrollExpands() {
+    const article = document.querySelector(".portfolio-essay");
+    window.WorkbookScrollExpand?.initialize(article, { scroller: window });
+  }
+
   document.addEventListener("click", async event => {
     const button = event.target instanceof Element && event.target.closest("[data-code-copy]");
     if (!button) return;
@@ -366,6 +371,7 @@
     initializeMotionStudies();
     initializeConversations();
     initializeWeatherStudies();
+    initializeScrollExpands();
     document.title = config.browserTitle || "workbook of theageofadzz";
     document.querySelectorAll("h2 a").forEach(anchor => {
       if (anchor.textContent === "设计垂点") anchor.textContent = config.title;

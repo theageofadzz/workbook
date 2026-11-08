@@ -82,7 +82,7 @@ function updateByline(container, frontmatter) {
   });
 }
 
-export async function personalizePortfolio({ root, out, base, footer }) {
+export async function personalizePortfolio({ root, out, base, footer, scrollExpandVersion }) {
   const contentRoot = join(root, "src", "content");
   const logoStudy = await readFile(join(root, "src", "assets", "intensea-golden-ratio.svg"), "utf8");
   await writeFile(join(out, "assets", "intensea-golden-ratio.svg"), logoStudy);
@@ -122,7 +122,7 @@ export async function personalizePortfolio({ root, out, base, footer }) {
       templateSlug: "wxad12"
     }
   ]) {
-    const result = await personalizeArticle({ contentRoot, out, base, logoStudy, footer, ...entry });
+    const result = await personalizeArticle({ contentRoot, out, base, logoStudy, footer, scrollExpandVersion, ...entry });
     retiredContent.push(...result.retiredContent);
     compiledArticles.push(result.compiled);
   }
@@ -166,6 +166,7 @@ async function personalizeArticle({
   base,
   footer,
   logoStudy,
+  scrollExpandVersion,
   name,
   cover: coverName,
   articleCover: articleCoverName = coverName,
@@ -270,6 +271,17 @@ async function personalizeArticle({
     if (name === "author") setAttr(node, "content", frontmatter.author);
     if (name === "og:title") setAttr(node, "content", frontmatter.title);
   });
+  const head = find(document, node => node.tagName === "head");
+  if (head && !head.childNodes.some(node =>
+    node.tagName === "script" && attr(node, "src")?.includes("/scroll-expand.js")
+  )) {
+    const scrollScript = parseFragment(
+      `<script src="${base}/scroll-expand.js?v=${scrollExpandVersion}" defer></script>`
+    ).childNodes[0];
+    scrollScript.parentNode = head;
+    const firstScript = head.childNodes.findIndex(node => node.tagName === "script");
+    head.childNodes.splice(firstScript < 0 ? head.childNodes.length : firstScript, 0, scrollScript);
+  }
   await mkdir(join(out, frontmatter.slug), { recursive: true });
   await writeFile(articlePath, serialize(document));
   await writeFile(join(out, "_next", "data", data.buildId, `${frontmatter.slug}.json`), JSON.stringify(data.props));

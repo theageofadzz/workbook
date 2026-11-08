@@ -246,10 +246,12 @@
     document.querySelector("[data-reader-date]").textContent = article.publishedAt.replaceAll("-", ".");
     document.querySelector("[data-reader-date]").dateTime = article.publishedAt;
     document.querySelector("[data-reader-subtitle]").textContent = article.subtitle || article.description;
-    cover.hidden = !article.cover;
+    const coverMedia = cover.closest("[data-scroll-expand]") || cover;
+    coverMedia.hidden = !article.cover;
     if (article.cover) cover.src = new URL(article.cover, assetBase).href;
     else cover.removeAttribute("src");
     body.innerHTML = article.html;
+    window.WorkbookScrollExpand?.initialize(dialog.querySelector(".reading-article"), { scroller: scroll });
     document.title = `${article.title} · theageofadzz`;
     if (pushHistory) {
       const url = new URL(location.href);

@@ -275,6 +275,49 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .portfolio-essay .portfolio-essay-lead { color: #737373; font-size: 16px; }
 .portfolio-essay-cover { margin: 48px 0 72px; }
 .portfolio-essay-cover .portfolio-cover { max-width: 440px; margin: auto; }
+.scroll-expand {
+  --scroll-expand-inset: 10%;
+  --scroll-expand-scale: .9;
+  --scroll-expand-radius: 12px;
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: transparent;
+  isolation: isolate;
+}
+.scroll-expand[hidden] { display: none; }
+.scroll-expand__frame {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--scroll-expand-radius);
+  clip-path: inset(var(--scroll-expand-inset) round var(--scroll-expand-radius));
+  transform: scale(var(--scroll-expand-scale));
+  transform-origin: center;
+  will-change: clip-path, transform, border-radius;
+}
+.scroll-expand__frame > picture,
+.scroll-expand__frame > img {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
+.scroll-expand__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.scroll-expand--cover { margin-bottom: 30px; }
+.scroll-expand--cover .scroll-expand__frame { border-radius: var(--scroll-expand-radius); }
+.portfolio-essay .scroll-expand { margin-right: auto; margin-left: auto; }
+.intensea-wave-reference > .scroll-expand,
+.portfolio-album-reference > .scroll-expand,
+.portfolio-cicada-reference > .scroll-expand {
+  width: 330px;
+  max-width: 100%;
+}
 .intensea-logo-study { width: 100%; max-width: 680px; margin: 40px auto 32px; }
 .intensea-logo-study > svg { display: block; width: 100%; height: auto; aspect-ratio: 1; }
 .intensea-logo-study.is-initialized:not(.is-visible) .study-motion,
