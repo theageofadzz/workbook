@@ -231,7 +231,9 @@ const githubHTML = await readFile(join(root, "github", "index.html"), "utf8");
 const githubSource = JSON.parse(await readFile(new URL("../src/content/github.json", import.meta.url), "utf8"));
 const githubDocument = parse(githubHTML);
 let githubData;
+const githubNodes = [];
 function inspectGitHub(node) {
+  githubNodes.push(node);
   if (node.tagName === "script" && node.attrs?.some(attr => attr.name === "id" && attr.value === "github-data")) {
     githubData = JSON.parse(node.childNodes.map(child => child.value || "").join(""));
   }
@@ -241,6 +243,24 @@ inspectGitHub(githubDocument);
 assert.equal(githubData.user.login, "theageofadzz");
 assert.equal(githubData.repos.length, githubSource.repos.length);
 assert(githubData.repos.some(repo => repo.name === "GameStation"), "The internal profile must include GameStation");
+assert.deepEqual(githubData.pinned, githubSource.pinned, "Pinned repositories must come from the GitHub profile");
+for (const name of githubData.pinned) assert(githubHTML.includes(`data-repository="${name}"`), `Missing pinned repository: ${name}`);
+assert(githubData.calendars.length > 0, "The profile needs a real contribution calendar");
+for (const calendar of githubData.calendars) {
+  const days = calendar.weeks.flatMap(week => week.contributionDays);
+  assert.equal(new Set(days.map(day => day.date)).size, days.length, `Duplicate contribution date in ${calendar.id}`);
+  assert.equal(days.reduce((total, day) => total + day.contributionCount, 0), calendar.totalContributions, `Incorrect calendar total in ${calendar.id}`);
+  assert(days.every(day => Number.isInteger(day.contributionCount) && day.contributionCount >= 0), "Contribution counts must be actual nonnegative integers");
+  const panel = githubNodes.find(node => node.attrs?.some(attr => attr.name === "data-calendar" && attr.value === calendar.id));
+  assert(panel, `Missing selectable calendar: ${calendar.id}`);
+}
+assert.equal(
+  githubNodes.filter(node => node.attrs?.some(attr => attr.name === "data-contribution-day")).length,
+  githubData.calendars.reduce((total, calendar) => total + calendar.weeks.flatMap(week => week.contributionDays).length, 0),
+  "Every API contribution day must be rendered"
+);
+assert(githubData.activity.some(month => month.commits.length), "The profile needs actual repository activity");
+assert(githubHTML.includes("data-github-overview") && githubHTML.includes("data-github-archive"), "Overview and repository search must have separate views");
 for (const repo of githubData.repos) {
   const fragment = parse(repo.readme);
   function inspectReadme(node) {

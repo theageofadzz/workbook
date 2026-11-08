@@ -23,6 +23,8 @@
         <div class="github-profile-name"><h2>{{name}}</h2><p>{{username}}</p></div>
         <p class="github-bio">{{bio}}</p>
         <div class="github-profile-stats"><span>{{icon:users}}<b>{{followers}}</b> 关注者</span><span>{{icon:star}}<b>{{stars}}</b> Stars</span></div>
+        <p class="github-profile-website">{{icon:link}}<a href="{{base}}/">theageofadzz.github.io/workbook/</a></p>
+        <a class="github-profile-external" href="https://github.com/{{username}}" target="_blank" rel="noopener noreferrer">GitHub 个人主页{{icon:arrow-up-right}}</a>
         <p class="github-source">GitHub 公开资料<br><time>{{updated}}</time></p>
       </aside>
       <section class="github-content" aria-label="GitHub 项目">
@@ -31,13 +33,31 @@
             <a href="?tab=overview" data-tab="overview" aria-current="page">{{icon:book-open}}概览</a>
             <a href="?tab=repositories" data-tab="repositories">{{icon:folder-git-2}}仓库<span class="github-count">{{repoCount}}</span></a>
           </nav>
-          <form class="github-search" role="search">
-            <label class="github-search-field">{{icon:search}}<input type="search" aria-label="搜索仓库" placeholder="搜索仓库…" data-repo-search></label>
-            <select aria-label="筛选编程语言" data-language-filter><option value="">全部语言</option>{{languages}}</select>
-          </form>
-          <div class="github-section-heading"><h2 data-list-title>公开项目</h2><span data-result-count aria-live="polite">{{repoCount}} 个仓库</span></div>
-          <div class="github-repositories" data-repositories>{{repositories}}</div>
-          <p class="github-empty" data-empty hidden>没有找到匹配的仓库。</p>
+          <div class="github-overview" data-github-overview>
+            <section class="github-pinned" aria-labelledby="github-pinned-title">
+              <div class="github-section-heading"><h2 id="github-pinned-title">置顶项目</h2><span>{{pinnedCount}} 个项目</span></div>
+              <div class="github-repositories">{{pinned}}</div>
+            </section>
+            <section class="github-contributions" aria-label="公开贡献">
+              <div class="github-section-heading"><h2>贡献记录</h2><select aria-label="选择贡献年份" data-contribution-range>{{calendarOptions}}</select></div>
+              <div data-contribution-calendars>{{calendars}}</div>
+            </section>
+            <section class="github-activity" aria-labelledby="github-activity-title">
+              <div class="github-section-heading"><h2 id="github-activity-title">贡献活动</h2></div>
+              <div data-contribution-activity>{{activity}}</div>
+              <p class="github-activity-empty" data-activity-empty hidden>这一年暂无公开贡献活动。</p>
+              <button class="github-load-activity" type="button" data-more-activity hidden>{{icon:chevron-down}}更早的活动</button>
+            </section>
+          </div>
+          <div data-github-archive hidden>
+            <form class="github-search" role="search">
+              <label class="github-search-field">{{icon:search}}<input type="search" aria-label="搜索仓库" placeholder="搜索仓库…" data-repo-search></label>
+              <select aria-label="筛选编程语言" data-language-filter><option value="">全部语言</option>{{languages}}</select>
+            </form>
+            <div class="github-section-heading"><h2 data-list-title>全部仓库</h2><span data-result-count aria-live="polite">{{repoCount}} 个仓库</span></div>
+            <div class="github-repositories is-list" data-repositories>{{repositories}}</div>
+            <p class="github-empty" data-empty hidden>没有找到匹配的仓库。</p>
+          </div>
         </div>
         <article class="github-detail" data-repository-detail hidden>
           <header class="github-detail-heading">
@@ -55,5 +75,6 @@
   </main>
 {{dock}}
   <script type="application/json" id="github-data">{{data}}</script>
+  <div class="github-contribution-tooltip" role="tooltip" data-contribution-tooltip hidden></div>
 </body>
 </html>
