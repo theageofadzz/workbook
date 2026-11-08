@@ -28,12 +28,10 @@
   </figure>
   <p>成品保存了 48 帧，每帧播放 80 毫秒，3.84 秒循环一次。同一图层的帧排成一张“图集”，像一页连环画；代码按帧号取图，再放回画布。</p>
   <p>七层共用同一个播放时间，这样伞、天气卡片和预报图形就能同步。素材全部加载后才播放，切走页面时暂停，回来后继续。</p>
-  <details class="weather-code-details">
-    <summary>展开核心播放代码</summary>
-    <p>以下摘自成品逻辑，省略素材加载；完整 HTML 可在文末打开。</p>
-    <figure class="gamestation-code">
-      <figcaption><span>CANVAS · 按同一帧号合成图层</span><button type="button" data-code-copy="" aria-label="复制代码" title="复制代码">{{icon:copy}}{{icon:check}}</button><span class="gamestation-copy-status" role="status" aria-live="polite"></span></figcaption>
-      <pre tabindex="0"><code>function render() {
+  <p>以下摘自成品逻辑，省略素材加载；完整 HTML 可在文末打开。</p>
+  <figure class="gamestation-code">
+    <figcaption><span>CANVAS · 按同一帧号合成图层</span><button type="button" data-code-copy="" aria-label="复制代码" title="复制代码">{{icon:copy}}{{icon:check}}</button><span class="gamestation-copy-status" role="status" aria-live="polite"></span></figcaption>
+    <pre tabindex="0"><code>function render() {
   const time = (Number(clock.currentTime) || 0) % data.duration;
   const index = Math.min(
     data.frameCount - 1,
@@ -60,8 +58,7 @@
     );
   }
 }</code></pre>
-    </figure>
-  </details>
+  </figure>
 
   <h2 id="把署名与语言融进画面">调整署名和文字</h2>
   <p>画面与动作确认后，我把复刻版底部署名改成 <em>cicada</em>，要求保留原来的字体风格。原作作者的署名在本文开头单独说明。</p>
