@@ -151,6 +151,7 @@ export async function createPaperReader({ root, sheet, scroller, signal }) {
   let frame = 0, lastTime = 0, previousAmount = -1;
   let held = false, keyboard = false, disposed = false, contextLost = false;
   let gesture = null;
+  let pendingPress = null, pressTimer = 0, ignoreClickUntil = 0;
   let texture = null, capturePromise = null, captureTimer = 0, captured = "";
 
   function setState(state) {
@@ -248,7 +249,9 @@ export async function createPaperReader({ root, sheet, scroller, signal }) {
     if (!frame && !disposed && !contextLost && root.open && !document.hidden) frame = requestAnimationFrame(render);
   }
   function restore(instant = false) {
+    cancelPress();
     const pointerId = gesture?.id;
+    if (gesture) ignoreClickUntil = performance.now() + 700;
     gesture = null;
     held = keyboard = false;
     controls[0]?.setAttribute("aria-pressed", "false");
@@ -263,6 +266,7 @@ export async function createPaperReader({ root, sheet, scroller, signal }) {
   }
   function resize() {
     if (disposed || !root.open) return;
+    cancelPress();
     if (held) restore(true);
     const viewport = root.getBoundingClientRect();
     const rect = sheet.getBoundingClientRect();
@@ -357,24 +361,27 @@ export async function createPaperReader({ root, sheet, scroller, signal }) {
     const rect = root.getBoundingClientRect();
     return { x: clamp(event.clientX - rect.left, 8, width - 8), y: clamp(event.clientY - rect.top, 8, height - 8) };
   }
-  async function pointerDown(event) {
-    if (event.button !== 0 || !event.isPrimary || gesture || contextLost) return;
-    event.preventDefault();
-    const start = point(event);
-    const pending = { id: event.pointerId, ...start, startX: start.x, startY: start.y, time: performance.now() };
-    gesture = pending;
-    root.setPointerCapture(event.pointerId);
-    if (!await capture() || gesture !== pending || disposed) return;
+  function cancelPress() {
+    clearTimeout(pressTimer);
+    pressTimer = 0;
+    pendingPress = null;
+  }
+  async function beginPress(pending) {
+    pressTimer = 0;
+    if (!await capture() || pendingPress !== pending || disposed || contextLost || !root.open) {
+      if (pendingPress === pending) cancelPress();
+      return;
+    }
     for (const state of springs) state.target = state.value = state.velocity = 0;
     previousAmount = -1;
     deform();
     paper.position.set(baseX, baseY, 0);
     paper.rotation.set(0, 0, 0);
     paper.updateMatrixWorld(true);
-    setPointer(start.x, start.y);
+    setPointer(pending.x, pending.y);
     const intersection = raycaster.intersectObjects([front, back], false)[0];
     if (!intersection?.face) {
-      restore(true);
+      cancelPress();
       return;
     }
     const { face } = intersection;
@@ -383,13 +390,36 @@ export async function createPaperReader({ root, sheet, scroller, signal }) {
     b.fromBufferAttribute(geometry.attributes.position, face.b);
     c.fromBufferAttribute(geometry.attributes.position, face.c);
     THREE.Triangle.getBarycoord(paper.worldToLocal(intersection.point.clone()), a, b, c, weights);
+    gesture = pending;
+    cancelPress();
+    root.setPointerCapture(pending.id);
+    window.getSelection()?.removeAllRanges();
     held = true;
     amount.target = .85;
     controls[0]?.setAttribute("aria-pressed", "true");
     setState("holding");
     wake();
   }
+  function pointerDown(event) {
+    if (!event.isPrimary) {
+      restore(true);
+      return;
+    }
+    if (event.button !== 0 || held || gesture || contextLost || root.dataset.paperStatus !== "ready") return;
+    if (event.target.closest('input, textarea, select, button, [contenteditable="true"]')) return;
+    cancelPress();
+    ignoreClickUntil = 0;
+    const start = point(event);
+    pendingPress = { id: event.pointerId, ...start, startX: start.x, startY: start.y, time: performance.now() };
+    const pending = pendingPress;
+    // Wait without capturing the pointer so swipes, selection and short clicks stay native.
+    pressTimer = setTimeout(() => beginPress(pending), 400);
+  }
   function pointerMove(event) {
+    if (pendingPress?.id === event.pointerId) {
+      const next = point(event);
+      if (Math.hypot(next.x - pendingPress.startX, next.y - pendingPress.startY) > 8) cancelPress();
+    }
     if (!gesture || gesture.id !== event.pointerId) return;
     const next = point(event);
     const dt = Math.max(.008, (performance.now() - gesture.time) / 1000);
@@ -403,6 +433,7 @@ export async function createPaperReader({ root, sheet, scroller, signal }) {
     if ([" ", "Enter"].includes(event.key)) {
       event.preventDefault();
       if (event.repeat || !texture) return;
+      cancelPress();
       held = keyboard = true;
       amount.target = .85;
       controls[0].setAttribute("aria-pressed", "true");
@@ -415,17 +446,43 @@ export async function createPaperReader({ root, sheet, scroller, signal }) {
       wake();
     }
   }
-  for (const control of controls) listen(control, "pointerdown", pointerDown);
+  listen(sheet, "pointerdown", pointerDown, { capture: true });
   listen(controls[0], "keydown", keyDown);
   listen(controls[0], "keyup", event => {
     if ([" ", "Enter"].includes(event.key) && keyboard) { event.preventDefault(); restore(); }
   });
   listen(controls[0], "blur", () => { if (keyboard) restore(true); });
-  listen(root, "pointermove", pointerMove);
-  listen(root, "pointerup", event => { if (gesture?.id === event.pointerId) restore(); });
-  listen(root, "pointercancel", event => { if (gesture?.id === event.pointerId) restore(true); });
-  listen(root, "lostpointercapture", event => { if (gesture?.id === event.pointerId) restore(true); });
-  listen(scroller, "scroll", scheduleCapture, { passive: true });
+  listen(window, "pointermove", pointerMove, { capture: true });
+  listen(window, "pointerup", event => {
+    if (pendingPress?.id === event.pointerId) cancelPress();
+    if (gesture?.id === event.pointerId) restore();
+  }, { capture: true });
+  listen(window, "pointercancel", event => {
+    if (pendingPress?.id === event.pointerId) cancelPress();
+    if (gesture?.id === event.pointerId) restore(true);
+  }, { capture: true });
+  listen(root, "lostpointercapture", event => { if (event.target === root && gesture?.id === event.pointerId) restore(true); });
+  listen(root, "touchmove", event => {
+    if (held && event.cancelable) event.preventDefault();
+  }, { capture: true, passive: false });
+  listen(root, "click", event => {
+    if (event.detail && (held || performance.now() < ignoreClickUntil)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      ignoreClickUntil = 0;
+    }
+  }, { capture: true });
+  listen(sheet, "contextmenu", event => {
+    if (pendingPress || held || performance.now() < ignoreClickUntil) event.preventDefault();
+  });
+  listen(scroller, "scroll", () => {
+    cancelPress();
+    scheduleCapture();
+  }, { passive: true });
+  listen(scroller, "wheel", event => {
+    cancelPress();
+    if (held) event.preventDefault();
+  }, { passive: false });
   listen(scroller, "load", scheduleCapture, { capture: true });
   listen(window, "blur", () => restore(true));
   listen(document, "visibilitychange", () => { if (document.hidden) restore(true); });
