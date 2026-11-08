@@ -32,8 +32,8 @@
 
 ## 作品浏览
 
-- [文章首页](https://theageofadzz.github.io/workbook/)：两篇个人文章，分别介绍作品集的设计与 GameStation 的交互实验。
-- [作品](https://theageofadzz.github.io/workbook/crafts/)：沿用 Crafts 作品墙风格，仅展示 cicada 在 centurypaw 的文章。新旧文章随机交错，以带鼠标上下浏览效果的 3:4 竖版预览呈现，点击后打开 3:4 阅读卡片。
+- [文章首页](https://theageofadzz.github.io/workbook/)：三篇个人文章，记录 weather 动效复刻的完整对话与实现、作品集设计和 GameStation 交互实验。新教程使用圆形动态封面。
+- [作品](https://theageofadzz.github.io/workbook/crafts/)：沿用 Crafts 作品墙风格，展示 weather 循环动效与 cicada 在 centurypaw 的文章。动效卡片标注名称和日期，点击可查看完整 GIF；文章以带鼠标上下浏览效果的 3:4 竖版预览呈现，点击后打开阅读卡片。
 - [关于 theageofadzz](https://theageofadzz.github.io/workbook/about/)：了解这个作品集。
 - [站内 GitHub](https://theageofadzz.github.io/workbook/github/)：在作品集内浏览个人主页、公开仓库与项目介绍。
 

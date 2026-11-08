@@ -1,0 +1,14 @@
+{
+  "works": [
+    {
+      "slug": "weather",
+      "title": "weather",
+      "publishedAt": "2026-11-07",
+      "category": "动效",
+      "media": "assets/works/weather.gif",
+      "poster": "assets/works/weather.webp",
+      "width": 518,
+      "height": 518
+    }
+  ]
+}

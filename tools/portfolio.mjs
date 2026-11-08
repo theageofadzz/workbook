@@ -1,8 +1,9 @@
 import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parse, parseFragment, serialize } from "parse5";
+import { parse, parseFragment, serialize, serializeOuter } from "parse5";
 import { parse as parseJavaScript } from "acorn";
 import { cursorMarkup } from "./cursor.mjs";
+import { writeWeatherFrames } from "./weather-frames.mjs";
 
 function walk(node, visit) {
   visit(node);
@@ -37,6 +38,8 @@ const reactAttributes = {
   autoplay: "autoPlay",
   playsinline: "playsInline",
   tabindex: "tabIndex",
+  datetime: "dateTime",
+  srcset: "srcSet",
   "stroke-width": "strokeWidth",
   "stroke-linecap": "strokeLinecap",
   "stroke-linejoin": "strokeLinejoin",
@@ -94,6 +97,10 @@ export async function personalizePortfolio({ root, out, base }) {
   ]) {
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
+  await writeWeatherFrames({ root, out });
+  for (const file of ["weather-x-browse.mp4", "weather-x-browse.webp"]) {
+    await copyFile(join(root, "src", "assets", "articles", file), join(out, "assets", "articles", file));
+  }
   const retiredContent = [];
   const compiledArticles = [];
   for (const entry of [
@@ -103,7 +110,13 @@ export async function personalizePortfolio({ root, out, base }) {
       articleCover: "portfolio-article-cover",
       sourceSlug: "wxad12"
     },
-    { name: "gamestation", cover: "gamestation-cover", sourceSlug: "interactive-design-in-ai" }
+    { name: "gamestation", cover: "gamestation-cover", sourceSlug: "interactive-design-in-ai" },
+    {
+      name: "weather-recreation",
+      cover: "weather-cover",
+      sourceSlug: "weather-recreation",
+      templateSlug: "wxad12"
+    }
   ]) {
     const result = await personalizeArticle({ contentRoot, out, base, logoStudy, ...entry });
     retiredContent.push(...result.retiredContent);
@@ -151,7 +164,8 @@ async function personalizeArticle({
   name,
   cover: coverName,
   articleCover: articleCoverName = coverName,
-  sourceSlug
+  sourceSlug,
+  templateSlug
 }) {
   const frontmatter = JSON.parse(await readFile(join(contentRoot, `${name}.json`), "utf8"));
   const coverHTML = (await readFile(join(contentRoot, `${coverName}.html`), "utf8"))
@@ -180,9 +194,27 @@ async function personalizeArticle({
 
   const homepagePath = join(out, "index.html");
   const homepage = parse(await readFile(homepagePath, "utf8"));
-  const titleLink = find(homepage, node => node.tagName === "a"
+  let titleLink = find(homepage, node => node.tagName === "a"
     && [frontmatter.slug, sourceSlug].some(slug => attr(node, "href")?.replace(/\/$/, "") === `${base}/${slug}`)
     && attr(node, "class")?.includes("font-[Weixin]"));
+  if (!titleLink && templateSlug) {
+    const templateLink = find(homepage, node => node.tagName === "a"
+      && attr(node, "href")?.replace(/\/$/, "") === `${base}/${templateSlug}`
+      && attr(node, "class")?.includes("font-[Weixin]"));
+    let templateCard = templateLink;
+    while (templateCard && attr(templateCard, "class") !== "mb-12") templateCard = templateCard.parentNode;
+    if (!templateCard) throw new Error(`Could not find the homepage template for ${frontmatter.slug}.`);
+    const card = parseFragment(serializeOuter(templateCard)).childNodes[0];
+    card.parentNode = templateCard.parentNode;
+    const siblings = templateCard.parentNode.childNodes;
+    siblings.splice(siblings.indexOf(templateCard), 0, card);
+    walk(card, node => {
+      if (node.tagName === "a" && attr(node, "href")?.replace(/\/$/, "") === `${base}/${templateSlug}`) {
+        setAttr(node, "href", `${base}/${frontmatter.slug}`);
+      }
+    });
+    titleLink = find(card, node => node.tagName === "a" && attr(node, "class")?.includes("font-[Weixin]"));
+  }
   if (!titleLink) throw new Error("Could not find the static featured entry.");
   const intro = titleLink.parentNode;
   const byline = intro.childNodes.find(node => attr(node, "class")?.includes("font-mono"));
@@ -201,7 +233,7 @@ async function personalizeArticle({
   try { previousArticle = await readFile(articlePath, "utf8"); }
   catch (error) {
     if (error.code !== "ENOENT") throw error;
-    previousArticle = await readFile(join(out, sourceSlug, "index.html"), "utf8");
+    previousArticle = await readFile(join(out, templateSlug || sourceSlug, "index.html"), "utf8");
   }
   retiredContent.push(previousArticle);
   const document = parse(previousArticle);
@@ -243,7 +275,9 @@ async function personalizeArticle({
   const manifestPath = join(out, "site-manifest.json");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
   const page = manifest.pages.find(page => [frontmatter.slug, sourceSlug].some(slug => page.route === `/${slug}`));
-  Object.assign(page, { title: frontmatter.title, route: `/${frontmatter.slug}`, file: `${frontmatter.slug}/index.html` });
+  const record = { title: frontmatter.title, route: `/${frontmatter.slug}`, file: `${frontmatter.slug}/index.html` };
+  if (page) Object.assign(page, record);
+  else manifest.pages.push(record);
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
   return { retiredContent, compiled: { token, code } };
 }

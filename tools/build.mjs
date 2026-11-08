@@ -442,4 +442,4 @@ const publishedPages = JSON.parse(await readFile(join(out, "site-manifest.json")
 await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);
 await pruneUnusedBranding({ out });
 await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
-console.log(`Built ${pages.length + 1} pages for ${config.url}/`);
+console.log(`Built ${publishedPages.pages.length + 2} pages for ${config.url}/`);

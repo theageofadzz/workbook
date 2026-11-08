@@ -34,7 +34,7 @@ export const excludedRoutes = [
 ];
 const excludedSlugs = new Set(excludedRoutes.map(route => route.slice(1)));
 export const standaloneRoutes = ["/", "/crafts", "/github", "/about"];
-const personalSlugs = new Set(["", "crafts", "github", "about", "wxad12", "gamestation", "interactive-design-in-ai"]);
+const personalSlugs = new Set(["", "crafts", "github", "about", "wxad12", "gamestation", "weather-recreation", "shirota-weather.html", "interactive-design-in-ai"]);
 
 export function isExcludedRoute(route) {
   const slug = route.replace(/^\/+/, "").split(/[/?#]/)[0];

@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const { articles } = JSON.parse(document.querySelector("#crafts-content").textContent);
+  const { articles, works } = JSON.parse(document.querySelector("#crafts-content").textContent);
   const displayArticles = [...articles];
   for (let index = displayArticles.length - 1; index > 0; index--) {
     const other = Math.floor(Math.random() * (index + 1));
@@ -14,7 +14,9 @@
     }
   }
   const bySlug = new Map(articles.map(article => [article.slug, article]));
+  const byWorkSlug = new Map(works.map(work => [work.slug, work]));
   const dialog = document.querySelector("[data-reader]");
+  const workDialog = document.querySelector("[data-work-reader]");
   const scroll = document.querySelector("[data-reader-scroll]");
   const body = document.querySelector("[data-reader-body]");
   const cover = document.querySelector("[data-reader-cover]");
@@ -23,6 +25,7 @@
   let returnFocus = null;
   let progressFrame = 0;
   let readerCloseTimer = 0;
+  let workCloseTimer = 0;
   const positions = new Map();
   const storage = {
     get(key) { try { return sessionStorage.getItem(`workbook-writing:${key}`); } catch { return null; } },
@@ -31,6 +34,7 @@
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const previews = new Map();
+  let workReturnFocus = null;
   function initializeSplitText() {
     const heading = document.querySelector("[data-split-text]");
     if (!heading) return;
@@ -70,7 +74,7 @@
   }
 
   function refreshMotion() {
-    const playing = !document.hidden && !dialog.open && !reducedMotion.matches;
+    const playing = !document.hidden && !dialog.open && !workDialog.open && !reducedMotion.matches;
     for (const state of previews.values()) {
       for (const animation of state.animations || []) {
         if (reducedMotion.matches) animation.currentTime = 0;
@@ -266,6 +270,28 @@
     });
   }
 
+  function openWork(work, pushHistory = true) {
+    clearTimeout(workCloseTimer);
+    workCloseTimer = 0;
+    workDialog.classList.remove("is-closing");
+    if (!workDialog.open) workReturnFocus = document.activeElement;
+    const media = workDialog.querySelector("[data-work-reader-media]");
+    media.src = new URL(work.media, assetBase).href;
+    media.alt = work.title;
+    document.title = `${work.title} · theageofadzz`;
+    if (pushHistory) {
+      const url = new URL(location.href);
+      url.searchParams.delete("read");
+      url.searchParams.set("work", work.slug);
+      if (workDialog.open) history.replaceState(history.state, "", url);
+      else history.pushState({ ...history.state, workReader: true }, "", url);
+    }
+    document.documentElement.classList.add("reading-open");
+    resetDock();
+    if (!workDialog.open) workDialog.showModal();
+    refreshMotion();
+  }
+
   function dismissWindow() {
     if (!dialog.open || readerCloseTimer) return;
     updateProgress();
@@ -296,10 +322,42 @@
       history.replaceState(history.state, "", url);
     }
   }
+  function dismissWork() {
+    if (!workDialog.open || workCloseTimer) return;
+    const finish = () => {
+      workCloseTimer = 0;
+      workDialog.close();
+      workDialog.classList.remove("is-closing");
+      document.documentElement.classList.remove("reading-open");
+      workDialog.querySelector("[data-work-reader-media]").removeAttribute("src");
+      document.title = "workbook of theageofadzz";
+      workReturnFocus?.focus({ preventScroll: true });
+    };
+    if (reducedMotion.matches) finish();
+    else {
+      workDialog.classList.add("is-closing");
+      workCloseTimer = setTimeout(finish, 180);
+    }
+  }
+  function closeWork() {
+    if (workCloseTimer || !workDialog.open) return;
+    dismissWork();
+    if (history.state?.workReader) history.back();
+    else {
+      const url = new URL(location.href);
+      url.searchParams.delete("work");
+      history.replaceState(history.state, "", url);
+    }
+  }
   document.querySelector("[data-close-reader]").addEventListener("click", closeReader);
+  document.querySelector("[data-close-work]").addEventListener("click", closeWork);
   dialog.addEventListener("cancel", event => {
     event.preventDefault();
     closeReader();
+  });
+  workDialog.addEventListener("cancel", event => {
+    event.preventDefault();
+    closeWork();
   });
   dialog.addEventListener("keydown", event => {
     if (event.key !== "Tab") return;
@@ -318,7 +376,19 @@
     const rect = dialog.getBoundingClientRect();
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeReader();
   });
+  workDialog.addEventListener("click", event => {
+    if (event.target === workDialog) closeWork();
+  });
   document.addEventListener("click", event => {
+    const workLink = event.target.closest("[data-open-work]");
+    if (workLink && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+      const work = byWorkSlug.get(workLink.dataset.openWork);
+      if (work) {
+        event.preventDefault();
+        openWork(work);
+      }
+      return;
+    }
     const link = event.target.closest("[data-open-article]");
     if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const article = bySlug.get(link.dataset.openArticle);
@@ -329,8 +399,17 @@
   function syncLocation() {
     const url = new URL(location.href);
     const article = bySlug.get(url.searchParams.get("read"));
-    if (article) openArticle(article, false);
-    else dismissWindow();
+    const work = byWorkSlug.get(url.searchParams.get("work"));
+    if (article) {
+      if (workDialog.open) dismissWork();
+      openArticle(article, false);
+    } else if (work) {
+      if (dialog.open) dismissWindow();
+      openWork(work, false);
+    } else {
+      dismissWindow();
+      dismissWork();
+    }
   }
   window.addEventListener("popstate", syncLocation);
   document.addEventListener("visibilitychange", refreshMotion);

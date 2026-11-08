@@ -51,6 +51,7 @@ async function articleBody(path) {
 export async function writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc }) {
   const contentRoot = join(root, "src", "content", "writing");
   const snapshot = JSON.parse(await readFile(join(contentRoot, "manifest.json"), "utf8"));
+  const { works } = JSON.parse(await readFile(join(root, "src", "content", "works.json"), "utf8"));
   const articles = [];
   for (const entry of snapshot.articles) {
     const { plainText, ...body } = await articleBody(join(contentRoot, entry.sourcePath));
@@ -84,7 +85,16 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     logo: logoSrc,
     cssVersion: hash(css),
     jsVersion: hash(js),
-    articles: articles.map(article => `
+    articles: works.map(work => `
+      <article class="writing-entry" data-slug="${escape(work.slug)}">
+        <a class="writing-link crafts-card" href="?work=${encodeURIComponent(work.slug)}" data-open-work="${escape(work.slug)}" aria-haspopup="dialog" aria-label="查看作品：${escape(work.title)}">
+          <picture class="work-preview">
+            <source media="(prefers-reduced-motion: reduce)" srcset="${base}/${escape(work.poster)}">
+            <img src="${base}/${escape(work.media)}" alt="${escape(work.title)}" width="${work.width}" height="${work.height}" decoding="async">
+          </picture>
+          <div class="crafts-caption"><h2>${escape(work.title)}</h2><div class="crafts-caption-meta"><time datetime="${work.publishedAt}">${work.publishedAt}</time><span class="crafts-category">${escape(work.category)}</span></div></div>
+        </a>
+      </article>`).join("") + articles.map(article => `
       <article class="writing-entry" data-slug="${article.slug}">
         <a class="writing-link crafts-card" href="?read=${article.slug}" data-open-article="${article.slug}" aria-haspopup="dialog" aria-label="阅读：${escape(article.title)}">
           <div class="article-preview" aria-hidden="true">
@@ -106,7 +116,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
           <div class="crafts-caption"><h2>${escape(article.title)}</h2><div class="crafts-caption-meta"><time datetime="${article.publishedAt}">${article.publishedAt}</time><span class="crafts-category">${escape(article.category)}</span></div></div>
         </a>
       </article>`).join(""),
-    data: JSON.stringify({ articles }).replaceAll("<", "\\u003c")
+    data: JSON.stringify({ articles, works }).replaceAll("<", "\\u003c")
   };
   let html = await readFile(join(root, "src", "content", "crafts.html"), "utf8");
   for (const [name, value] of Object.entries(replacements)) html = html.replaceAll(`{{${name}}}`, value);
@@ -120,8 +130,14 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
   for (const article of articles) {
     if (article.cover) await copyFile(join(root, "src", article.cover), join(out, article.cover));
   }
+  await mkdir(join(out, "assets", "works"), { recursive: true });
+  for (const work of works) {
+    for (const asset of [work.media, work.poster]) {
+      await copyFile(join(root, "src", asset), join(out, asset));
+    }
+  }
   await writeFile(join(out, "crafts", "index.html"), html.replace(/^[ \t]+$/gm, ""));
   await writeFile(join(out, "crafts.css"), css);
   await writeFile(join(out, "crafts.js"), js);
-  console.log(`Published ${articles.length} cicada essays; removed the legacy crafts gallery.`);
+  console.log(`Published ${works.length} works and ${articles.length} cicada essays.`);
 }

@@ -2,6 +2,7 @@ import { readFile, access, readdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { parse } from "parse5";
 import { parse as parseJavaScript } from "acorn";
+import sharp from "sharp";
 import assert from "node:assert/strict";
 import { excludedRoutes, isExcludedRoute, standaloneRoutes } from "./content-policy.mjs";
 
@@ -45,10 +46,22 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
   if (page.route === "/crafts") {
     assert(writingData, "Expected the standalone writing archive");
     const imported = JSON.parse(await readFile(new URL("../src/content/writing/manifest.json", import.meta.url), "utf8"));
+    const { works } = JSON.parse(await readFile(new URL("../src/content/works.json", import.meta.url), "utf8"));
+    assert.deepEqual(writingData.works, works, "Every work and its date must be available");
+    assert.equal((html.match(/class="work-preview"/g) || []).length, works.length, "Every work needs a media preview");
+    for (const work of works) {
+      assert.match(html, new RegExp(`<h2>${work.title}</h2>`), `Missing work title: ${work.slug}`);
+      assert(html.includes(`<time datetime="${work.publishedAt}">${work.publishedAt}</time>`), `Missing work date: ${work.slug}`);
+      const media = await sharp(join(root, work.media), { animated: true }).metadata();
+      assert.equal(media.format, "gif", `Expected an actual GIF: ${work.slug}`);
+      assert(media.pages > 1, `Expected animated frames: ${work.slug}`);
+      assert.equal(media.loop, 0, `Expected an infinite loop: ${work.slug}`);
+      await access(join(root, work.poster));
+    }
     assert.equal(writingData.articles.length, imported.articles.length, "Every original essay must be available");
     assert.equal((html.match(/class="article-preview"/g) || []).length, imported.articles.length, "Every essay needs an animated portrait preview");
     assert.match(html, /<h1(?:\s[^>]*)?>Crafts<\/h1>/, "Keep the original Crafts heading");
-    assert.equal(writingData.gallery, undefined, "Only cicada articles should be published");
+    assert.equal(writingData.gallery, undefined, "The retired gallery should stay removed");
     assert.equal((html.match(/class="preview-cursor"/g) || []).length, imported.articles.length, "Every preview needs a browsing cursor");
     assert.equal((html.match(/class="cicada-pointer"/g) || []).length, imported.articles.length, "Every preview should use the shared cicada pointer");
     assert(!html.includes("preview-wheel"), "Use the reference pointer without a wheel badge");
@@ -262,7 +275,7 @@ function inspectHome(node) {
   for (const child of node.childNodes || []) inspectHome(child);
 }
 inspectHome(homepage);
-assert.deepEqual(homepageEntries, ["wxad12", "gamestation"], "Only the two personal entries belong on the homepage");
+assert.deepEqual(homepageEntries, ["weather-recreation", "wxad12", "gamestation"], "The weather tutorial should lead the three personal homepage entries");
 assert(!home.includes("wxad.design") && !home.includes("Aragakey") && !home.includes("aragakey"), "The homepage must not retain reference-site content or links");
 assert(!/小 p[：:]|Figma Make|微广|制作有趣的界面/.test(home), "Reference entries must also be removed from the animated miniature homepage");
 await assert.rejects(access(join(root, "_next", "static", "chunks", "2ka_qt01g8-f4.js")), "The retired homepage client must be removed");
@@ -335,6 +348,49 @@ assert.equal(renderedText(renderedProject), nodeText(projectArticle), "GameStati
 for (const heading of projectData.props.pageProps.content.headings) {
   assert(projectNodes.some(node => node.tagName === "h2" && node.attrs.some(attr => attr.name === "id" && attr.value === heading.id)), `Missing project section ${heading.text}`);
 }
+const tutorial = JSON.parse(await readFile(new URL("../src/content/weather-recreation.json", import.meta.url), "utf8"));
+const tutorialHTML = await readFile(join(root, tutorial.slug, "index.html"), "utf8");
+const tutorialNodes = [];
+function inspectTutorial(node) {
+  tutorialNodes.push(node);
+  for (const child of node.childNodes || []) inspectTutorial(child);
+}
+inspectTutorial(parse(tutorialHTML));
+const tutorialScript = tutorialNodes.find(node => node.attrs?.some(attr => attr.name === "id" && attr.value === "__NEXT_DATA__"));
+const tutorialData = JSON.parse(nodeText(tutorialScript));
+assert.deepEqual(tutorialData.props.pageProps.content.frontmatter, tutorial, "The weather tutorial must retain its author, title and date");
+assert.deepEqual(
+  JSON.parse(await readFile(join(root, "_next", "data", tutorialData.buildId, `${tutorial.slug}.json`), "utf8")),
+  tutorialData.props,
+  "Direct visits and navigation must load the same weather tutorial"
+);
+const tutorialArticle = tutorialNodes.find(node => node.tagName === "article");
+assert.equal(
+  renderedText(compileArticle(tutorialData.props.pageProps.content.code).default()),
+  nodeText(tutorialArticle),
+  "The tutorial's pictures, quoted dialogue and code must survive hydration"
+);
+const tutorialOpening = tutorialArticle.childNodes.find(node => node.tagName === "p");
+assert(
+  tutorialHTML.indexOf("assets/articles/weather-x-browse.mp4") < tutorialHTML.indexOf("assets/works/weather.gif"),
+  "Show the real X browsing recording before the recreation"
+);
+const sourceBrowse = tutorialNodes.find(node => node.tagName === "video");
+assert(sourceBrowse?.attrs.some(attr => attr.name === "src" && attr.value.endsWith("/assets/articles/weather-x-browse.mp4")), "The tutorial must include the real X browsing recording");
+for (const name of ["autoplay", "muted", "loop", "playsinline"]) {
+  assert(sourceBrowse.attrs.some(attr => attr.name === name), `Source browsing must retain ${name}`);
+}
+assert(!sourceBrowse.attrs.some(attr => attr.name === "controls"), "Source browsing should loop without playback controls");
+assert(!tutorialHTML.includes("assets/weather-reference.webp"), "The static source screenshot must be replaced");
+for (const heading of tutorialData.props.pageProps.content.headings) {
+  assert(tutorialNodes.some(node => node.tagName === "h2" && node.attrs.some(attr => attr.name === "id" && attr.value === heading.id)), `Missing tutorial section ${heading.text}`);
+}
+assert(home.includes("weather-tutorial-cover") && home.includes(tutorial.title), "The homepage must include the new tutorial and its circular GIF cover");
+assert(tutorialHTML.includes("我觉得图形你已经复刻了") && tutorialHTML.includes("我的意思打开后显示 gif"), "The tutorial must document the user's visual and preview corrections");
+assert(tutorialHTML.includes("assets/works/weather.gif") && tutorialHTML.includes("assets/articles/weather-frames.webp"), "The tutorial needs the actual animation and a keyframe study");
+const contactSheet = await sharp(join(root, "assets", "articles", "weather-frames.webp")).metadata();
+assert.equal(contactSheet.width, 984);
+assert.equal(contactSheet.height, 652);
 assert(!projectHTML.includes('href="https://gamestation.cc/"') && !projectHTML.includes('href="https://github.com/theageofadzz/GameStation"'), "Project article must omit the removed preview and GitHub entry points");
 const walkthrough = projectNodes.find(node => node.tagName === "video");
 assert(walkthrough, "Expected an actual website walkthrough video");

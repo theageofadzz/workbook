@@ -23,6 +23,11 @@
       "route": "/gamestation",
       "title": "一次3D交互实验",
       "file": "gamestation/index.html"
+    },
+    {
+      "title": "像素级复刻一段天气动效",
+      "route": "/weather-recreation",
+      "file": "weather-recreation/index.html"
     }
   ],
   "localFiles": 437,

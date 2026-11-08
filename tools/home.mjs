@@ -13,7 +13,7 @@ function remove(node) {
 }
 
 export async function writeHomePage({ root, out, base, title }) {
-  const entries = await Promise.all(["portfolio-design", "gamestation"].map(async name =>
+  const entries = await Promise.all(["weather-recreation", "portfolio-design", "gamestation"].map(async name =>
     JSON.parse(await readFile(join(root, "src", "content", `${name}.json`), "utf8"))
   ));
   const allowed = new Set(entries.map(entry => `${base}/${entry.slug}`));
@@ -66,7 +66,7 @@ export async function writeHomePage({ root, out, base, title }) {
     }
   });
   if (retained.join(",") !== entries.map(entry => entry.slug).join(",")) {
-    throw new Error("The homepage must contain only the two personal entries, in order.");
+    throw new Error("The homepage must contain the configured personal entries, in order.");
   }
   await writeFile(join(out, "index.html"), serialize(document));
   const chunks = join(out, "_next", "static", "chunks");
