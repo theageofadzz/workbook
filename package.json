@@ -15,8 +15,11 @@
   },
   "devDependencies": {
     "acorn": "^8.19.0",
+    "esbuild": "0.28.2",
+    "html-to-image": "1.11.13",
     "lucide-static": "^1.68.0",
     "parse5": "^7.3.0",
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "three": "0.180.0"
   }
 }

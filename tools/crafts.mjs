@@ -2,6 +2,7 @@ import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promi
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { parseFragment, serialize } from "parse5";
+import { build } from "esbuild";
 import { cursorMarkup } from "./cursor.mjs";
 
 const text = node => node.nodeName === "#text" ? node.value : (node.childNodes || []).map(text).join("");
@@ -68,6 +69,23 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
   const css = await readFile(join(root, "src", "crafts.css"), "utf8");
   const js = await readFile(join(root, "src", "crafts.js"), "utf8");
   const hash = source => createHash("sha256").update(source).digest("hex").slice(0, 8);
+  async function bundle(file, define = {}) {
+    const result = await build({
+      entryPoints: [join(root, "src", file)], bundle: true, write: false, minify: true,
+      format: "esm", target: "es2020", legalComments: "eof", define
+    });
+    return result.outputFiles[0].text;
+  }
+  const paperWorker = await bundle("paper-crumple-worker.js");
+  const paperJS = await bundle("paper-crumple.js", { PAPER_WORKER_VERSION: JSON.stringify(hash(paperWorker)) });
+  await writeFile(join(out, "paper-crumple-worker.js"), paperWorker);
+  await writeFile(join(out, "paper-crumple.js"), paperJS);
+  const licenses = await Promise.all([
+    join(root, "src", "licenses", "react-bits.txt"),
+    join(root, "node_modules", "three", "LICENSE"),
+    join(root, "node_modules", "html-to-image", "LICENSE")
+  ].map(file => readFile(file, "utf8")));
+  await writeFile(join(out, "paper-crumple-LICENSE.txt"), licenses.join("\n\n---\n\n"));
   function previewContent(article) {
     const document = parseFragment(article.html);
     const paragraphs = [];
@@ -87,6 +105,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     scrollExpandVersion,
     cssVersion: hash(css),
     jsVersion: hash(js),
+    paperVersion: hash(paperJS),
     articles: works.map(work => `
       <article class="writing-entry" data-slug="${escape(work.slug)}">
         <a class="writing-link crafts-card" href="?work=${encodeURIComponent(work.slug)}" data-open-work="${escape(work.slug)}" aria-haspopup="dialog" aria-label="查看作品：${escape(work.title)}">

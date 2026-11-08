@@ -21,6 +21,10 @@
   const body = document.querySelector("[data-reader-body]");
   const cover = document.querySelector("[data-reader-cover]");
   const assetBase = new URL(".", document.currentScript.src);
+  const paperURL = new URL(`paper-crumple.js?v=${document.currentScript.dataset.paperVersion}`, assetBase);
+  let paperModule;
+  let paperReader = null;
+  let paperAbort = null;
   let activeArticle = null;
   let returnFocus = null;
   let progressFrame = 0;
@@ -33,6 +37,36 @@
   };
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  function destroyPaper() {
+    paperAbort?.abort();
+    paperAbort = null;
+    paperReader?.destroy();
+    paperReader = null;
+  }
+  function initializePaper() {
+    destroyPaper();
+    if (reducedMotion.matches) return;
+    paperAbort = new AbortController();
+    const { signal } = paperAbort;
+    paperModule ||= import(paperURL.href);
+    paperModule.then(module => {
+      if (signal.aborted || !dialog.open) return null;
+      return module.createPaperReader({ root: dialog, sheet: dialog.querySelector("[data-paper-sheet]"), scroller: scroll, signal });
+    }).then(reader => {
+      if (signal.aborted || !dialog.open) reader?.destroy();
+      else {
+        paperReader = reader;
+        if (!reader) dialog.dataset.paperStatus = "unavailable";
+      }
+    }).catch(error => {
+      console.warn("Paper initialization failed", error);
+      if (!signal.aborted) dialog.dataset.paperStatus = "unavailable";
+    });
+  }
+  reducedMotion.addEventListener("change", () => {
+    if (reducedMotion.matches) destroyPaper();
+    else if (dialog.open) initializePaper();
+  });
   const previews = new Map();
   let workReturnFocus = null;
   function initializeSplitText() {
@@ -236,6 +270,7 @@
   }).observe(scroll);
 
   function openArticle(article, pushHistory = true) {
+    destroyPaper();
     clearTimeout(readerCloseTimer);
     readerCloseTimer = 0;
     dialog.classList.remove("is-closing");
@@ -263,6 +298,7 @@
     document.documentElement.classList.add("reading-open");
     resetDock();
     if (!dialog.open) dialog.showModal();
+    initializePaper();
     refreshMotion();
     // Layout must settle before restoring a saved position inside the reading window.
     const targetPosition = positions.get(article.slug) ?? Number(storage.get(`position:${article.slug}`)) ?? 0;
@@ -296,13 +332,14 @@
 
   function dismissWindow() {
     if (!dialog.open || readerCloseTimer) return;
+    destroyPaper();
     updateProgress();
     const finish = () => {
       readerCloseTimer = 0;
       body.querySelectorAll("iframe").forEach(frame => frame.remove());
       dialog.close();
       dialog.classList.remove("is-closing");
-      document.documentElement.classList.remove("reading-open");
+      document.documentElement.classList.toggle("reading-open", workDialog.open);
       activeArticle = null;
       refreshMotion();
       document.title = "workbook of theageofadzz";
@@ -330,7 +367,7 @@
       workCloseTimer = 0;
       workDialog.close();
       workDialog.classList.remove("is-closing");
-      document.documentElement.classList.remove("reading-open");
+      document.documentElement.classList.toggle("reading-open", dialog.open);
       workDialog.querySelector("[data-work-reader-media]").removeAttribute("src");
       document.title = "workbook of theageofadzz";
       workReturnFocus?.focus({ preventScroll: true });
@@ -351,10 +388,12 @@
       history.replaceState(history.state, "", url);
     }
   }
-  document.querySelector("[data-close-reader]").addEventListener("click", closeReader);
-  document.querySelector("[data-close-work]").addEventListener("click", closeWork);
   dialog.addEventListener("cancel", event => {
     event.preventDefault();
+    if (paperReader?.active) {
+      paperReader.restore(true);
+      return;
+    }
     closeReader();
   });
   workDialog.addEventListener("cancel", event => {
@@ -373,14 +412,24 @@
       (event.shiftKey ? last : first)?.focus();
     }
   });
-  dialog.addEventListener("click", event => {
-    if (event.target !== dialog) return;
-    const rect = dialog.getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeReader();
-  });
-  workDialog.addEventListener("click", event => {
-    if (event.target === workDialog) closeWork();
-  });
+  function dismissOnBlankClick(window, dismiss, fullScreen = false) {
+    let press = null;
+    function isBlank(event) {
+      if (event.target !== window) return false;
+      if (fullScreen) return true;
+      const rect = window.getBoundingClientRect();
+      return event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+    }
+    window.addEventListener("pointerdown", event => {
+      press = event.button === 0 && isBlank(event) ? { x: event.clientX, y: event.clientY } : null;
+    }, { capture: true });
+    window.addEventListener("click", event => {
+      if (press && isBlank(event) && Math.hypot(event.clientX - press.x, event.clientY - press.y) < 8) dismiss();
+      press = null;
+    });
+  }
+  dismissOnBlankClick(dialog, closeReader, true);
+  dismissOnBlankClick(workDialog, closeWork);
   document.addEventListener("click", event => {
     const workLink = event.target.closest("[data-open-work]");
     if (workLink && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {

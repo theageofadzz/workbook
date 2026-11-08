@@ -79,6 +79,10 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     }
     assert(!html.includes("__NEXT_DATA__"), "Next hydration must not replace the custom writing archive");
     assert.match(html, /<dialog[^>]+aria-labelledby="reader-title"/, "Expected an accessible reading dialog");
+    assert(!/data-close-(?:reader|work)/.test(html), "Preview windows should close from the backdrop, without close buttons");
+    for (const file of ["paper-crumple.js", "paper-crumple-worker.js", "paper-crumple-LICENSE.txt"]) {
+      await access(join(root, file));
+    }
   }
   for (const url of urls) {
     let path = decodeURIComponent(url.split(/[?#]/)[0].slice(manifest.basePath.length));

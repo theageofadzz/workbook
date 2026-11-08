@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="{{base}}/workbook.css">
   <link rel="stylesheet" href="{{base}}/crafts.css?v={{cssVersion}}">
   <script src="{{base}}/scroll-expand.js?v={{scrollExpandVersion}}" defer></script>
-  <script src="{{base}}/crafts.js?v={{jsVersion}}" defer></script>
+  <script src="{{base}}/crafts.js?v={{jsVersion}}" data-paper-version="{{paperVersion}}" defer></script>
 </head>
 <body class="writing-page">
   <main class="writing-main">
@@ -34,22 +34,26 @@
   <div class="writing-dock-backdrop" aria-hidden="true"></div>
 
   <dialog class="reading-window" data-reader aria-labelledby="reader-title">
-    <button class="writing-icon-button reading-close" type="button" data-close-reader aria-label="关闭阅读窗口" title="关闭阅读窗口" autofocus>{{icon:x}}</button>
-    <div class="reading-scroll" data-reader-scroll tabindex="0" aria-label="文章正文">
-      <article class="reading-article preview-article">
-        <header>
-          <p class="preview-date"><time data-reader-date></time></p>
-          <h2 class="preview-title" id="reader-title"></h2>
-          <p class="preview-subtitle" data-reader-subtitle></p>
-        </header>
-        <img class="preview-cover" data-reader-cover alt="" hidden>
-        <div class="reading-body preview-body" data-reader-body></div>
-        <div class="preview-end" aria-hidden="true">· · ·</div>
-      </article>
+    <div class="reading-sheet" data-paper-sheet>
+      <div class="reading-scroll" data-reader-scroll tabindex="0" aria-label="文章正文" autofocus>
+        <article class="reading-article preview-article">
+          <header>
+            <p class="preview-date"><time data-reader-date></time></p>
+            <h2 class="preview-title" id="reader-title"></h2>
+            <p class="preview-subtitle" data-reader-subtitle></p>
+          </header>
+          <img class="preview-cover" data-reader-cover alt="" hidden>
+          <div class="reading-body preview-body" data-reader-body></div>
+          <div class="preview-end" aria-hidden="true">· · ·</div>
+        </article>
+      </div>
+      <button class="paper-grip paper-grip-left" data-paper-grip type="button" aria-label="揉纸：按住空格或回车，方向键移动，松开复原" aria-pressed="false" title="拖动纸张，松手复原" disabled></button>
+      <span class="paper-grip paper-grip-right" data-paper-grip aria-hidden="true"></span>
+      <span class="paper-grip paper-grip-top" data-paper-grip aria-hidden="true"></span>
+      <span class="paper-grip paper-grip-bottom" data-paper-grip aria-hidden="true"></span>
     </div>
   </dialog>
   <dialog class="work-window" data-work-reader aria-label="作品预览">
-    <button class="writing-icon-button work-close" type="button" data-close-work aria-label="关闭作品预览" title="关闭作品预览" autofocus>{{icon:x}}</button>
     <img class="work-reader-media" data-work-reader-media alt="" decoding="async">
   </dialog>
   <script type="application/json" id="crafts-content">{{data}}</script>
