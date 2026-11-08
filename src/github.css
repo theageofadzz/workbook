@@ -13,7 +13,11 @@
   font-size: 14px;
   line-height: 1.6;
 }
-.github-page .profile-background { background-image: radial-gradient(circle, #ffffff80 .7px, transparent .9px); }
+.github-page .profile-background {
+  background-image: radial-gradient(circle, #ffffff38 .55px, transparent 1px);
+  background-size: 8px 8px;
+  filter: blur(.4px);
+}
 .github-page .profile-background::before { display: none; }
 .github-page a:hover { color: var(--github-link); }
 .github-page :is(a, button, input, select):focus-visible { outline: 2px solid var(--github-text); outline-offset: 4px; }
