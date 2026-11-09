@@ -473,8 +473,11 @@ export async function createPaperReader({ root, sheet, scroller, signal }) {
     }
   }, { capture: true });
   listen(sheet, "contextmenu", event => {
-    if (pendingPress || held || performance.now() < ignoreClickUntil) event.preventDefault();
+    event.preventDefault();
   });
+  listen(scroller, "selectstart", event => event.preventDefault());
+  listen(scroller, "copy", event => event.preventDefault());
+  listen(scroller, "cut", event => event.preventDefault());
   listen(scroller, "scroll", () => {
     cancelPress();
     scheduleCapture();

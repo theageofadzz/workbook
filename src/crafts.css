@@ -178,7 +178,9 @@ html.reading-open { overflow: hidden; }
   from { opacity: 1; transform: translateY(0) scale(1); }
   to { opacity: 0; transform: translateY(8px) scale(.97); }
 }
-.reading-scroll { flex: 1; min-width: 0; min-height: 0; border-radius: inherit; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c8c8c8 transparent; outline: none; }
+.reading-scroll { flex: 1; min-width: 0; min-height: 0; border-radius: inherit; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #c8c8c8 transparent; outline: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.reading-article, .reading-article * { user-select: none; -webkit-user-select: none; }
+.reading-article img { -webkit-user-drag: none; user-drag: none; }
 .reading-article { min-height: 100%; }
 .reading-body :is(h2, h3, h4) { color: #333; font-family: "Songti SC", STSong, Georgia, serif; font-weight: 500; scroll-margin-top: 25px; }
 .reading-body h2 { margin: 2.2em 0 .9em; font-size: 25px; line-height: 1.6; }
