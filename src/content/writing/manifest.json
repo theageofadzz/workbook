@@ -3,16 +3,6 @@
   "revision": "4801a449d2ddba62d15327432e8df1971a903dc9",
   "articles": [
     {
-      "slug": "downloader-one",
-      "title": "Downloader One",
-      "description": "从 OpenDownload 演变而来的全新下载产品设计。",
-      "subtitle": "从 OpenDownload 到 Downloader One 的蜕变之旅",
-      "category": "技术与设计",
-      "publishedAt": "2026-08-19",
-      "sourcePath": "downloader-one.html",
-      "cover": "assets/writing/downloader-one.webp"
-    },
-    {
       "slug": "a-moveable-feast",
       "title": "漂流的盛宴",
       "description": "这个名字来自海明威的《流动的盛宴》。",
