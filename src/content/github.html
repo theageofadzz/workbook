@@ -29,7 +29,6 @@
         <div data-repository-list>
           <nav class="github-tabs" aria-label="GitHub 视图">
             <a href="?tab=overview" data-tab="overview" aria-current="page">{{icon:book-open}}概览</a>
-            <a href="?tab=repositories" data-tab="repositories">{{icon:folder-git-2}}仓库<span class="github-count">{{repoCount}}</span></a>
           </nav>
           <div class="github-overview" data-github-overview>
             <section class="github-pinned" aria-labelledby="github-pinned-title">
@@ -47,19 +46,10 @@
               <button class="github-load-activity" type="button" data-more-activity hidden>{{icon:chevron-down}}更早的活动</button>
             </section>
           </div>
-          <div data-github-archive hidden>
-            <form class="github-search" role="search">
-              <label class="github-search-field">{{icon:search}}<input type="search" aria-label="搜索仓库" placeholder="搜索仓库…" data-repo-search></label>
-              <select aria-label="筛选编程语言" data-language-filter><option value="">全部语言</option>{{languages}}</select>
-            </form>
-            <div class="github-section-heading"><h2 data-list-title>全部仓库</h2><span data-result-count aria-live="polite">{{repoCount}} 个仓库</span></div>
-            <div class="github-repositories is-list" data-repositories>{{repositories}}</div>
-            <p class="github-empty" data-empty hidden>没有找到匹配的仓库。</p>
-          </div>
         </div>
         <article class="github-detail" data-repository-detail hidden>
           <header class="github-detail-heading">
-            <button type="button" class="github-icon-button" data-back aria-label="返回仓库列表" title="返回仓库列表">{{icon:arrow-left}}</button>
+            <button type="button" class="github-icon-button" data-back aria-label="返回概览" title="返回概览">{{icon:arrow-left}}</button>
             <h2 data-repository-title tabindex="-1"></h2><span class="github-visibility">公开</span>
           </header>
           <p class="github-detail-description" data-repository-description></p>

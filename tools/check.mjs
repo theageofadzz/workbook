@@ -273,7 +273,8 @@ assert.equal(
   "Every API contribution day must be rendered"
 );
 assert(githubData.activity.some(month => month.commits.length), "The profile needs actual repository activity");
-assert(githubHTML.includes("data-github-overview") && githubHTML.includes("data-github-archive"), "Overview and repository search must have separate views");
+assert(githubHTML.includes("data-github-overview"), "The GitHub overview must remain available");
+assert(!githubHTML.includes("data-github-archive") && !githubHTML.includes('data-tab="repositories"') && !githubHTML.includes("data-repo-search"), "The retired repository tab and search view must be removed");
 for (const repo of githubData.repos) {
   const fragment = parse(repo.readme);
   function inspectReadme(node) {

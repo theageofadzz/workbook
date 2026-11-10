@@ -2,13 +2,7 @@
   const { repos, calendars } = JSON.parse(document.querySelector("#github-data").textContent);
   const list = document.querySelector("[data-repository-list]");
   const detail = document.querySelector("[data-repository-detail]");
-  const repositories = document.querySelector("[data-repositories]");
-  const search = document.querySelector("[data-repo-search]");
-  const language = document.querySelector("[data-language-filter]");
   const baseURL = new URL(".", location.href);
-  let previousTab = "overview";
-  const overview = document.querySelector("[data-github-overview]");
-  const archive = document.querySelector("[data-github-archive]");
   const range = document.querySelector("[data-contribution-range]");
   const moreActivity = document.querySelector("[data-more-activity]");
   const activityMonths = [...document.querySelectorAll("[data-activity-month]")];
@@ -84,17 +78,6 @@
     renderContributions();
   });
 
-  function filter() {
-    const query = search.value.trim().toLocaleLowerCase();
-    let count = 0;
-    for (const card of repositories.children) {
-      card.hidden = !card.textContent.toLocaleLowerCase().includes(query) || Boolean(language.value && card.dataset.language !== language.value);
-      if (!card.hidden) count++;
-    }
-    document.querySelector("[data-result-count]").textContent = `${count} 个仓库`;
-    document.querySelector("[data-empty]").hidden = count !== 0;
-  }
-
   function render(focus = false) {
     tooltip.hidden = true;
     const params = new URLSearchParams(location.search);
@@ -109,17 +92,13 @@
       document.querySelector("[data-readme]").innerHTML = repo.readme || "<p>这个仓库暂时没有 README。</p>";
       if (focus) heading.focus({ preventScroll: true });
     } else {
-      const tab = params.get("tab") === "repositories" ? "repositories" : "overview";
-      overview.hidden = tab !== "overview";
-      archive.hidden = tab !== "repositories";
-      if (tab === "overview") renderContributions();
-      previousTab = tab;
-      for (const link of document.querySelectorAll("[data-tab]")) {
-        if (link.dataset.tab === tab) link.setAttribute("aria-current", "page");
-        else link.removeAttribute("aria-current");
+      if (params.get("tab") === "repositories") {
+        const url = new URL(location.href);
+        url.searchParams.set("tab", "overview");
+        history.replaceState(history.state, "", url);
       }
-      filter();
-      if (focus) document.querySelector(`[data-tab="${tab}"]`).focus({ preventScroll: true });
+      renderContributions();
+      if (focus) document.querySelector('[data-tab="overview"]').focus({ preventScroll: true });
     }
   }
 
@@ -143,10 +122,7 @@
     event.preventDefault();
     navigate(url);
   });
-  document.querySelector("[data-back]").addEventListener("click", () => navigate(new URL(`?tab=${previousTab}`, baseURL)));
-  document.querySelector(".github-search").addEventListener("submit", event => event.preventDefault());
-  search.addEventListener("input", filter);
-  language.addEventListener("change", filter);
+  document.querySelector("[data-back]").addEventListener("click", () => navigate(new URL("?tab=overview", baseURL)));
   window.addEventListener("popstate", () => {
     if (window.WorkbookMotion) window.WorkbookMotion.change(() => render(true), document.querySelector(".github-content"));
     else render(true);
