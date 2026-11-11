@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdir, readdir, rm } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
@@ -22,4 +22,19 @@ export async function writeSkillDownloads({ root, out }) {
   const archive = join(target, `${name}.zip`);
   await rm(archive, { force: true });
   await run("zip", ["-q", "-X", archive, ...files.sort()], { cwd: skills, timeout: 30000 });
+  const discovery = join(out, ".well-known", "agent-skills");
+  for (const file of files) {
+    const target = join(discovery, file);
+    await mkdir(join(target, ".."), { recursive: true });
+    await copyFile(join(skills, file), target);
+  }
+  const instructions = await readFile(join(skills, name, "SKILL.md"), "utf8");
+  const description = instructions.match(/^description: (.+)$/m)?.[1];
+  if (!description) throw new Error("The public skill needs a description.");
+  await writeFile(join(discovery, "index.json"), JSON.stringify({
+    skills: [{
+      name, description: JSON.parse(description),
+      files: files.map(file => file.slice(name.length + 1)).sort()
+    }]
+  }, null, 2) + "\n");
 }

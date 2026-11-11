@@ -467,6 +467,14 @@ assert.equal(skillDownload.attrs.find(attr => attr.name === "href")?.value,
   "Article route pruning must preserve the skill's downloadable asset link");
 const skillArchive = await readFile(join(root, "assets", "skills", "blueprint-3d-showcase.zip"));
 assert.equal(skillArchive.readUInt32LE(0), 0x04034b50, "The downloadable skill must be a ZIP archive");
+const skillDiscovery = JSON.parse(await readFile(join(root, ".well-known", "agent-skills", "index.json"), "utf8"));
+assert.equal(skillDiscovery.skills.length, 1);
+assert.equal(skillDiscovery.skills[0].name, "blueprint-3d-showcase");
+for (const file of skillDiscovery.skills[0].files) {
+  assert((await readFile(join(root, ".well-known", "agent-skills", "blueprint-3d-showcase", file)))
+    .equals(await readFile(join(root, "..", "skills", "blueprint-3d-showcase", file))),
+  `The hosted skill must include its complete portable resource: ${file}`);
+}
 const experiences = blueprintNodes.filter(node => node.tagName === "iframe");
 assert.equal(experiences.length, 2, "Both blueprints must be directly interactive in the article");
 for (const [index, slug] of ["drone", "model-3"].entries()) {

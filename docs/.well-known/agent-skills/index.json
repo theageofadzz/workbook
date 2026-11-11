@@ -1,0 +1,20 @@
+{
+  "skills": [
+    {
+      "name": "blueprint-3d-showcase",
+      "description": "Build immersive engineering-blueprint websites with progressive line drawing, grid-cell hover reveals of aligned 3D models, and click-to-inspect transitions. Use for drone, car, camera, or other product showcases in the blueprint style by theageofadzz; not for dashboards or video renders.",
+      "files": [
+        "SKILL.md",
+        "assets/reference/car-3d-desktop.jpg",
+        "assets/reference/car-3d-mobile.jpg",
+        "assets/reference/car-blueprint-desktop.jpg",
+        "assets/reference/car-blueprint-mobile.jpg",
+        "assets/reference/car-hover-desktop.jpg",
+        "assets/reference/car-rotated-desktop.jpg",
+        "references/design.md",
+        "references/implementation.md",
+        "references/provenance.md"
+      ]
+    }
+  ]
+}
