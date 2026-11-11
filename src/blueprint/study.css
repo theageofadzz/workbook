@@ -1,0 +1,50 @@
+@font-face {
+  font-family: "Geist Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./assets/geist-latin.woff2") format("woff2");
+}
+
+:root {
+  color-scheme: dark;
+  font-family: "Geist Variable", Arial, sans-serif;
+  font-feature-settings: "tnum" 1;
+  -webkit-font-smoothing: antialiased;
+  background: #0d24ba;
+  color: #f2f4ff;
+  --u: 10vh;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { min-width: 240px; }
+#sheet, .stick { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.stick { touch-action: pan-y; user-select: none; -webkit-user-select: none; outline: none; background: #0d24ba; }
+.stick.flying { touch-action: none; cursor: grab; }
+.stick.dragging { cursor: grabbing; }
+.stick.can-fly { cursor: pointer; }
+.stick:focus-visible { box-shadow: inset 0 0 0 2px #e2e8ff99; }
+#bg, #fg, #m3d { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+#fg, #m3d { pointer-events: none; }
+.persp { position: absolute; inset: 0; perspective-origin: 50%; pointer-events: none; }
+.plane { position: absolute; inset: 0; transform-origin: 50% 100%; transform-style: preserve-3d; }
+.labels { font-size: 12px; }
+.labels > span { position: absolute; color: #e2e8ffc7; font-size: inherit; font-weight: 400; line-height: 1.25; white-space: nowrap; transition: opacity .35s; }
+.labels b { display: block; color: #f2f4ff; font-weight: 500; }
+.labels .detail { display: none; }
+.labels .c { color: transparent; }
+.labels .c.on { color: inherit; animation: char-in .26s linear both; }
+@keyframes char-in {
+  0% { color: transparent; background: #f2f4fff2; }
+  35% { color: transparent; background: #f2f4ff8c; }
+  70% { background: #f2f4ff14; }
+  100% { background: transparent; }
+}
+#failure { position: absolute; bottom: 24px; left: 16px; right: 16px; margin: 0; color: #f2f4ff; font-size: 13px; line-height: 1.8; text-align: center; }
+#failure button { padding: 0; border: 0; color: inherit; background: transparent; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .labels .c.on { animation: none; }
+  .labels > span { transition: none; }
+}

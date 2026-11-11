@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d24ba">
+  <title>无人机 / Blueprint</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./study.css">
+</head>
+<body>
+  <main id="sheet">
+    <div class="stick" id="stick" role="button" tabindex="0" aria-label="无人机蓝图。悬停查看实体，点击或按回车起飞，拖动旋转，再次点击或按 Escape 返回。" aria-pressed="false" aria-busy="true">
+      <canvas id="bg" aria-hidden="true"></canvas>
+      <div class="persp" id="persp" aria-hidden="true">
+        <div class="plane" id="plane">
+          <div id="copy" data-layout="figures" hidden></div>
+          <div class="labels" id="labels"></div>
+        </div>
+      </div>
+      <canvas id="fg" aria-hidden="true"></canvas>
+    </div>
+    <p id="failure" role="alert" hidden>画面未能加载，<button id="retry" type="button">重新加载</button></p>
+  </main>
+  <script type="module" src="./study.js"></script>
+</body>
+</html>

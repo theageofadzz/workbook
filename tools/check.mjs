@@ -458,7 +458,17 @@ for (const video of blueprintVideos) {
   assert(!video.attrs.some(attr => attr.name === "controls"), "Blueprint animations must not show video player controls");
   assert(video.attrs.some(attr => attr.name === "preload" && attr.value === "auto"), "Blueprint examples should load and play before they enter the viewport");
 }
-assert(blueprintNodes.some(node => node.tagName === "h2" && nodeText(node) === "参考资料："), "The article must end with a references section");
+assert(blueprintNodes.some(node => node.tagName === "h2" && nodeText(node) === "参考资料"), "The references heading must omit the colon");
+const experiences = blueprintNodes.filter(node => node.tagName === "iframe");
+assert.equal(experiences.length, 2, "Both blueprints must be directly interactive in the article");
+for (const [index, slug] of ["drone", "model-3"].entries()) {
+  assert(experiences[index].attrs.some(attr => attr.name === "src" && attr.value.endsWith(`/assets/blueprint/${slug}.html`)), `Missing embedded ${slug} experience`);
+  assert(experiences[index].attrs.some(attr => attr.name === "title" && attr.value), "Interactive frames need accessible titles");
+  const experienceHTML = await readFile(join(root, "assets", "blueprint", `${slug}.html`), "utf8");
+  assert(experienceHTML.includes('id="stick"') && experienceHTML.includes('type="module"'), "Embed the live renderer");
+}
+const referenceList = blueprintNodes.find(node => node.tagName === "ol" && node.attrs.some(attr => attr.name === "class" && attr.value === "blueprint-references"));
+assert.equal(referenceList?.childNodes.filter(node => node.tagName === "li").length, 2, "Model references should use two semantic source entries");
 assert(!blueprintHTML.includes("无人机原始网页实验："), "Remove the former standalone experiment credit");
 for (const source of [
   "https://sketchfab.com/3d-models/tesla-2018-model-3-5ef9b845aaf44203b6d04e2c677e444f",

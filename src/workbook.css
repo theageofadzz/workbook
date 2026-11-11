@@ -639,7 +639,28 @@ figure:not(.gamestation-code, .weather-conversation) > figcaption { text-align: 
 .blueprint-figure figcaption { margin-top: 12px; color: #737373; font: 11px/1.8 ui-monospace, monospace; }
 .blueprint-essay > p a { text-decoration: underline; text-underline-offset: 3px; }
 .blueprint-essay > p code { font-size: .9em; overflow-wrap: anywhere; }
-.blueprint-essay .blueprint-credits { margin-top: 16px; color: #737373; font-size: 12px; }
+.blueprint-experiences { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 36px 0 44px; }
+.blueprint-experience { min-width: 0; margin: 0; }
+.blueprint-experience iframe { display: block; width: 100%; height: auto; aspect-ratio: 8 / 9; border: 0; border-radius: 4px; background: #0d24ba; }
+.blueprint-experience figcaption { margin-top: 12px; color: #737373; font: 11px/1.8 ui-monospace, monospace; }
+.portfolio-essay .blueprint-references { margin: 32px 0 0; padding: 0; list-style: none; border-top: 1px solid #d4d4d4; }
+.portfolio-essay .blueprint-references > li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 16px; margin: 0; padding: 24px 0; border-bottom: 1px solid #d4d4d4; }
+.blueprint-reference-number { padding-top: 3px; color: #a3a3a3; font: 11px/1.8 ui-monospace, monospace; }
+.blueprint-reference-content { min-width: 0; }
+.blueprint-reference-title { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; color: #404040; font-size: 15px; line-height: 1.6; }
+.blueprint-reference-title > span { display: inline-flex; flex: 0 0 14px; }
+.blueprint-reference-title svg { width: 14px; height: 14px; color: #858585; }
+.blueprint-reference-title:hover { color: #171717; text-decoration: underline; text-underline-offset: 4px; }
+.blueprint-reference-title:focus-visible { outline: 1px solid #737373; outline-offset: 4px; }
+.blueprint-reference-content .blueprint-reference-meta { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 8px 0 0; color: #737373; font-size: 12px; line-height: 1.8; }
+.blueprint-reference-meta > span { color: #a3a3a3; }
+.blueprint-reference-meta a { text-decoration: underline; text-underline-offset: 3px; }
+.blueprint-reference-content .blueprint-reference-note { margin: 5px 0 0; color: #858585; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.blueprint-reference-note code { font-size: 11px; }
+@media (max-width: 600px) {
+  .blueprint-experiences { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .portfolio-essay .blueprint-references > li { gap: 10px; padding: 20px 0; }
+}
 .weather-demo { max-width: 518px; margin: 44px auto 52px; }
 .weather-demo picture,
 .weather-demo img { display: block; width: 100%; aspect-ratio: 1; }

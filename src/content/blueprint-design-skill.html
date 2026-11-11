@@ -31,7 +31,36 @@
   <p>做完这两个案例，我把能重复用的部分整理成了 <code>$blueprint-3d-showcase</code>：用同一个视角对齐线稿和模型，悬停时按格露出实体，点击后连续过渡到三维查看，再沿原路回到图纸。无人机的起飞、汽车的原地转动，则留给各自的物件来决定。</p>
   <p>下次想把一台相机做成这样的交互，我可以直接说：「用 <code>$blueprint-3d-showcase</code> 做一台相机。打开是蓝色图纸，悬停露出实体，点进去能拖动看镜头和机身。」不必从头解释什么叫蓝图显影，也能把时间留给这个新物件值得看的细节。</p>
 
-  <h2 id="references">参考资料：</h2>
-  <p class="blueprint-credits">Model 3 模型：<a href="https://sketchfab.com/3d-models/tesla-2018-model-3-5ef9b845aaf44203b6d04e2c677e444f">Tesla 2018 Model 3</a>，Ameer Studio，<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>；调整了车漆与照明，线稿由模型几何生成。<br>无人机模型：<a href="https://experiments.thisiswhitespace.com/standalone/lathe-blueprint/models/drone_built.glb">drone_built.glb</a>，来自 Whitespace 的《Lathe Blueprint》实验。</p>
+  <h2 id="experience">在线体验</h2>
+  <div class="blueprint-experiences">
+    <figure class="blueprint-experience">
+      <iframe src="{{base}}/assets/blueprint/drone.html" title="无人机蓝图交互体验" width="640" height="720" loading="lazy"></iframe>
+      <figcaption>无人机</figcaption>
+    </figure>
+    <figure class="blueprint-experience">
+      <iframe src="{{base}}/assets/blueprint/model-3.html" title="Model 3 蓝图交互体验" width="640" height="720" loading="lazy"></iframe>
+      <figcaption>Model 3</figcaption>
+    </figure>
+  </div>
+
+  <h2 id="references">参考资料</h2>
+  <ol class="blueprint-references">
+    <li>
+      <span class="blueprint-reference-number" aria-hidden="true">01</span>
+      <div class="blueprint-reference-content">
+        <a class="blueprint-reference-title" href="https://sketchfab.com/3d-models/tesla-2018-model-3-5ef9b845aaf44203b6d04e2c677e444f">Tesla 2018 Model 3 <span aria-hidden="true">{{icon:arrow-up-right}}</span></a>
+        <p class="blueprint-reference-meta">汽车模型 <span aria-hidden="true">·</span> Ameer Studio <span aria-hidden="true">·</span> <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+        <p class="blueprint-reference-note">调整车漆与照明，线稿由模型几何生成。</p>
+      </div>
+    </li>
+    <li>
+      <span class="blueprint-reference-number" aria-hidden="true">02</span>
+      <div class="blueprint-reference-content">
+        <a class="blueprint-reference-title" href="https://experiments.thisiswhitespace.com/standalone/lathe-blueprint/models/drone_built.glb">Lathe Blueprint · Drone <span aria-hidden="true">{{icon:arrow-up-right}}</span></a>
+        <p class="blueprint-reference-meta">无人机模型 <span aria-hidden="true">·</span> Zsolt Kacso · Whitespace</p>
+        <p class="blueprint-reference-note">模型文件 <code>drone_built.glb</code>，来自《Lathe Blueprint》实验。</p>
+      </div>
+    </li>
+  </ol>
   {{footer}}
 </article>

@@ -1,0 +1,13 @@
+{
+  "author": "Zsolt Kacso / Whitespace",
+  "experiment": "https://experiments.thisiswhitespace.com/lathe-blueprint",
+  "renderer": "https://experiments.thisiswhitespace.com/standalone/lathe-blueprint/assets/index-Oz0N-zdv.js",
+  "sha256": "b04ff925d196fc77de85260b5a88de25229c3fc14f1b055c0a5f2aaf2c137b7f",
+  "retrievedAt": "2026-11-10",
+  "assets": [
+    "https://experiments.thisiswhitespace.com/standalone/lathe-blueprint/data/drone.json",
+    "https://experiments.thisiswhitespace.com/standalone/lathe-blueprint/models/drone_built.glb",
+    "https://experiments.thisiswhitespace.com/standalone/lathe-blueprint/tex/seam_sdf.png",
+    "https://experiments.thisiswhitespace.com/standalone/lathe-blueprint/assets/geist-latin-wght-normal-BgDaEnEv.woff2"
+  ]
+}
