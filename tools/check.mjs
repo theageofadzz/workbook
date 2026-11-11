@@ -446,7 +446,7 @@ assert.equal(
   nodeText(blueprintArticle),
   "The film introduction and both animated demonstrations must survive hydration"
 );
-assert(blueprintHTML.includes("小时候看到电影里那些蓝图绘制特效") && blueprintHTML.includes("我不是学理工科的"), "Keep the user's personal film memory");
+assert(blueprintHTML.includes("前段时间在看电影《惊天魔盗团》") && blueprintHTML.includes("最终临近下班时，gpt终于给到现在我最满意的结果"), "Keep the user's film inspiration and iterative design process");
 assert(blueprintHTML.includes("rodeofx-webpage-videos/project/images/043-Now-You-See-Me/now-you-see-me_stills-005.jpg"), "Credit and show the actual film blueprint scene");
 assert(!/blueprint-(?:drone-hover|drone-flight|model-3-hover|model-3-inspect)\.webp/.test(blueprintHTML), "Case studies should demonstrate motion instead of still screenshots");
 const blueprintVideos = blueprintNodes.filter(node => node.tagName === "video");
