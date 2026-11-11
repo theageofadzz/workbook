@@ -308,6 +308,64 @@
   }
   document.addEventListener("visibilitychange", playBlueprintDemos);
 
+  function syncBlueprintFullscreen() {
+    document.querySelectorAll("[data-blueprint-fullscreen]").forEach(button => {
+      const stage = button.closest(".blueprint-experience-stage");
+      const expanded = document.fullscreenElement === stage || stage.classList.contains("is-fullscreen");
+      const label = expanded ? "退出全屏体验" : "全屏体验";
+      button.setAttribute("aria-pressed", String(expanded));
+      button.setAttribute("aria-label", label);
+      button.title = label;
+    });
+  }
+
+  function closeBlueprintFullscreenFallback() {
+    const stage = document.querySelector(".blueprint-experience-stage.is-fullscreen");
+    if (!stage) return;
+    if (stage.matches(":popover-open")) stage.hidePopover();
+    stage.removeAttribute("popover");
+    stage.classList.remove("is-fullscreen");
+    document.documentElement.classList.remove("has-blueprint-fullscreen");
+    syncBlueprintFullscreen();
+    stage.querySelector("[data-blueprint-fullscreen]").focus({ preventScroll: true });
+  }
+
+  document.addEventListener("fullscreenchange", syncBlueprintFullscreen);
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeBlueprintFullscreenFallback();
+  });
+  document.addEventListener("click", async event => {
+    const button = event.target instanceof Element && event.target.closest("[data-blueprint-fullscreen]");
+    if (!button) return;
+    const stage = button.closest(".blueprint-experience-stage");
+    if (stage.classList.contains("is-fullscreen")) {
+      closeBlueprintFullscreenFallback();
+      return;
+    }
+    if (document.fullscreenElement === stage) {
+      await document.exitFullscreen();
+      syncBlueprintFullscreen();
+      return;
+    }
+    if (stage.requestFullscreen) {
+      try {
+        await stage.requestFullscreen();
+        syncBlueprintFullscreen();
+        return;
+      } catch {}
+    }
+    if (!stage.showPopover) {
+      window.open(stage.querySelector("iframe").src, "_blank", "noopener");
+      return;
+    }
+    // The top layer keeps article animation transforms from containing the expanded scene.
+    stage.classList.add("is-fullscreen");
+    stage.setAttribute("popover", "manual");
+    stage.showPopover();
+    document.documentElement.classList.add("has-blueprint-fullscreen");
+    syncBlueprintFullscreen();
+  });
+
   function initializeScrollExpands() {
     const article = document.querySelector(".portfolio-essay");
     window.WorkbookScrollExpand?.initialize(article, { scroller: window });

@@ -639,9 +639,24 @@ figure:not(.gamestation-code, .weather-conversation) > figcaption { text-align: 
 .blueprint-figure figcaption { margin-top: 12px; color: #737373; font: 11px/1.8 ui-monospace, monospace; }
 .blueprint-essay > p a { text-decoration: underline; text-underline-offset: 3px; }
 .blueprint-essay > p code { font-size: .9em; overflow-wrap: anywhere; }
-.blueprint-experiences { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 36px 0 44px; }
+.blueprint-experiences { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; margin: 36px 0 44px; }
 .blueprint-experience { min-width: 0; margin: 0; }
-.blueprint-experience iframe { display: block; width: 100%; height: auto; aspect-ratio: 8 / 9; border: 0; border-radius: 4px; background: #0d24ba; }
+.blueprint-experience-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px; background: #0d24ba; }
+.blueprint-experience iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; }
+.blueprint-fullscreen { position: absolute; top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid #ffffff40; border-radius: 8px; background: #ffffff17; color: #f2f4ff; box-shadow: inset 0 1px 0 #ffffff26, 0 2px 8px #07125b1a; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); cursor: pointer; }
+.blueprint-fullscreen:hover { background: #ffffff2b; }
+.blueprint-fullscreen:focus-visible { outline: 2px solid #f2f4ff; outline-offset: 3px; }
+.blueprint-fullscreen > span { display: flex; }
+.blueprint-fullscreen svg { width: 16px; height: 16px; }
+.blueprint-fullscreen [data-blueprint-collapse],
+.blueprint-fullscreen[aria-pressed="true"] [data-blueprint-expand] { display: none; }
+.blueprint-fullscreen[aria-pressed="true"] [data-blueprint-collapse] { display: flex; }
+.blueprint-fullscreen::after { position: absolute; top: calc(100% + 8px); right: 0; padding: 5px 8px; border: 1px solid #ffffff26; border-radius: 4px; background: #142470e6; color: #f2f4ff; font: 11px/1.5 sans-serif; white-space: nowrap; content: attr(aria-label); opacity: 0; pointer-events: none; }
+.blueprint-fullscreen:hover::after,
+.blueprint-fullscreen:focus-visible::after { opacity: 1; }
+.blueprint-experience-stage:fullscreen { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
+.blueprint-experience-stage.is-fullscreen { position: fixed; inset: 0; z-index: 10000; width: 100%; height: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; aspect-ratio: auto; border-radius: 0; }
+html.has-blueprint-fullscreen { overflow: hidden; }
 .blueprint-experience figcaption { margin-top: 12px; color: #737373; font: 11px/1.8 ui-monospace, monospace; }
 .portfolio-essay .blueprint-references { margin: 32px 0 0; padding: 0; list-style: none; border-top: 1px solid #d4d4d4; }
 .portfolio-essay .blueprint-references > li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 16px; margin: 0; padding: 24px 0; border-bottom: 1px solid #d4d4d4; }
@@ -658,7 +673,9 @@ figure:not(.gamestation-code, .weather-conversation) > figcaption { text-align: 
 .blueprint-reference-content .blueprint-reference-note { margin: 5px 0 0; color: #858585; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
 .blueprint-reference-note code { font-size: 11px; }
 @media (max-width: 600px) {
-  .blueprint-experiences { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .blueprint-experiences { gap: 32px; }
+  .blueprint-experience-stage { aspect-ratio: 8 / 9; }
+  .blueprint-fullscreen { width: 44px; height: 44px; }
   .portfolio-essay .blueprint-references > li { gap: 10px; padding: 20px 0; }
 }
 .weather-demo { max-width: 518px; margin: 44px auto 52px; }
