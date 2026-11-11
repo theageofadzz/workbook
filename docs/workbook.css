@@ -312,6 +312,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .scroll-expand--cover { margin-bottom: 30px; }
 .scroll-expand--cover .scroll-expand__frame { border-radius: var(--scroll-expand-radius); }
 .portfolio-essay .scroll-expand { margin-right: auto; margin-left: auto; }
+figure:not(.gamestation-code, .weather-conversation) > figcaption { text-align: center; }
 .intensea-wave-reference > .scroll-expand,
 .portfolio-album-reference > .scroll-expand,
 .portfolio-cicada-reference > .scroll-expand {
@@ -326,7 +327,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .portfolio-icon-browser.is-paused .icon-browser-motion { animation-play-state: paused; }
 .intensea-logo-study > figcaption, .portfolio-icon-browser > figcaption {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 8px 20px;
   margin-top: 14px;
@@ -636,7 +637,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .blueprint-figure video { display: block; width: 100%; height: auto; border-radius: 4px; }
 .blueprint-figure video { aspect-ratio: 4 / 3; background: #141e9e; pointer-events: none; }
 .blueprint-figure figcaption { margin-top: 12px; color: #737373; font: 11px/1.8 ui-monospace, monospace; }
-.blueprint-film figcaption { text-align: center; }
 .blueprint-essay > p a { text-decoration: underline; text-underline-offset: 3px; }
 .blueprint-essay > p code { font-size: .9em; overflow-wrap: anywhere; }
 .blueprint-essay .blueprint-credits { margin-top: 44px; color: #737373; font-size: 12px; }
@@ -725,10 +725,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid #555; outline-offset:
 .weather-attribution > a:last-child { display: inline-block; margin-top: 10px; }
 .weather-source-browse { max-width: 100%; }
 .weather-source-browse video { display: block; width: 100%; height: auto; aspect-ratio: 55 / 42; border: 1px solid #e1e1e1; border-radius: 4px; background: #fff; }
-.weather-source-browse > figcaption { text-align: center; }
 .weather-explainer { max-width: 100%; margin: 32px 0 40px; }
 .weather-explainer > video { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; border: 1px solid #dce2de; border-radius: 4px; background: #f3f5f4; }
-.weather-explainer > figcaption { text-align: center; }
 @media (max-width: 767px) {
   .gamestation-computer { gap: 12px; }
   .gamestation-monitor { border-radius: 12px; }
