@@ -68,6 +68,7 @@
     else if (dialog.open) initializePaper();
   });
   const previews = new Map();
+  const workPreviewVideos = [...document.querySelectorAll("[data-work-preview-video]")];
   let workReturnFocus = null;
   function initializeSplitText() {
     const heading = document.querySelector("[data-split-text]");
@@ -109,6 +110,19 @@
 
   function refreshMotion() {
     const playing = !document.hidden && !dialog.open && !workDialog.open && !reducedMotion.matches;
+    for (const video of workPreviewVideos) {
+      if (playing) {
+        if (video.paused) video.play().catch(() => {});
+      } else video.pause();
+    }
+    const workVideo = workDialog.querySelector("video");
+    if (workVideo) {
+      workVideo.hidden = reducedMotion.matches;
+      workDialog.querySelector("[data-work-reader-poster]").hidden = !reducedMotion.matches;
+      if (!document.hidden && workDialog.open && !reducedMotion.matches) {
+        if (workVideo.paused) workVideo.play().catch(() => {});
+      } else workVideo.pause();
+    }
     for (const state of previews.values()) {
       for (const animation of state.animations || []) {
         if (reducedMotion.matches) animation.currentTime = 0;
@@ -308,14 +322,48 @@
     });
   }
 
+  function clearWorkMedia() {
+    const container = workDialog.querySelector("[data-work-reader-media]");
+    for (const video of container.querySelectorAll("video")) {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    }
+    container.replaceChildren();
+  }
+
   function openWork(work, pushHistory = true) {
     clearTimeout(workCloseTimer);
     workCloseTimer = 0;
     workDialog.classList.remove("is-closing");
     if (!workDialog.open) workReturnFocus = document.activeElement;
-    const media = workDialog.querySelector("[data-work-reader-media]");
-    media.src = new URL(work.media, assetBase).href;
-    media.alt = work.title;
+    clearWorkMedia();
+    const container = workDialog.querySelector("[data-work-reader-media]");
+    const image = document.createElement("img");
+    image.alt = work.title;
+    image.decoding = "async";
+    if (work.mediaType === "video") {
+      image.src = new URL(work.poster, assetBase).href;
+      image.dataset.workReaderPoster = "";
+      image.hidden = !reducedMotion.matches;
+      const video = document.createElement("video");
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = "auto";
+      video.disablePictureInPicture = true;
+      video.poster = image.src;
+      video.setAttribute("aria-label", work.title);
+      video.hidden = reducedMotion.matches;
+      video.src = new URL(work.media, assetBase).href;
+      container.append(image, video);
+    } else {
+      image.src = new URL(work.media, assetBase).href;
+      container.append(image);
+    }
+    workDialog.style.setProperty("--work-ratio", work.width / work.height);
+    workDialog.setAttribute("aria-label", `${work.title} · 作品预览`);
     document.title = `${work.title} · theageofadzz`;
     if (pushHistory) {
       const url = new URL(location.href);
@@ -368,7 +416,8 @@
       workDialog.close();
       workDialog.classList.remove("is-closing");
       document.documentElement.classList.toggle("reading-open", dialog.open);
-      workDialog.querySelector("[data-work-reader-media]").removeAttribute("src");
+      clearWorkMedia();
+      refreshMotion();
       document.title = "workbook of theageofadzz";
       workReturnFocus?.focus({ preventScroll: true });
     };

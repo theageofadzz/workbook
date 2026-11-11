@@ -57,7 +57,12 @@ html.reading-open { overflow: hidden; }
 .writing-link { transition: border-color 160ms; }
 .writing-link:hover { border-color: #bcbcbc; }
 .work-preview { display: block; aspect-ratio: 1; overflow: hidden; border-radius: 4px; background: #d5f1f3; }
-.work-preview img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.work-preview :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; }
+.work-preview .work-video-poster { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .work-preview video { display: none; }
+  .work-preview .work-video-poster { display: block; }
+}
 .article-preview { position: relative; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 4px; background: #fff; }
 .article-preview-canvas { width: 480px; transform: scale(var(--preview-scale, .8)); transform-origin: top left; }
 .article-preview-sheet { min-height: var(--preview-sheet-height, 800px); background: #fff; will-change: transform; }
@@ -135,8 +140,8 @@ html.reading-open { overflow: hidden; }
 .paper-snapshot { pointer-events: none; }
 .work-window {
   position: fixed;
-  width: min(640px, calc(100vw - 32px), calc(100dvh - 48px));
-  aspect-ratio: 1;
+  width: min(640px, calc(100vw - 32px), calc((100dvh - 48px) * var(--work-ratio, 1)));
+  aspect-ratio: var(--work-ratio, 1);
   max-width: none;
   max-height: none;
   margin: auto;
@@ -151,6 +156,7 @@ html.reading-open { overflow: hidden; }
 .work-window[open] { display: block; }
 .work-window::backdrop { background: #3939392e; backdrop-filter: blur(5px); }
 .work-reader-media { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 3px; background: #d5f1f3; }
+.work-reader-media > :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
 @media (prefers-reduced-motion: no-preference) {
   .reading-window[open] .reading-sheet { animation: reading-enter 300ms cubic-bezier(.22, 1, .36, 1) both; }
   .reading-window[open]::backdrop { animation: reading-shade-in 240ms ease both; }

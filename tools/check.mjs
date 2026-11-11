@@ -15,8 +15,10 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
   const html = await readFile(join(root, page.file), "utf8");
   const document = parse(html);
   const urls = [];
+  const videos = [];
   let writingData;
   function visit(node) {
+    if (node.tagName === "video") videos.push(node);
     for (const attr of node.attrs || []) {
       if (["src", "href", "poster"].includes(attr.name) && attr.value.startsWith(`${manifest.basePath}/`)) urls.push(attr.value);
     }
@@ -52,10 +54,22 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     for (const work of works) {
       assert.match(html, new RegExp(`<h2>${work.title}</h2>`), `Missing work title: ${work.slug}`);
       assert(html.includes(`<time datetime="${work.publishedAt}">${work.publishedAt}</time>`), `Missing work date: ${work.slug}`);
-      const media = await sharp(join(root, work.media), { animated: true }).metadata();
-      assert.equal(media.format, "gif", `Expected an actual GIF: ${work.slug}`);
-      assert(media.pages > 1, `Expected animated frames: ${work.slug}`);
-      assert.equal(media.loop, 0, `Expected an infinite loop: ${work.slug}`);
+      if (work.mediaType === "video") {
+        const video = videos.find(node => node.attrs.some(attr =>
+          attr.name === "src" && attr.value === `${manifest.basePath}/${work.media}`));
+        assert(video, `Expected a video preview: ${work.slug}`);
+        for (const name of ["autoplay", "muted", "loop", "playsinline"]) {
+          assert(video.attrs.some(attr => attr.name === name), `Missing ${name}: ${work.slug}`);
+        }
+        assert(!video.attrs.some(attr => attr.name === "controls"), `Keep player controls hidden: ${work.slug}`);
+        const media = await readFile(join(root, work.media));
+        assert.equal(media.toString("ascii", 4, 8), "ftyp", `Expected an MP4 animation: ${work.slug}`);
+      } else {
+        const media = await sharp(join(root, work.media), { animated: true }).metadata();
+        assert.equal(media.format, "gif", `Expected an actual GIF: ${work.slug}`);
+        assert(media.pages > 1, `Expected animated frames: ${work.slug}`);
+        assert.equal(media.loop, 0, `Expected an infinite loop: ${work.slug}`);
+      }
       await access(join(root, work.poster));
     }
     assert.equal(writingData.articles.length, imported.articles.length, "Every original essay must be available");

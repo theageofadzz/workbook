@@ -1,6 +1,6 @@
 import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { parseFragment, serialize } from "parse5";
 import { build } from "esbuild";
 import { cursorMarkup } from "./cursor.mjs";
@@ -96,6 +96,18 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     });
     return paragraphs.join("");
   }
+  function workPreview(work) {
+    if (work.mediaType === "video") return `
+          <div class="work-preview" style="aspect-ratio: ${work.width} / ${work.height}">
+            <video data-work-preview-video src="${base}/${escape(work.media)}" poster="${base}/${escape(work.poster)}" width="${work.width}" height="${work.height}" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-label="${escape(work.title)}"></video>
+            <img class="work-video-poster" src="${base}/${escape(work.poster)}" alt="${escape(work.title)}" width="${work.width}" height="${work.height}" decoding="async">
+          </div>`;
+    return `
+          <picture class="work-preview" style="aspect-ratio: ${work.width} / ${work.height}">
+            <source media="(prefers-reduced-motion: reduce)" srcset="${base}/${escape(work.poster)}">
+            <img src="${base}/${escape(work.media)}" alt="${escape(work.title)}" width="${work.width}" height="${work.height}" decoding="async">
+          </picture>`;
+  }
   const replacements = {
     footer,
     base,
@@ -109,10 +121,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     articles: works.map(work => `
       <article class="writing-entry" data-slug="${escape(work.slug)}">
         <a class="writing-link crafts-card" href="?work=${encodeURIComponent(work.slug)}" data-open-work="${escape(work.slug)}" aria-haspopup="dialog" aria-label="查看作品：${escape(work.title)}">
-          <picture class="work-preview">
-            <source media="(prefers-reduced-motion: reduce)" srcset="${base}/${escape(work.poster)}">
-            <img src="${base}/${escape(work.media)}" alt="${escape(work.title)}" width="${work.width}" height="${work.height}" decoding="async">
-          </picture>
+          ${workPreview(work)}
           <div class="crafts-caption"><h2>${escape(work.title)}</h2><div class="crafts-caption-meta"><time datetime="${work.publishedAt}">${work.publishedAt}</time><span class="crafts-category">${escape(work.category)}</span></div></div>
         </a>
       </article>`).join("") + articles.map(article => `
@@ -154,6 +163,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
   await mkdir(join(out, "assets", "works"), { recursive: true });
   for (const work of works) {
     for (const asset of [work.media, work.poster]) {
+      await mkdir(dirname(join(out, asset)), { recursive: true });
       await copyFile(join(root, "src", asset), join(out, asset));
     }
   }

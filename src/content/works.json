@@ -1,6 +1,28 @@
 {
   "works": [
     {
+      "slug": "blueprint-drone",
+      "title": "无人机蓝图",
+      "publishedAt": "2026-11-11",
+      "category": "动效",
+      "mediaType": "video",
+      "media": "assets/articles/blueprint-drone.mp4",
+      "poster": "assets/articles/blueprint-drone-poster.webp",
+      "width": 960,
+      "height": 720
+    },
+    {
+      "slug": "blueprint-model-3",
+      "title": "Model 3 蓝图",
+      "publishedAt": "2026-11-11",
+      "category": "动效",
+      "mediaType": "video",
+      "media": "assets/articles/blueprint-model-3.mp4",
+      "poster": "assets/articles/blueprint-model-3-poster.webp",
+      "width": 960,
+      "height": 720
+    },
+    {
       "slug": "weather",
       "title": "weather",
       "publishedAt": "2026-11-07",
