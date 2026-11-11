@@ -459,6 +459,14 @@ for (const video of blueprintVideos) {
   assert(video.attrs.some(attr => attr.name === "preload" && attr.value === "auto"), "Blueprint examples should load and play before they enter the viewport");
 }
 assert(blueprintNodes.some(node => node.tagName === "h2" && nodeText(node) === "参考资料"), "The references heading must omit the colon");
+const skillDownload = blueprintNodes.find(node => node.tagName === "a"
+  && node.attrs.some(attr => attr.name === "download" && attr.value === "blueprint-3d-showcase.zip"));
+assert(skillDownload, "The skill needs a browser download link");
+assert.equal(skillDownload.attrs.find(attr => attr.name === "href")?.value,
+  `${manifest.basePath}/assets/skills/blueprint-3d-showcase.zip`,
+  "Article route pruning must preserve the skill's downloadable asset link");
+const skillArchive = await readFile(join(root, "assets", "skills", "blueprint-3d-showcase.zip"));
+assert.equal(skillArchive.readUInt32LE(0), 0x04034b50, "The downloadable skill must be a ZIP archive");
 const experiences = blueprintNodes.filter(node => node.tagName === "iframe");
 assert.equal(experiences.length, 2, "Both blueprints must be directly interactive in the article");
 for (const [index, slug] of ["drone", "model-3"].entries()) {

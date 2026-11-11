@@ -10,6 +10,7 @@ import { writeGitHubPage } from "./github.mjs";
 import { writeHomePage } from "./home.mjs";
 import { writeCursorAssets } from "./cursor.mjs";
 import { writeBlueprintExperiences } from "./blueprint.mjs";
+import { writeSkillDownloads } from "./skill-downloads.mjs";
 import { isExcludedRoute, pruneExcludedContent, pruneUnusedBranding, pruneRetiredAssets, useStandaloneNavigation } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
@@ -59,6 +60,7 @@ const securityPolicy = [
 await mkdir(join(out, "assets"), { recursive: true });
 await writeCursorAssets({ root, out });
 await writeBlueprintExperiences({ root, out });
+await writeSkillDownloads({ root, out });
 
 async function writeFavicon() {
   const logo = join(root, "src", "assets", "intensea-logo.png");

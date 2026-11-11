@@ -46,6 +46,12 @@ export function isRetiredClientRoute(route) {
     || standaloneRoutes.some(path => route === path || route.startsWith(`${path}/`));
 }
 
+function isExcludedArticleLink(href, base) {
+  return typeof href === "string" && href.startsWith(`${base}/`)
+    && !href.startsWith(`${base}/assets/`)
+    && isExcludedRoute(href.slice(base.length));
+}
+
 const attr = (node, name) => node.attrs?.find(item => item.name === name)?.value;
 function walk(node, visit) {
   if (visit(node) === false) return;
@@ -148,7 +154,7 @@ function pruneContentCode(source, base) {
   walkJavaScript(parseJavaScript(source, { ecmaVersion: "latest", allowReturnOutsideFunction: true }), node => {
     if (node.type !== "Property" || (node.key?.name || node.key?.value) !== "href") return;
     const href = node.value?.value;
-    if (typeof href === "string" && href.startsWith(`${base}/`) && isExcludedRoute(href.slice(base.length))) {
+    if (isExcludedArticleLink(href, base)) {
       edits.push(node.value);
     }
   });
@@ -176,7 +182,7 @@ function pruneDocument(source, base) {
     }
     if (node.tagName !== "a") return;
     const href = attr(node, "href");
-    if (!href?.startsWith(`${base}/`) || !isExcludedRoute(href.slice(base.length))) return;
+    if (!isExcludedArticleLink(href, base)) return;
     let card = node.parentNode;
     while (card && attr(card, "class") !== "mb-12") card = card.parentNode;
     if (card) {

@@ -374,8 +374,10 @@
   document.addEventListener("click", async event => {
     const button = event.target instanceof Element && event.target.closest("[data-code-copy]");
     if (!button) return;
-    const code = button.closest(".gamestation-code")?.querySelector("pre code");
+    const block = button.closest(".gamestation-code, .blueprint-skill-code");
+    const code = block?.querySelector("pre code");
     if (!code) return;
+    const defaultLabel = button.dataset.copyLabel || "复制代码";
     clearTimeout(copyResets.get(button));
     let copied = false;
     try {
@@ -392,16 +394,16 @@
       selection?.removeAllRanges();
       if (previous) selection?.addRange(previous);
     }
-    const label = copied ? "已复制代码" : "复制失败，请选择代码复制";
+    const label = copied ? "已复制" : "复制失败，请选择内容复制";
     button.dataset.copied = String(copied);
     button.setAttribute("aria-label", label);
     button.title = label;
-    button.closest(".gamestation-code").querySelector("[role=status]").textContent = label;
+    block.querySelector("[role=status]").textContent = label;
     copyResets.set(button, setTimeout(() => {
       delete button.dataset.copied;
-      button.setAttribute("aria-label", "复制代码");
-      button.title = "复制代码";
-      button.closest(".gamestation-code")?.querySelector("[role=status]")?.replaceChildren();
+      button.setAttribute("aria-label", defaultLabel);
+      button.title = defaultLabel;
+      block.querySelector("[role=status]")?.replaceChildren();
     }, 2400));
   });
 
