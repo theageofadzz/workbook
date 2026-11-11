@@ -452,11 +452,19 @@ assert(!/blueprint-(?:drone-hover|drone-flight|model-3-hover|model-3-inspect)\.w
 const blueprintVideos = blueprintNodes.filter(node => node.tagName === "video");
 assert.equal(blueprintVideos.length, 2, "Each case study needs one continuous demonstration");
 for (const video of blueprintVideos) {
-  for (const name of ["data-blueprint-demo", "muted", "loop", "playsinline"]) {
+  for (const name of ["data-blueprint-demo", "autoplay", "muted", "loop", "playsinline"]) {
     assert(video.attrs.some(attr => attr.name === name), `Missing ${name} on the animated blueprint example`);
   }
   assert(!video.attrs.some(attr => attr.name === "controls"), "Blueprint animations must not show video player controls");
-  assert(video.attrs.some(attr => attr.name === "preload" && attr.value === "none"), "Offscreen examples should not load before they are visible");
+  assert(video.attrs.some(attr => attr.name === "preload" && attr.value === "auto"), "Blueprint examples should load and play before they enter the viewport");
+}
+assert(blueprintNodes.some(node => node.tagName === "h2" && nodeText(node) === "参考资料："), "The article must end with a references section");
+assert(!blueprintHTML.includes("无人机原始网页实验："), "Remove the former standalone experiment credit");
+for (const source of [
+  "https://sketchfab.com/3d-models/tesla-2018-model-3-5ef9b845aaf44203b6d04e2c677e444f",
+  "https://experiments.thisiswhitespace.com/standalone/lathe-blueprint/models/drone_built.glb"
+]) {
+  assert(blueprintNodes.some(node => node.tagName === "a" && node.attrs.some(attr => attr.name === "href" && attr.value === source)), `Missing model source: ${source}`);
 }
 assert(home.includes("assets/articles/blueprint-cover.mp4"), "The circular homepage cover must animate too");
 assert(tutorialHTML.includes("我觉得图形你已经复刻了"), "The tutorial must document the user's animation correction");

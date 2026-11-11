@@ -274,7 +274,7 @@
     }
   }, { threshold: .25 });
 
-  const articleVideoSelector = "video[data-weather-study], video[data-blueprint-demo]";
+  const articleVideoSelector = "video[data-weather-study]";
 
   function initializeWeatherStudies() {
     document.querySelectorAll(articleVideoSelector).forEach(video => {
@@ -299,6 +299,14 @@
   }
   reducedMotion.addEventListener("change", refreshWeatherStudies);
   document.addEventListener("visibilitychange", refreshWeatherStudies);
+
+  function playBlueprintDemos() {
+    document.querySelectorAll("video[data-blueprint-demo]").forEach(video => {
+      video.muted = true;
+      if (video.paused) video.play().catch(() => {});
+    });
+  }
+  document.addEventListener("visibilitychange", playBlueprintDemos);
 
   function initializeScrollExpands() {
     const article = document.querySelector(".portfolio-essay");
@@ -373,6 +381,7 @@
     initializeMotionStudies();
     initializeConversations();
     initializeWeatherStudies();
+    playBlueprintDemos();
     initializeScrollExpands();
     document.title = config.browserTitle || "workbook of theageofadzz";
     document.querySelectorAll("h2 a").forEach(anchor => {
