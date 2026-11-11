@@ -318,7 +318,7 @@ function inspectHome(node) {
   for (const child of node.childNodes || []) inspectHome(child);
 }
 inspectHome(homepage);
-assert.deepEqual(homepageEntries, ["weather-recreation", "wxad12", "gamestation"], "The weather tutorial should lead the three personal homepage entries");
+assert.deepEqual(homepageEntries, ["blueprint-design-skill", "weather-recreation", "wxad12", "gamestation"], "The blueprint article should lead the personal homepage entries");
 assert(!home.includes("wxad.design") && !home.includes("Aragakey") && !home.includes("aragakey"), "The homepage must not retain reference-site content or links");
 assert(!/小 p[：:]|Figma Make|微广|制作有趣的界面/.test(home), "Reference entries must also be removed from the animated miniature homepage");
 await assert.rejects(access(join(root, "_next", "static", "chunks", "2ka_qt01g8-f4.js")), "The retired homepage client must be removed");
@@ -429,6 +429,36 @@ for (const heading of tutorialData.props.pageProps.content.headings) {
   assert(tutorialNodes.some(node => node.tagName === "h2" && node.attrs.some(attr => attr.name === "id" && attr.value === heading.id)), `Missing tutorial section ${heading.text}`);
 }
 assert(home.includes("weather-tutorial-cover") && home.includes(tutorial.title), "The homepage must include the new tutorial and its circular GIF cover");
+const blueprint = JSON.parse(await readFile(new URL("../src/content/blueprint-design-skill.json", import.meta.url), "utf8"));
+const blueprintHTML = await readFile(join(root, blueprint.slug, "index.html"), "utf8");
+const blueprintNodes = [];
+function inspectBlueprint(node) {
+  blueprintNodes.push(node);
+  for (const child of node.childNodes || []) inspectBlueprint(child);
+}
+inspectBlueprint(parse(blueprintHTML));
+const blueprintScript = blueprintNodes.find(node => node.attrs?.some(attr => attr.name === "id" && attr.value === "__NEXT_DATA__"));
+const blueprintData = JSON.parse(nodeText(blueprintScript));
+const blueprintArticle = blueprintNodes.find(node => node.tagName === "article");
+assert.deepEqual(blueprintData.props.pageProps.content.frontmatter, blueprint);
+assert.equal(
+  renderedText(compileArticle(blueprintData.props.pageProps.content.code).default()),
+  nodeText(blueprintArticle),
+  "The film introduction and both animated demonstrations must survive hydration"
+);
+assert(blueprintHTML.includes("小时候看到电影里那些蓝图绘制特效") && blueprintHTML.includes("我不是学理工科的"), "Keep the user's personal film memory");
+assert(blueprintHTML.includes("rodeofx-webpage-videos/project/images/043-Now-You-See-Me/now-you-see-me_stills-005.jpg"), "Credit and show the actual film blueprint scene");
+assert(!/blueprint-(?:drone-hover|drone-flight|model-3-hover|model-3-inspect)\.webp/.test(blueprintHTML), "Case studies should demonstrate motion instead of still screenshots");
+const blueprintVideos = blueprintNodes.filter(node => node.tagName === "video");
+assert.equal(blueprintVideos.length, 2, "Each case study needs one continuous demonstration");
+for (const video of blueprintVideos) {
+  for (const name of ["data-blueprint-demo", "muted", "loop", "playsinline"]) {
+    assert(video.attrs.some(attr => attr.name === name), `Missing ${name} on the animated blueprint example`);
+  }
+  assert(!video.attrs.some(attr => attr.name === "controls"), "Blueprint animations must not show video player controls");
+  assert(video.attrs.some(attr => attr.name === "preload" && attr.value === "none"), "Offscreen examples should not load before they are visible");
+}
+assert(home.includes("assets/articles/blueprint-cover.mp4"), "The circular homepage cover must animate too");
 assert(tutorialHTML.includes("我觉得图形你已经复刻了"), "The tutorial must document the user's animation correction");
 assert(!tutorialHTML.includes("列表有信息，打开后看动画") && !tutorialHTML.includes("我的意思打开后显示 gif") && !tutorialHTML.includes("weather-preview.mp4"), "The removed preview section must not return");
 assert(!tutorialData.props.pageProps.content.headings.some(heading => heading.id === "作品列表与纯净预览"), "The table of contents must omit the removed preview section");

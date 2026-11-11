@@ -19,8 +19,26 @@ const server = createServer(async (request, response) => {
     if (!file.startsWith(`${root}${sep}`) && file !== root) throw new Error("Invalid path");
     if ((await stat(file)).isDirectory()) file = join(file, "index.html");
     const body = await readFile(file);
-    response.writeHead(200, { "Content-Type": mime[extname(file)] || "application/octet-stream", "Cache-Control": "no-cache" });
-    response.end(body);
+    const headers = {
+      "Content-Type": mime[extname(file)] || "application/octet-stream",
+      "Cache-Control": "no-cache",
+      "Accept-Ranges": "bytes"
+    };
+    if (request.headers.range) {
+      const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.range);
+      const start = range?.[1] ? Number(range[1]) : Math.max(0, body.length - Number(range?.[2]));
+      const end = range?.[1] && range[2] ? Number(range[2]) : body.length - 1;
+      if (!range || !(range[1] || range[2]) || !Number.isSafeInteger(start)
+        || !Number.isSafeInteger(end) || start < 0 || start >= body.length || end < start) {
+        response.writeHead(416, { ...headers, "Content-Range": `bytes */${body.length}` });
+        return response.end();
+      }
+      const last = Math.min(end, body.length - 1);
+      response.writeHead(206, { ...headers, "Content-Range": `bytes ${start}-${last}/${body.length}`, "Content-Length": last - start + 1 });
+      return response.end(request.method === "HEAD" ? undefined : body.subarray(start, last + 1));
+    }
+    response.writeHead(200, { ...headers, "Content-Length": body.length });
+    response.end(request.method === "HEAD" ? undefined : body);
   } catch {
     response.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
     response.end(await readFile(join(root, "404.html"), "utf8").catch(() => "Not found"));

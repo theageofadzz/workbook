@@ -99,6 +99,8 @@ export async function personalizePortfolio({ root, out, base, footer, scrollExpa
   }
   await writeWeatherFrames({ root, out });
   for (const file of [
+    "blueprint-cover.mp4", "blueprint-cover.webp", "blueprint-drone.mp4", "blueprint-drone-poster.webp",
+    "blueprint-model-3.mp4", "blueprint-model-3-poster.webp",
     "weather-x-browse.mp4", "weather-x-browse.webp",
     ...["align", "layers", "type", "gif", "preview", "check"].flatMap(name =>
       [`weather-${name}.mp4`, `weather-${name}.webp`])
@@ -120,6 +122,12 @@ export async function personalizePortfolio({ root, out, base, footer, scrollExpa
       cover: "weather-cover",
       sourceSlug: "weather-recreation",
       templateSlug: "wxad12"
+    },
+    {
+      name: "blueprint-design-skill",
+      cover: "blueprint-cover",
+      sourceSlug: "blueprint-design-skill",
+      templateSlug: "weather-recreation"
     }
   ]) {
     const result = await personalizeArticle({ contentRoot, out, base, logoStudy, footer, scrollExpandVersion, ...entry });

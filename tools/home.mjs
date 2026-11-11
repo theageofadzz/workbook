@@ -13,7 +13,7 @@ function remove(node) {
 }
 
 export async function writeHomePage({ root, out, base, title, footer }) {
-  const entries = await Promise.all(["weather-recreation", "portfolio-design", "gamestation"].map(async name =>
+  const entries = await Promise.all(["blueprint-design-skill", "weather-recreation", "portfolio-design", "gamestation"].map(async name =>
     JSON.parse(await readFile(join(root, "src", "content", `${name}.json`), "utf8"))
   ));
   const allowed = new Set(entries.map(entry => `${base}/${entry.slug}`));

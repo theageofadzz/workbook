@@ -1,0 +1,36 @@
+<article class="portfolio-essay blueprint-essay">
+  <p class="portfolio-essay-lead">{{description}}</p>
+
+  <p>小时候看到电影里那些蓝图绘制特效，就觉得很炫酷。我不是学理工科的，但我对这种极致理性和克制的绘画有种天然般的好感。</p>
+  <figure class="blueprint-figure blueprint-film">
+    <a href="https://www.rodeofx.com/project/now-you-see-me" aria-label="查看 Rodeo FX 的《惊天魔盗团》特效项目">
+      <img src="https://storage.googleapis.com/rodeofx-webpage-videos/project/images/043-Now-You-See-Me/now-you-see-me_stills-005.jpg" width="1904" height="810" alt="《惊天魔盗团》中，四位魔术师在公寓里看着蓝色的全息蓝图在雾中展开" loading="lazy" decoding="async">
+    </a>
+    <figcaption>《惊天魔盗团》（2013）的全息蓝图</figcaption>
+  </figure>
+  <p>后来在网页上看到 Whitespace 的 <a href="https://experiments.thisiswhitespace.com/lathe-blueprint">Lathe Blueprint</a>，我又想起了这种感觉。电影里只能看着线条展开，在网页里，自己动一下鼠标就能让线稿显出实体。我想试试看，这个动作放到不同的物件上会是什么样。</p>
+  <p>我也试过在这个页面上加机型列表和工具栏。东西一多，打开页面先看到的就成了操作界面。我最后把它们都撤掉，回到一整页蓝色格纸，只留下图纸和几个尺寸标注。没选中物件时，我想让画面安静一点，留出让人自己发现的空间。</p>
+
+  <h2 id="drone">无人机：从图纸上起飞</h2>
+  <p>页面打开后，线条先画出机身和四个旋翼。鼠标进入轮廓时，和背景网格对齐的小方格逐一打开，露出底下的机身；鼠标移走，格子又收回去。线稿和模型得对得很准，尤其是旋翼的轴心。只要错开一点，就会感觉是在叠两张图。</p>
+  <p>点下去，方格铺开，视角从俯视转为斜视。旋翼开始转动，机身抬离格纸，影子还留在下面。我喜欢这段起飞：第一次悬停只让人看清它的样子，第二步点击才让人看见它会做什么。</p>
+  <figure class="blueprint-figure">
+    <video data-blueprint-demo="" src="{{base}}/assets/articles/blueprint-drone.mp4" poster="{{base}}/assets/articles/blueprint-drone-poster.webp" width="960" height="720" muted loop playsinline preload="none" aria-label="无人机案例：绘制俯视线稿、悬停显影、点击起飞、返回蓝图"></video>
+    <figcaption>02 / DRONE · 从画出线稿、显出机身，到旋翼转动起飞</figcaption>
+  </figure>
+
+  <h2 id="model-3">Model 3：在原地绕车看一圈</h2>
+  <p>换成 Tesla Model 3 后，我保留了蓝色格纸、线条的出现方式和按格显影。难的是让新的线稿和车身对上。我从同一个三维模型里提取俯视轮廓，去掉视角里看不见的线，把车顶、车头和后视镜当作对齐的检查点。这样，鼠标扫过车顶时，深色玻璃正好从原来的线框里显出来。</p>
+  <p>车不需要起飞。点击后，车身留在画面中央，视角转到斜前方；拖动可以绕车看一圈，再点一下就回到图纸。我想要的是在原处把物件展开、拿近一点看的感觉，像空间界面里的模型展示。页面可以只靠物件本身完成这段交互；将来真要放按钮，也可以等选中后再出现，用轻薄的 Liquid Glass 风格处理。</p>
+  <figure class="blueprint-figure">
+    <video data-blueprint-demo="" src="{{base}}/assets/articles/blueprint-model-3.mp4" poster="{{base}}/assets/articles/blueprint-model-3-poster.webp" width="960" height="720" muted loop playsinline preload="none" aria-label="Model 3 案例：绘制俯视线稿、悬停显影、点击并拖动旋转车身、返回蓝图"></video>
+    <figcaption>03 / MODEL 3 · 车顶先从方格里显影，点击后可以拖动绕车查看</figcaption>
+  </figure>
+
+  <h2 id="skill">把这次灵感留成一个 Skill</h2>
+  <p>做完这两个案例，我把能重复用的部分整理成了 <code>$blueprint-3d-showcase</code>：用同一个视角对齐线稿和模型，悬停时按格露出实体，点击后连续过渡到三维查看，再沿原路回到图纸。无人机的起飞、汽车的原地转动，则留给各自的物件来决定。</p>
+  <p>下次想把一台相机做成这样的交互，我可以直接说：「用 <code>$blueprint-3d-showcase</code> 做一台相机。打开是蓝色图纸，悬停露出实体，点进去能拖动看镜头和机身。」不必从头解释什么叫蓝图显影，也能把时间留给这个新物件值得看的细节。</p>
+
+  <p class="blueprint-credits">无人机原始网页实验：Zsolt Kacso / <a href="https://experiments.thisiswhitespace.com/lathe-blueprint">Whitespace</a>。<br>Model 3 模型：<a href="https://sketchfab.com/3d-models/tesla-2018-model-3-5ef9b845aaf44203b6d04e2c677e444f">Ameer Studio</a>，<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>；调整了车漆与照明，线稿由模型几何生成。</p>
+  {{footer}}
+</article>

@@ -28,6 +28,11 @@
       "title": "像素级复刻一段天气动效",
       "route": "/weather-recreation",
       "file": "weather-recreation/index.html"
+    },
+    {
+      "title": "蓝图设计skill",
+      "route": "/blueprint-design-skill",
+      "file": "blueprint-design-skill/index.html"
     }
   ],
   "localFiles": 437,

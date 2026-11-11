@@ -274,8 +274,10 @@
     }
   }, { threshold: .25 });
 
+  const articleVideoSelector = "video[data-weather-study], video[data-blueprint-demo]";
+
   function initializeWeatherStudies() {
-    document.querySelectorAll("video[data-weather-study]").forEach(video => {
+    document.querySelectorAll(articleVideoSelector).forEach(video => {
       if (weatherStudies.has(video)) return;
       const state = {
         visible: false,
@@ -293,7 +295,7 @@
     });
   }
   function refreshWeatherStudies() {
-    document.querySelectorAll("video[data-weather-study]").forEach(video => weatherStudies.get(video)?.sync());
+    document.querySelectorAll(articleVideoSelector).forEach(video => weatherStudies.get(video)?.sync());
   }
   reducedMotion.addEventListener("change", refreshWeatherStudies);
   document.addEventListener("visibilitychange", refreshWeatherStudies);
