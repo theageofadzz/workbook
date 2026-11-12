@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { parseFragment, serialize } from "parse5";
 
-export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer }) {
+export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer, xiaohongshu }) {
   const css = await readFile(join(root, "src", "about.css"), "utf8");
   const js = await readFile(join(root, "src", "about.js"), "utf8");
   const security = await readFile(join(root, "src", "security.js"), "utf8");
@@ -14,6 +14,7 @@ export async function writeAboutPage({ root, out, base, browserTitle, faviconSrc
     base,
     browserTitle,
     favicon: faviconSrc,
+    xiaohongshu,
     logo: `${base}/assets/intensea-logo.png?v=${logoVersion}`,
     cssVersion: version(css),
     jsVersion: version(js)

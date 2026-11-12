@@ -9,6 +9,7 @@ import { excludedRoutes, isExcludedRoute, standaloneRoutes } from "./content-pol
 const root = resolve(import.meta.dirname, "..", "docs");
 const manifest = JSON.parse(await readFile(join(root, "site-manifest.json"), "utf8"));
 const config = JSON.parse(await readFile(join(root, "config.json"), "utf8"));
+const xiaohongshu = config.xiaohongshu || "https://www.xiaohongshu.com/search_result?keyword=theageofadzz";
 let checked = 0;
 const missing = new Set();
 for (const page of [...manifest.pages, { route: "/about", file: "about/index.html" }, { route: "/github", file: "github/index.html" }]) {
@@ -225,6 +226,11 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
       if (index === 2) {
         assert.equal(node.attrs.find(attr => attr.name === "href")?.value, `${manifest.basePath}/github/`, `Expected an internal GitHub profile link in ${page}`);
         assert(!node.attrs.some(attr => attr.name === "target"), `The GitHub navigation must not open another tab in ${page}`);
+      }
+      if (index === 3) {
+        assert.equal(node.attrs.find(attr => attr.name === "href")?.value, xiaohongshu, `Expected the Xiaohongshu profile link in ${page}`);
+        assert.equal(node.attrs.find(attr => attr.name === "target")?.value, "_blank", `Expected the Xiaohongshu link to open a new tab in ${page}`);
+        assert.match(node.attrs.find(attr => attr.name === "rel")?.value || "", /noopener/, `Expected the Xiaohongshu link to be hardened in ${page}`);
       }
     }
     if (node.tagName === "title" && node.parentNode?.tagName === "head") title = node.childNodes.map(child => child.value || "").join("");

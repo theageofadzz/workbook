@@ -119,7 +119,7 @@ function contributionActivity(activity, username, names) {
   }).join("");
 }
 
-export async function writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer }) {
+export async function writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer, xiaohongshu }) {
   const snapshot = JSON.parse(await readFile(join(root, "src", "content", "github.json"), "utf8"));
   const names = new Set(snapshot.repos.map(repo => repo.name));
   const repos = snapshot.repos.map(repo => ({ ...repo, readme: cleanReadme(repo.readme, repo, base, names) }));
@@ -137,6 +137,7 @@ export async function writeGitHubPage({ root, out, base, browserTitle, faviconSr
   const totalStars = repos.reduce((total, repo) => total + repo.stars, 0);
   const replacements = {
     footer,
+    xiaohongshu,
     base, browserTitle, favicon: faviconSrc, logo: logoSrc,
     cssVersion: hash(css), jsVersion: hash(js),
     profileCSSVersion: hash(profileCSS), profileJSVersion: hash(profileJS),

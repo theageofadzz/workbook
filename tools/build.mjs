@@ -36,6 +36,7 @@ const logoSrc = `${base}/assets/intensea-logo.png?v=${logoVersion}`;
 const faviconSrc = `${base}/assets/intensea-favicon.png?v=${logoVersion}`;
 const browserTitle = config.browserTitle || config.title;
 const headerTitle = config.headerTitle || config.title;
+const xiaohongshu = config.xiaohongshu || "https://www.xiaohongshu.com/search_result?keyword=theageofadzz";
 const headerClasses = "relative w-12 h-12 74:top-[0.15rem] 74:mr-2 74:w-10 74:h-10 opacity-80";
 const logoClasses = `${headerClasses} workbook-header-logo`;
 const homeLogoClasses = "size-1/2 workbook-home-logo";
@@ -148,6 +149,19 @@ async function refreshRuntimeLinks(files) {
   for (const file of files) {
     const path = join(out, file);
     const document = parse(await readFile(path, "utf8"));
+    const footerItems = [];
+    walk(document, node => {
+      if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {
+        footerItems.push(node);
+      }
+    });
+    if (!footerItems.some(node => node.attrs?.some(attr => attr.name === "data-social" && attr.value === "xiaohongshu"))
+      && footerItems[2]) {
+      const social = parseFragment(`<a href="${xiaohongshu}" target="_blank" rel="noopener noreferrer" data-role="footer-item" data-social="xiaohongshu" data-tooltip="小红书" aria-label="小红书"><span class="profile-dock-item"><span class="profile-dock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="profile-xiaohongshu-icon"><rect x="4" y="4" width="16" height="16" rx="4"></rect><path d="M8 8h8M8 11.5h8M8 15h5M8 18h8"></path></svg></span></span></a>`).childNodes[0];
+      social.parentNode = footerItems[2].parentNode;
+      const siblings = social.parentNode.childNodes;
+      siblings.splice(siblings.indexOf(footerItems[2]) + 1, 0, social);
+    }
     let footerIndex = 0;
     const crafts = normalizeCrafts(document);
     if (crafts) {
@@ -160,11 +174,12 @@ async function refreshRuntimeLinks(files) {
     walk(document, node => {
       if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {
         const index = footerIndex++;
-        const destination = [`${base}/`, `${base}/crafts/`, `${base}/github/`, `${base}/about/`][index];
-        const label = ["首页", "作品", "GitHub 个人主页", `关于 ${config.title}`][index];
+        const destination = [`${base}/`, `${base}/crafts/`, `${base}/github/`, xiaohongshu, `${base}/about/`][index];
+        const label = ["首页", "作品", "GitHub 个人主页", "小红书", `关于 ${config.title}`][index];
         if (destination) {
           node.attrs = node.attrs.filter(attr => !["href", "target", "rel", "aria-label", "data-tooltip"].includes(attr.name));
           node.attrs.push({ name: "href", value: destination }, { name: "aria-label", value: label }, { name: "data-tooltip", value: label });
+          if (index === 3) node.attrs.push({ name: "target", value: "_blank" }, { name: "rel", value: "noopener noreferrer" });
         }
         if (index === 2) {
           walk(node, mark => {
@@ -273,12 +288,12 @@ try {
   await writeNotFoundPage();
   const retiredArticles = await personalizePortfolio({ root, out, base, footer, scrollExpandVersion });
   await writeHomePage({ root, out, base, title: config.title, footer });
-  await writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer });
+  await writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer, xiaohongshu });
   await pruneExcludedContent({ out, base, url: config.url });
   const builtPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
   await brandClientHeader();
   await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer, scrollExpandVersion });
-  await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
+  await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer, xiaohongshu });
   await refreshRuntimeLinks([...builtPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);
   await pruneUnusedBranding({ out });
   await pruneRetiredAssets({ out, base, retiredContent: retiredArticles });
@@ -444,11 +459,11 @@ await writeFile(join(out, "site-manifest.json"), JSON.stringify({
 await writeNotFoundPage();
 const retiredArticles = await personalizePortfolio({ root, out, base, footer, scrollExpandVersion });
 await writeHomePage({ root, out, base, title: config.title, footer });
-await writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer });
+await writeAboutPage({ root, out, base, browserTitle, faviconSrc, footer, xiaohongshu });
 await pruneExcludedContent({ out, base, url: config.url, retiredContent });
 await brandClientHeader();
 await writeCraftsPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer, scrollExpandVersion });
-await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer });
+await writeGitHubPage({ root, out, base, browserTitle, faviconSrc, logoSrc, footer, xiaohongshu });
 const publishedPages = JSON.parse(await readFile(join(out, "site-manifest.json"), "utf8"));
 await refreshRuntimeLinks([...publishedPages.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]);
 await pruneUnusedBranding({ out });
