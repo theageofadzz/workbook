@@ -374,7 +374,7 @@ function inspectHome(node) {
   for (const child of node.childNodes || []) inspectHome(child);
 }
 inspectHome(homepage);
-assert.deepEqual(homepageEntries, ["blueprint-design-skill", "weather-recreation", "wxad12", "gamestation"], "The blueprint article should lead the personal homepage entries");
+assert.deepEqual(homepageEntries, ["cicada-cells", "blueprint-design-skill", "weather-recreation", "wxad12", "gamestation"], "The cells article should lead the personal homepage entries");
 assert(!home.includes("wxad.design") && !home.includes("Aragakey") && !home.includes("aragakey"), "The homepage must not retain reference-site content or links");
 assert(!/小 p[：:]|Figma Make|微广|制作有趣的界面/.test(home), "Reference entries must also be removed from the animated miniature homepage");
 await assert.rejects(access(join(root, "_next", "static", "chunks", "2ka_qt01g8-f4.js")), "The retired homepage client must be removed");
@@ -549,6 +549,69 @@ for (const source of [
   assert(blueprintNodes.some(node => node.tagName === "a" && node.attrs.some(attr => attr.name === "href" && attr.value === source)), `Missing model source: ${source}`);
 }
 assert(home.includes("assets/articles/blueprint-cover.mp4"), "The circular homepage cover must animate too");
+const cells = JSON.parse(await readFile(new URL("../src/content/cicada-cells.json", import.meta.url), "utf8"));
+const cellsHTML = await readFile(join(root, cells.slug, "index.html"), "utf8");
+const cellsNodes = [];
+function inspectCells(node) {
+  cellsNodes.push(node);
+  for (const child of node.childNodes || []) inspectCells(child);
+}
+inspectCells(parse(cellsHTML));
+const cellsAttribute = (node, name) => node.attrs?.find(attr => attr.name === name)?.value;
+const cellsData = JSON.parse(nodeText(cellsNodes.find(node => cellsAttribute(node, "id") === "__NEXT_DATA__")));
+const cellsArticle = cellsNodes.find(node => node.tagName === "article");
+assert.deepEqual(cellsData.props.pageProps.content.frontmatter, cells, "Keep the cells article's title, author and date");
+assert.deepEqual(
+  JSON.parse(await readFile(join(root, "_next", "data", cellsData.buildId, `${cells.slug}.json`), "utf8")),
+  cellsData.props,
+  "Direct visits and client navigation must load the same cells article"
+);
+const renderedCells = compileArticle(cellsData.props.pageProps.content.code).default();
+assert.equal(renderedText(renderedCells), nodeText(cellsArticle), "The complete cells article must survive hydration");
+assert.equal(cellsData.props.pageProps.content.headings.at(-1).id, "experience", "End the article with the live HTML");
+const cellsFrames = cellsNodes.filter(node => node.tagName === "iframe");
+assert.equal(cellsFrames.length, 1, "The final section needs one live cells experience");
+assert.equal(cellsAttribute(cellsFrames[0], "src"), `${manifest.basePath}/assets/cells/index.html`);
+assert(cellsAttribute(cellsFrames[0], "title"), "Describe the embedded experience for assistive technology");
+assert(cellsFrames[0].attrs.some(attr => attr.name === "allowfullscreen"), "Allow the experience's own fullscreen control");
+const renderedFrame = [];
+function inspectRenderedCells(node) {
+  if (typeof node === "string") return;
+  if (node.tag === "iframe") renderedFrame.push(node);
+  for (const child of node.props.children || []) inspectRenderedCells(child);
+}
+inspectRenderedCells(renderedCells);
+assert.equal(renderedFrame[0].props.allowFullScreen, true, "Preserve iframe fullscreen permission during hydration");
+assert(cellsNodes.some(node => node.tagName === "a" && cellsAttribute(node, "download") === "cicada-cells.html"), "Offer a downloadable standalone HTML");
+assert(cellsNodes.some(node => node.tagName === "a"
+  && cellsAttribute(node, "href") === `${manifest.basePath}/assets/cells/index.html`
+  && cellsAttribute(node, "target") === "_blank"), "Offer an independent live experience");
+assert(cellsNodes.some(node => node.tagName === "a"
+  && cellsAttribute(node, "href") === "https://x.com/secondeight_/status/2120519348804542930"), "Credit the original visual reference");
+assert(home.includes(cells.title) && home.includes("assets/articles/cells-cover.webp"), "Link the new article from the homepage");
+const cellsExperience = await readFile(join(root, "assets", "cells", "index.html"));
+assert(cellsExperience.equals(await readFile(new URL("../src/cells/index.html", import.meta.url))), "Publish the complete standalone HTML unchanged");
+const cellsExperienceDocument = parse(cellsExperience.toString("utf8"));
+const cellsExperienceNodes = [];
+function inspectExperience(node) {
+  cellsExperienceNodes.push(node);
+  for (const child of node.childNodes || []) inspectExperience(child);
+}
+inspectExperience(cellsExperienceDocument);
+for (const id of ["scene", "add-cell", "remove-cell", "cell-count", "sound", "pause", "fullscreen"]) {
+  assert(cellsExperienceNodes.some(node => cellsAttribute(node, "id") === id), `Keep the live control: ${id}`);
+}
+assert(cellsExperienceNodes.some(node => node.tagName === "a"
+  && cellsAttribute(node, "href") === "https://github.com/theageofadzz"
+  && nodeText(node).includes("cicada@github")), "Keep the final GitHub signature");
+assert(!cellsExperienceNodes.some(node =>
+  (node.tagName === "script" && cellsAttribute(node, "src"))
+  || (node.tagName === "link" && cellsAttribute(node, "rel") === "stylesheet")),
+  "The downloaded HTML must include its own scripts and styles");
+for (const file of ["cells-overview.webp", "cells-counts.webp", "cells-cover.webp"]) {
+  const image = await sharp(join(root, "assets", "articles", file)).metadata();
+  assert(image.width > 0 && image.height > 0, `Expected an actual project image: ${file}`);
+}
 assert(tutorialHTML.includes("我觉得图形你已经复刻了"), "The tutorial must document the user's animation correction");
 assert(!tutorialHTML.includes("列表有信息，打开后看动画") && !tutorialHTML.includes("我的意思打开后显示 gif") && !tutorialHTML.includes("weather-preview.mp4"), "The removed preview section must not return");
 assert(!tutorialData.props.pageProps.content.headings.some(heading => heading.id === "作品列表与纯净预览"), "The table of contents must omit the removed preview section");

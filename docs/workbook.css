@@ -638,6 +638,14 @@ figure:not(.gamestation-code, .weather-conversation) > figcaption { text-align: 
   background: #d5f1f3;
 }
 .blueprint-cover { border-color: #18239c; background: #141e9e; }
+.cells-cover { display: block; width: 100%; aspect-ratio: 1; overflow: hidden; border: 1px solid #544342; border-radius: 50%; background: #100d0d; }
+.cells-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cells-experience-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 20px; }
+.cells-experiences { margin-top: 20px; }
+.blueprint-experience-stage.cells-experience-stage { aspect-ratio: 10 / 9; background: #080707; }
+@media (max-width: 600px) {
+  .blueprint-experience-stage.cells-experience-stage { aspect-ratio: 3 / 5; }
+}
 .weather-tutorial-cover picture,
 .weather-tutorial-cover img,
 .blueprint-cover video { display: block; width: 100%; height: 100%; }

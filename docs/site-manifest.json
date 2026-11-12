@@ -30,9 +30,14 @@
       "file": "weather-recreation/index.html"
     },
     {
-      "title": "蓝图设计skill",
+      "title": "从《惊天魔盗团》出发：一次人工智能畅想",
       "route": "/blueprint-design-skill",
       "file": "blueprint-design-skill/index.html"
+    },
+    {
+      "title": "让细胞在网页里呼吸",
+      "route": "/cicada-cells",
+      "file": "cicada-cells/index.html"
     }
   ],
   "localFiles": 437,

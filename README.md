@@ -27,12 +27,13 @@
 
 ## 代表项目
 
+- [让细胞在网页里呼吸](https://theageofadzz.github.io/workbook/cicada-cells/)：从三维动效参考到细胞材质、数量变化与合成声音的交互练习，文末可在线体验并下载独立 HTML。[独立体验](https://theageofadzz.github.io/workbook/assets/cells/index.html)。
 - [关于我和我的作品](https://theageofadzz.github.io/workbook/wxad12/)：去繁留简，从留白、黑白配色、文字层级与 Intensea 标识出发，记录这个作品集的设计思路。
 - [一次3D交互实验](https://theageofadzz.github.io/workbook/gamestation/)：尝试把实体游戏盘搬入数字世界，想让鼠标变成人的手一般与虚拟世界交互。[在线体验](https://gamestation.cc/)。
 
 ## 作品浏览
 
-- [文章首页](https://theageofadzz.github.io/workbook/)：三篇个人文章，记录 weather 动效复刻的完整对话与实现、作品集设计和 GameStation 交互实验。新教程使用圆形动态封面。
+- [文章首页](https://theageofadzz.github.io/workbook/)：个人项目文章，记录细胞交互、蓝图设计 Skill、weather 动效复刻、作品集设计和 GameStation 交互实验。
 - [作品](https://theageofadzz.github.io/workbook/crafts/)：沿用 Crafts 作品墙风格，展示 weather 循环动效与 cicada 在 centurypaw 的文章。动效卡片标注名称和日期，点击可查看完整 GIF；文章以带鼠标上下浏览效果的 3:4 竖版预览呈现，点击后打开阅读卡片。
 - [关于 theageofadzz](https://theageofadzz.github.io/workbook/about/)：了解这个作品集。
 - [站内 GitHub](https://theageofadzz.github.io/workbook/github/)：在作品集内浏览个人主页、公开仓库与项目介绍。

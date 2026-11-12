@@ -43,12 +43,13 @@ const reactAttributes = {
   "stroke-width": "strokeWidth",
   "stroke-linecap": "strokeLinecap",
   "stroke-linejoin": "strokeLinejoin",
+  allowfullscreen: "allowFullScreen",
   "font-family": "fontFamily",
   "font-size": "fontSize",
   "font-weight": "fontWeight",
   "text-anchor": "textAnchor"
 };
-const booleanAttributes = new Set(["autoplay", "controls", "loop", "muted", "playsinline"]);
+const booleanAttributes = new Set(["autoplay", "controls", "loop", "muted", "playsinline", "allowfullscreen"]);
 function reactNode(node, runtime) {
   if (node.nodeName === "#text") return JSON.stringify(node.value);
   const properties = Object.fromEntries((node.attrs || []).map(({ name, value }) =>
@@ -98,7 +99,10 @@ export async function personalizePortfolio({ root, out, base, footer, scrollExpa
     await copyFile(join(root, "src", "assets", file), join(out, "assets", file));
   }
   await writeWeatherFrames({ root, out });
+  await mkdir(join(out, "assets", "cells"), { recursive: true });
+  await copyFile(join(root, "src", "cells", "index.html"), join(out, "assets", "cells", "index.html"));
   for (const file of [
+    "cells-cover.webp", "cells-overview.webp", "cells-counts.webp",
     "blueprint-cover.mp4", "blueprint-cover.webp", "blueprint-drone.mp4", "blueprint-drone-poster.webp",
     "blueprint-model-3.mp4", "blueprint-model-3-poster.webp",
     "weather-x-browse.mp4", "weather-x-browse.webp",
@@ -128,6 +132,12 @@ export async function personalizePortfolio({ root, out, base, footer, scrollExpa
       cover: "blueprint-cover",
       sourceSlug: "blueprint-design-skill",
       templateSlug: "weather-recreation"
+    },
+    {
+      name: "cicada-cells",
+      cover: "cicada-cells-cover",
+      sourceSlug: "cicada-cells",
+      templateSlug: "blueprint-design-skill"
     }
   ]) {
     const result = await personalizeArticle({ contentRoot, out, base, logoStudy, footer, scrollExpandVersion, ...entry });
