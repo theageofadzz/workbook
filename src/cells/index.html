@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080707">
   <title>cicada - Cells, motion and sound</title>
+  <script>if (location.hash === "#cover") document.documentElement.classList.add("cells-cover-mode");</script>
   <style>
     * { box-sizing: border-box; }
     :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; letter-spacing: 0; }
@@ -35,6 +36,7 @@
     .caption { left: max(34px, env(safe-area-inset-left)); bottom: max(36px, env(safe-area-inset-bottom)); font-size: 16px; line-height: 1.5; color: #f1e3de; opacity: .55; }
     .loading { position: fixed; inset: 0; display: grid; place-items: center; color: #e5d5d0; font: 24px Georgia, serif; transition: opacity .7s; z-index: 5; background: #090808; pointer-events: none; }
     .loading.ready { opacity: 0; }
+    .cells-cover-mode .chrome, .cells-cover-mode .loading { display: none; }
     @media (max-width: 600px) {
       .brand { left: 22px; top: max(26px, env(safe-area-inset-top)); }
       .brand-name { font-size: 24px; }

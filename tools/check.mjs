@@ -589,7 +589,19 @@ assert(cellsNodes.some(node => node.tagName === "a"
 assert(cellsNodes.some(node => node.tagName === "a"
   && cellsAttribute(node, "href") === "https://x.com/secondeight_/status/2120519348804542930"), "Credit the original visual reference");
 assert(home.includes(cells.title) && home.includes("assets/articles/cells-cover.webp"), "Link the new article from the homepage");
+const cellsCoverFrame = parse(home).childNodes;
+const previewFrames = [];
+function inspectCover(node) {
+  if (node.tagName === "iframe" && cellsAttribute(node, "data-cells-preview-src")) previewFrames.push(node);
+  for (const child of node.childNodes || []) inspectCover(child);
+}
+cellsCoverFrame.forEach(inspectCover);
+assert.equal(previewFrames.length, 1, "The cells cover needs one live animation preview");
+assert.equal(cellsAttribute(previewFrames[0], "data-cells-preview-src"), `${manifest.basePath}/assets/cells/index.html#cover`);
+assert.equal(cellsAttribute(previewFrames[0], "tabindex"), "-1", "The cover's article link should own keyboard navigation");
+assert.equal(cellsAttribute(previewFrames[0], "aria-hidden"), "true", "The decorative animation should not duplicate the article link");
 const cellsExperience = await readFile(join(root, "assets", "cells", "index.html"));
+assert(cellsExperience.toString("utf8").includes('location.hash === "#cover"'), "Use the real cells renderer for the animated cover");
 assert(cellsExperience.equals(await readFile(new URL("../src/cells/index.html", import.meta.url))), "Publish the complete standalone HTML unchanged");
 const cellsExperienceDocument = parse(cellsExperience.toString("utf8"));
 const cellsExperienceNodes = [];

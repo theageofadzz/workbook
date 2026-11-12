@@ -301,6 +301,44 @@
   reducedMotion.addEventListener("change", refreshWeatherStudies);
   document.addEventListener("visibilitychange", refreshWeatherStudies);
 
+  const cellsPreviews = new Map();
+  function syncCellsPreview(frame, state) {
+    if (state.inView && !document.hidden && !reducedMotion.matches) {
+      if (!frame.hasAttribute("src")) frame.src = frame.dataset.cellsPreviewSrc;
+    } else {
+      frame.classList.remove("is-ready");
+      if (frame.hasAttribute("src")) frame.removeAttribute("src");
+    }
+  }
+  const cellsPreviewViewport = new IntersectionObserver(entries => {
+    for (const { target, isIntersecting } of entries) {
+      const state = cellsPreviews.get(target);
+      if (!state) continue;
+      state.inView = isIntersecting;
+      syncCellsPreview(target, state);
+    }
+  }, { rootMargin: "120px", threshold: .01 });
+  function initializeCellsPreviews() {
+    for (const [frame] of cellsPreviews) {
+      if (frame.isConnected) continue;
+      cellsPreviewViewport.unobserve(frame);
+      cellsPreviews.delete(frame);
+    }
+    document.querySelectorAll("iframe[data-cells-preview-src]").forEach(frame => {
+      if (cellsPreviews.has(frame)) return;
+      cellsPreviews.set(frame, { inView: false });
+      frame.addEventListener("load", () => {
+        if (frame.hasAttribute("src")) frame.classList.add("is-ready");
+      });
+      cellsPreviewViewport.observe(frame);
+    });
+  }
+  function refreshCellsPreviews() {
+    for (const [frame, state] of cellsPreviews) syncCellsPreview(frame, state);
+  }
+  reducedMotion.addEventListener("change", refreshCellsPreviews);
+  document.addEventListener("visibilitychange", refreshCellsPreviews);
+
   function playBlueprintDemos() {
     document.querySelectorAll("video[data-blueprint-demo]").forEach(video => {
       video.muted = true;
@@ -442,6 +480,7 @@
     initializeMotionStudies();
     initializeConversations();
     initializeWeatherStudies();
+    initializeCellsPreviews();
     playBlueprintDemos();
     initializeScrollExpands();
     document.title = config.browserTitle || "workbook of theageofadzz";
