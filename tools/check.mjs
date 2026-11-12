@@ -144,6 +144,7 @@ for (const build of await readdir(join(root, "_next", "static"))) {
 const aboutHTML = await readFile(join(root, "about", "index.html"), "utf8");
 const aboutCSS = await readFile(join(root, "about.css"), "utf8");
 assert.match(aboutHTML, /data-en="Cicada（Joya）">严采桦<\/h2>/, "Expected the updated profile name");
+assert.match(aboutHTML, /<span data-en="WeChat@theageofadzz">微信@theageofadzz<\/span>/, "Expected the WeChat handle to follow the selected language");
 assert.match(aboutHTML, /data-en="Creative Experiments">创意实验<\/h2>/);
 assert.match(aboutHTML, /href="\/workbook\/weather-recreation\/" data-en="Weather motion">天气动效<\/a>/, "Expected the weather experiment to open its article");
 assert.match(aboutHTML, /href="\/workbook\/blueprint-design-skill\/" data-en="Blueprint design skill">蓝图设计 Skill<\/a>/, "Expected the blueprint skill experiment to open its article");
