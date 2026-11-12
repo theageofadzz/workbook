@@ -145,6 +145,7 @@ const aboutHTML = await readFile(join(root, "about", "index.html"), "utf8");
 const aboutCSS = await readFile(join(root, "about.css"), "utf8");
 assert.match(aboutHTML, /data-en="Creative Experiments">创意实验<\/h2>/);
 assert.match(aboutHTML, /href="\/workbook\/weather-recreation\/" data-en="Weather motion">天气动效<\/a>/, "Expected the weather experiment to open its article");
+assert.match(aboutHTML, /href="\/workbook\/blueprint-design-skill\/" data-en="Blueprint design skill">蓝图设计 Skill<\/a>/, "Expected the blueprint skill experiment to open its article");
 assert.equal((aboutHTML.match(/class="profile-column"/g) || []).length, 2, "Expected the profile cards to flow in two content-sized columns");
 assert.match(aboutHTML, /<img src="\/workbook\/assets\/cicada-avatar\.jpg" width="2316" height="3088"/, "Keep the portrait's original dimensions");
 assert.doesNotMatch(
