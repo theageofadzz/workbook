@@ -101,9 +101,9 @@
     if (!document.body.hasAttribute("data-workbook-home")) return;
     const track = document.querySelector(".footer-animation > div");
     if (!track) return;
-    const items = [...track.querySelectorAll("a")].map(anchor => ({
+    const items = [...track.querySelectorAll('[data-role="footer-item"]')].map(anchor => ({
       anchor, element: anchor.firstElementChild, size: 40, target: 40, velocity: 0
-    }));
+    })).filter(item => item.element);
     const hover = matchMedia("(hover: hover) and (pointer: fine)");
     let frame = 0;
     let lastTime = 0;

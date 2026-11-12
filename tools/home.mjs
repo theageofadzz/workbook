@@ -62,7 +62,8 @@ export async function writeHomePage({ root, out, base, title, footer }) {
       card.attrs.push({ name: "data-home-entry", value: slug });
       retained.push(slug);
     }
-    if (href?.includes("jiangyijie27.github.io/aragakey") || attr(node, "data-workbook-signature") !== undefined) {
+    if (attr(node, "data-role") !== "footer-item"
+      && (href?.includes("jiangyijie27.github.io/aragakey") || attr(node, "data-workbook-signature") !== undefined)) {
       node.attrs = [
         { name: "href", value: `${base}/about/` },
         { name: "aria-label", value: `关于 ${title}` },

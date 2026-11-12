@@ -216,10 +216,12 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
   let icon;
   let homeLink;
   let homeLogo;
+  let aboutLink;
+  let aboutIcon;
   let homeTriangle = false;
   let footerIndex = 0;
   const contactFooters = [];
-  function inspect(node, inHomeLink = false) {
+  function inspect(node, inHomeLink = false, inAboutLink = false) {
     if (node.tagName === "footer" && node.attrs?.some(attr => attr.name === "data-site-footer")) contactFooters.push(node);
     if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {
       const index = footerIndex++;
@@ -232,6 +234,12 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
         assert.equal(node.attrs.find(attr => attr.name === "target")?.value, "_blank", `Expected the Xiaohongshu link to open a new tab in ${page}`);
         assert.match(node.attrs.find(attr => attr.name === "rel")?.value || "", /noopener/, `Expected the Xiaohongshu link to be hardened in ${page}`);
       }
+      if (index === 4) {
+        aboutLink = node;
+        inAboutLink = true;
+        assert.equal(node.attrs.find(attr => attr.name === "href")?.value, `${manifest.basePath}/about/`, `Expected the About link after Xiaohongshu in ${page}`);
+        assert(!node.attrs.some(attr => attr.name === "data-workbook-signature"), `The About dock icon must not become a text signature in ${page}`);
+      }
     }
     if (node.tagName === "title" && node.parentNode?.tagName === "head") title = node.childNodes.map(child => child.value || "").join("");
     if (node.tagName === "link" && node.attrs?.some(attr => attr.name === "rel" && attr.value === "icon")) icon = node.attrs.find(attr => attr.name === "href")?.value;
@@ -242,9 +250,19 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
     }
     if (inHomeLink && node.tagName === "img") homeLogo = node;
     if (inHomeLink && node.tagName === "svg") homeTriangle = true;
-    for (const child of node.childNodes || []) inspect(child, inHomeLink);
+    if (inAboutLink && node.tagName === "svg") aboutIcon = node;
+    for (const child of node.childNodes || []) inspect(child, inHomeLink, inAboutLink);
   }
   inspect(document);
+  if (footerIndex) {
+    assert.equal(footerIndex, 5, `Expected all five dock links in ${page}`);
+    assert(aboutLink && aboutIcon, `Expected the original About dock icon in ${page}`);
+    assert.match(
+      aboutIcon.childNodes.find(node => node.tagName === "path")?.attrs.find(attr => attr.name === "d")?.value || "",
+      /^M12 2A10 10/,
+      `Expected the original circular About icon in ${page}`
+    );
+  }
   assert.equal(contactFooters.length, 1, `Expected one shared contact footer in ${page}`);
   assert.deepEqual(
     contactFooters[0].childNodes.filter(node => node.tagName === "p").map(node => node.childNodes.map(child => child.value || "").join("")),
