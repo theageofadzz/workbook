@@ -9,7 +9,7 @@ import { excludedRoutes, isExcludedRoute, standaloneRoutes } from "./content-pol
 const root = resolve(import.meta.dirname, "..", "docs");
 const manifest = JSON.parse(await readFile(join(root, "site-manifest.json"), "utf8"));
 const config = JSON.parse(await readFile(join(root, "config.json"), "utf8"));
-const xiaohongshu = config.xiaohongshu || "https://www.xiaohongshu.com/search_result?keyword=theageofadzz";
+const xiaohongshu = config.xiaohongshu || "https://xhslink.cn/o/4PFTntg2jrJ";
 let checked = 0;
 const missing = new Set();
 for (const page of [...manifest.pages, { route: "/about", file: "about/index.html" }, { route: "/github", file: "github/index.html" }]) {

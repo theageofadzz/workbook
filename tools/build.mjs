@@ -36,7 +36,7 @@ const logoSrc = `${base}/assets/intensea-logo.png?v=${logoVersion}`;
 const faviconSrc = `${base}/assets/intensea-favicon.png?v=${logoVersion}`;
 const browserTitle = config.browserTitle || config.title;
 const headerTitle = config.headerTitle || config.title;
-const xiaohongshu = config.xiaohongshu || "https://www.xiaohongshu.com/search_result?keyword=theageofadzz";
+const xiaohongshu = config.xiaohongshu || "https://xhslink.cn/o/4PFTntg2jrJ";
 const headerClasses = "relative w-12 h-12 74:top-[0.15rem] 74:mr-2 74:w-10 74:h-10 opacity-80";
 const logoClasses = `${headerClasses} workbook-header-logo`;
 const homeLogoClasses = "size-1/2 workbook-home-logo";

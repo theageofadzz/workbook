@@ -484,7 +484,7 @@
         if (icon && !icon.classList.contains("workbook-github-icon")) icon.outerHTML = githubIcon;
       }
       if (index === 3) {
-        const xiaohongshu = config.xiaohongshu || "https://www.xiaohongshu.com/search_result?keyword=theageofadzz";
+        const xiaohongshu = config.xiaohongshu || "https://xhslink.cn/o/4PFTntg2jrJ";
         if (anchor.getAttribute("href") !== xiaohongshu) anchor.href = xiaohongshu;
         anchor.target = "_blank";
         anchor.rel = "noopener noreferrer";
