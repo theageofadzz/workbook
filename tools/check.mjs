@@ -568,7 +568,7 @@ assert.deepEqual(
 );
 const renderedCells = compileArticle(cellsData.props.pageProps.content.code).default();
 assert.equal(renderedText(renderedCells), nodeText(cellsArticle), "The complete cells article must survive hydration");
-assert.equal(cellsData.props.pageProps.content.headings.at(-1).id, "experience", "End the article with the live HTML");
+assert.equal(cellsData.props.pageProps.content.headings.at(-1).id, "reference", "End the article with the inspiration credit");
 const cellsFrames = cellsNodes.filter(node => node.tagName === "iframe");
 assert.equal(cellsFrames.length, 1, "The final section needs one live cells experience");
 assert.equal(cellsAttribute(cellsFrames[0], "src"), `${manifest.basePath}/assets/cells/index.html`);
@@ -582,10 +582,8 @@ function inspectRenderedCells(node) {
 }
 inspectRenderedCells(renderedCells);
 assert.equal(renderedFrame[0].props.allowFullScreen, true, "Preserve iframe fullscreen permission during hydration");
-assert(cellsNodes.some(node => node.tagName === "a" && cellsAttribute(node, "download") === "cicada-cells.html"), "Offer a downloadable standalone HTML");
-assert(cellsNodes.some(node => node.tagName === "a"
-  && cellsAttribute(node, "href") === `${manifest.basePath}/assets/cells/index.html`
-  && cellsAttribute(node, "target") === "_blank"), "Offer an independent live experience");
+assert(!cellsNodes.some(node => cellsAttribute(node, "class")?.split(/\s+/).includes("cells-experience-actions")), "Remove the experience action block shown in the screenshot");
+assert(!nodeText(cellsArticle).includes("下面就是完整的 HTML"), "Remove the experience introduction shown in the screenshot");
 assert(cellsNodes.some(node => node.tagName === "a"
   && cellsAttribute(node, "href") === "https://x.com/secondeight_/status/2120519348804542930"), "Credit the original visual reference");
 assert(home.includes(cells.title) && home.includes("assets/articles/cells-cover.webp"), "Link the new article from the homepage");

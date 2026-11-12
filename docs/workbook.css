@@ -642,7 +642,10 @@ figure:not(.gamestation-code, .weather-conversation) > figcaption { text-align: 
 .cells-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .cells-cover iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; opacity: 0; pointer-events: none; transition: opacity .3s; }
 .cells-cover iframe.is-ready { opacity: 1; }
-.cells-experience-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 20px; }
+.cells-essay .cells-inspiration-link { color: #1764cf; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.cells-essay .cells-inspiration-link:hover { color: #104a9d; }
+.cells-essay .cells-inspiration-link:focus-visible { outline: 2px solid #1764cf; outline-offset: 4px; }
+.cells-essay .cells-inspiration-link svg { color: currentColor; }
 .cells-experiences { margin-top: 20px; }
 .blueprint-experience-stage.cells-experience-stage { aspect-ratio: 10 / 9; background: #080707; }
 @media (max-width: 600px) {
