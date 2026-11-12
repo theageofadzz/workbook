@@ -1,7 +1,7 @@
 import { mkdir, readFile, readdir, writeFile, copyFile, rm } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { createHash } from "node:crypto";
-import { parse, parseFragment, serialize } from "parse5";
+import { parse, parseFragment, serialize, serializeOuter } from "parse5";
 import sharp from "sharp";
 import { personalizePortfolio } from "./portfolio.mjs";
 import { writeAboutPage } from "./about.mjs";
@@ -59,6 +59,7 @@ const securityPolicy = [
 ].join("; ");
 
 await mkdir(join(out, "assets"), { recursive: true });
+await copyFile(join(root, "src", "assets", "xiaohongshu-logo.svg"), join(out, "assets", "xiaohongshu-logo.svg"));
 await writeCursorAssets({ root, out });
 await writeBlueprintExperiences({ root, out });
 await writeSkillDownloads({ root, out });
@@ -157,7 +158,13 @@ async function refreshRuntimeLinks(files) {
     });
     if (!footerItems.some(node => node.attrs?.some(attr => attr.name === "data-social" && attr.value === "xiaohongshu"))
       && footerItems[2]) {
-      const social = parseFragment(`<a href="${xiaohongshu}" target="_blank" rel="noopener noreferrer" data-role="footer-item" data-social="xiaohongshu" data-tooltip="小红书" aria-label="小红书"><span class="profile-dock-item"><span class="profile-dock-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="profile-xiaohongshu-icon"><rect x="4" y="4" width="16" height="16" rx="4"></rect><path d="M8 8h8M8 11.5h8M8 15h5M8 18h8"></path></svg></span></span></a>`).childNodes[0];
+      const social = parseFragment(serializeOuter(footerItems[2])).childNodes[0];
+      social.attrs = social.attrs.filter(attr => !["aria-current", "data-label-en"].includes(attr.name));
+      social.attrs.push({ name: "data-social", value: "xiaohongshu" });
+      walk(social, node => {
+        node.childNodes = node.childNodes?.filter(child => !child.attrs?.some(attr =>
+          attr.name === "class" && attr.value.includes("translate-y-[6px]")));
+      });
       social.parentNode = footerItems[2].parentNode;
       const siblings = social.parentNode.childNodes;
       siblings.splice(siblings.indexOf(footerItems[2]) + 1, 0, social);
@@ -185,6 +192,15 @@ async function refreshRuntimeLinks(files) {
           walk(node, mark => {
             if (mark.tagName !== "svg") return;
             const icon = parseFragment('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="size-1/2 text-neutral-600 workbook-github-icon" aria-hidden="true"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.8A5.3 5.3 0 0 0 18.7 5a5 5 0 0 0-.1-3.6S17.4 1 15 2.8a13.4 13.4 0 0 0-6 0C6.6 1 5.4 1.4 5.4 1.4A5 5 0 0 0 5.3 5a5.3 5.3 0 0 0-1.5 3.7c0 5.3 3.1 6.5 6.1 6.8A3.4 3.4 0 0 0 9 18.1V22"/></svg>').childNodes[0];
+            icon.parentNode = mark.parentNode;
+            const siblings = mark.parentNode.childNodes;
+            siblings.splice(siblings.indexOf(mark), 1, icon);
+          });
+        }
+        if (index === 3) {
+          walk(node, mark => {
+            if (!["svg", "img"].includes(mark.tagName)) return;
+            const icon = parseFragment(`<img src="${base}/assets/xiaohongshu-logo.svg" alt="" aria-hidden="true" class="size-1/2 workbook-xiaohongshu-icon">`).childNodes[0];
             icon.parentNode = mark.parentNode;
             const siblings = mark.parentNode.childNodes;
             siblings.splice(siblings.indexOf(mark), 1, icon);

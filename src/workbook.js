@@ -6,7 +6,7 @@
   let config = { title: "theageofadzz", headerTitle: "奥兹时代", browserTitle: "workbook of theageofadzz", subtitle: "作品集 / 我的设计工程师职业生涯" };
   let fullBranding = document.readyState === "complete";
   const githubIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="size-1/2 text-neutral-600 workbook-github-icon" aria-hidden="true"><path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.8A5.3 5.3 0 0 0 18.7 5a5 5 0 0 0-.1-3.6S17.4 1 15 2.8a13.4 13.4 0 0 0-6 0C6.6 1 5.4 1.4 5.4 1.4A5 5 0 0 0 5.3 5a5.3 5.3 0 0 0-1.5 3.7c0 5.3 3.1 6.5 6.1 6.8A3.4 3.4 0 0 0 9 18.1V22"/></svg>';
-  const xiaohongshuIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="size-1/2 text-neutral-600 workbook-xiaohongshu-icon" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 8h8M8 11.5h8M8 15h5M8 18h8"/></svg>';
+  const xiaohongshuIcon = `<img src="${base}/assets/xiaohongshu-logo.svg" alt="" aria-hidden="true" class="size-1/2 workbook-xiaohongshu-icon">`;
   const initializedDrawings = new WeakSet();
   const startedDrawings = new WeakSet();
   const conversations = new WeakMap();
@@ -488,7 +488,7 @@
         if (anchor.getAttribute("href") !== xiaohongshu) anchor.href = xiaohongshu;
         anchor.target = "_blank";
         anchor.rel = "noopener noreferrer";
-        const icon = anchor.querySelector("svg");
+        const icon = anchor.querySelector("svg, img");
         if (icon && !icon.classList.contains("workbook-xiaohongshu-icon")) icon.outerHTML = xiaohongshuIcon;
       }
       if (index === 4) {
