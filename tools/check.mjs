@@ -181,6 +181,12 @@ assert.equal(favicon.readUInt32BE(20), 64, "Expected a square favicon");
 await access(join(root, "assets", "cicada-cursor.svg"));
 const cursorStyles = await readFile(join(root, "cursor.css"), "utf8");
 assert(!/\bcursor\s*:/.test(cursorStyles), "Preview cursor styles must preserve the system cursor");
+const workbookStyles = await readFile(join(root, "workbook.css"), "utf8");
+assert.match(
+  workbookStyles,
+  /\[data-role="footer-item"\]\[aria-current="page"\]::before\s*\{/,
+  "The shared dock must show its current-page marker"
+);
 assert(
   await readFile(join(root, "workbook.js"), "utf8").then(source => source.includes('config.browserTitle || "workbook of theageofadzz"')),
   "Expected client-side navigation to keep the requested browser title"
@@ -220,11 +226,13 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
   let aboutIcon;
   let homeTriangle = false;
   let footerIndex = 0;
+  const currentFooterIndices = [];
   const contactFooters = [];
   function inspect(node, inHomeLink = false, inAboutLink = false) {
     if (node.tagName === "footer" && node.attrs?.some(attr => attr.name === "data-site-footer")) contactFooters.push(node);
     if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {
       const index = footerIndex++;
+      if (node.attrs.some(attr => attr.name === "aria-current" && attr.value === "page")) currentFooterIndices.push(index);
       if (index === 2) {
         assert.equal(node.attrs.find(attr => attr.name === "href")?.value, `${manifest.basePath}/github/`, `Expected an internal GitHub profile link in ${page}`);
         assert(!node.attrs.some(attr => attr.name === "target"), `The GitHub navigation must not open another tab in ${page}`);
@@ -256,6 +264,13 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
   inspect(document);
   if (footerIndex) {
     assert.equal(footerIndex, 5, `Expected all five dock links in ${page}`);
+    const expectedCurrentIndex = page === "index.html" ? 0
+      : page === "crafts/index.html" ? 1
+      : page === "github/index.html" ? 2
+      : page === "about/index.html" ? 4
+      : page === "404.html" ? -1
+      : 1;
+    assert.deepEqual(currentFooterIndices, [expectedCurrentIndex], `Expected the current-page marker on the matching dock link in ${page}`);
     assert(aboutLink && aboutIcon, `Expected the original About dock icon in ${page}`);
     assert.match(
       aboutIcon.childNodes.find(node => node.tagName === "path")?.attrs.find(attr => attr.name === "d")?.value || "",

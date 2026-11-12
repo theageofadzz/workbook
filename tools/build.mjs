@@ -150,6 +150,12 @@ async function refreshRuntimeLinks(files) {
   for (const file of files) {
     const path = join(out, file);
     const document = parse(await readFile(path, "utf8"));
+    const activeFooterIndex = file === "index.html" ? 0
+      : file === "crafts/index.html" ? 1
+      : file === "github/index.html" ? 2
+      : file === "about/index.html" ? 4
+      : file === "404.html" ? -1
+      : 1;
     const footerItems = [];
     walk(document, node => {
       if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {
@@ -183,6 +189,14 @@ async function refreshRuntimeLinks(files) {
         const index = footerIndex++;
         const destination = [`${base}/`, `${base}/crafts/`, `${base}/github/`, xiaohongshu, `${base}/about/`][index];
         const label = ["首页", "作品", "GitHub 个人主页", "小红书", `关于 ${config.title}`][index];
+        node.attrs = node.attrs.filter(attr => attr.name !== "aria-current");
+        if (index === activeFooterIndex) node.attrs.push({ name: "aria-current", value: "page" });
+        walk(node, mark => {
+          if (!mark.attrs?.some(attr => attr.name === "class" && attr.value.includes("translate-y-[6px]"))) return;
+          const siblings = mark.parentNode?.childNodes;
+          const position = siblings?.indexOf(mark) ?? -1;
+          if (position >= 0) siblings.splice(position, 1);
+        });
         if (destination) {
           node.attrs = node.attrs.filter(attr => !["href", "target", "rel", "aria-label", "data-tooltip"].includes(attr.name));
           node.attrs.push({ name: "href", value: destination }, { name: "aria-label", value: label }, { name: "data-tooltip", value: label });

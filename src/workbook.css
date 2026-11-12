@@ -55,6 +55,17 @@ a[aria-label="访问 Aragakey 个人主页"]::after {
 }
 .workbook-split-text__space { display: inline-block; width: .28em; }
 [data-role="footer-item"] { position: relative; }
+[data-role="footer-item"][aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #e5e5e5;
+  transform: translateX(-50%);
+}
 [data-role="footer-item"]::after {
   content: attr(data-tooltip);
   position: absolute;
