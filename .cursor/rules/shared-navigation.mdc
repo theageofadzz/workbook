@@ -1,0 +1,13 @@
+---
+description: Keep workbook navigation identical on every page, including after hydration.
+alwaysApply: true
+---
+
+# Shared Navigation
+
+- Every page uses five dock destinations in this order: Home, Works, GitHub, Xiaohongshu, About.
+- Keep icons, spacing, sizes, separators, tooltips, hover motion and link behavior consistent.
+- Only the GitHub section uses the dark dock palette; other pages use the shared light palette.
+- Preserve the original circular About icon and an internal link to `/workbook/about/`.
+- Check the dock after React hydration and after navigating into an article. Static HTML checks alone missed a four-item legacy renderer that displaced About.
+- Implement navigation changes in both the build output and client renderer. Run `npm run check` and verify browser navigation before publishing.

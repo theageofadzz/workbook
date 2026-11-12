@@ -71,11 +71,37 @@ function removeNode(node) {
   if (index >= 0) siblings.splice(index, 1);
 }
 
-export function useStandaloneNavigation(source, base) {
+export function useStandaloneNavigation(source, base, xiaohongshu) {
   if (!source.includes('"data-role":"footer-item"')) return source;
   const edits = [];
+  const tree = parseJavaScript(source, { ecmaVersion: "latest" });
+  const property = (node, name) => node?.properties?.find(item => (item.key?.name || item.key?.value) === name)?.value;
+  let socialItem;
+  // Hydration must retain the same five destinations as the static dock.
+  walkJavaScript(tree, node => {
+    if (node.type !== "CallExpression") return;
+    const props = node.arguments[1];
+    if (property(props, "link")?.value !== "/about") return;
+    const offset = property(props, "leftOffset");
+    if (!offset) return;
+    const factory = source.slice(node.callee.start, node.callee.end);
+    const component = source.slice(node.arguments[0].start, node.arguments[0].end);
+    const icon = `(${factory})("img",{src:${JSON.stringify(`${base}/assets/xiaohongshu-logo.svg`)},alt:"","aria-hidden":!0,className:"size-1/2 workbook-xiaohongshu-icon"})`;
+    socialItem = `(${factory})(${component},{leftOffset:${source.slice(offset.start, offset.end)},link:${JSON.stringify(xiaohongshu)},children:${icon}})`;
+  });
+  if (socialItem) {
+    walkJavaScript(tree, node => {
+      if (node.type !== "CallExpression" || !property(node.arguments[1], "className")?.value?.includes("footer-animation")) return;
+      walkJavaScript(node.arguments[1], child => {
+        const children = child.type === "ObjectExpression" && property(child, "children");
+        if (children?.type !== "ArrayExpression" || children.elements.length !== 5) return;
+        const about = children.elements.at(-1);
+        edits.push({ start: about.start, end: about.start, value: `${socialItem},` });
+      });
+    });
+  }
   let footerLink;
-  walkJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
+  walkJavaScript(tree, node => {
     if (node.type !== "CallExpression" || node.arguments.length < 2) return;
     const props = node.arguments[1];
     if (props.type !== "ObjectExpression"
@@ -93,7 +119,7 @@ export function useStandaloneNavigation(source, base) {
     );
   });
   if (footerLink) {
-    walkJavaScript(parseJavaScript(source, { ecmaVersion: "latest" }), node => {
+    walkJavaScript(tree, node => {
       if (node.type !== "CallExpression" || node.arguments[0]?.value !== "div") return;
       const props = node.arguments[1];
       if (props?.type !== "ObjectExpression"

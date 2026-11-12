@@ -647,8 +647,11 @@ figure:not(.gamestation-code, .weather-conversation) > figcaption { text-align: 
 .cells-essay .cells-inspiration-link:focus-visible { outline: 2px solid #1764cf; outline-offset: 4px; }
 .cells-essay .cells-inspiration-link svg { color: currentColor; }
 .cells-experiences { margin-top: 20px; }
+.cells-study-stage { position: relative; width: 100%; aspect-ratio: 8 / 5; overflow: hidden; border-radius: 4px; background: #080707; }
+.cells-study-stage iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; }
 .blueprint-experience-stage.cells-experience-stage { aspect-ratio: 10 / 9; background: #080707; }
 @media (max-width: 600px) {
+  .cells-study-stage { aspect-ratio: 3 / 4; }
   .blueprint-experience-stage.cells-experience-stage { aspect-ratio: 3 / 5; }
 }
 .weather-tutorial-cover picture,

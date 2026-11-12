@@ -4,6 +4,7 @@ import { parse } from "parse5";
 import { parse as parseJavaScript } from "acorn";
 import sharp from "sharp";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { excludedRoutes, isExcludedRoute, standaloneRoutes } from "./content-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..", "docs");
@@ -558,8 +559,27 @@ function inspectCells(node) {
 }
 inspectCells(parse(cellsHTML));
 const cellsAttribute = (node, name) => node.attrs?.find(attr => attr.name === name)?.value;
+const cellsVersion = createHash("sha256").update(await readFile(join(root, "assets", "cells", "index.html"))).digest("hex").slice(0, 8);
 const cellsData = JSON.parse(nodeText(cellsNodes.find(node => cellsAttribute(node, "id") === "__NEXT_DATA__")));
 const cellsArticle = cellsNodes.find(node => node.tagName === "article");
+const dockScript = cellsNodes.find(node => node.tagName === "script" && /\/03_brwl2tpuxj-workbook-/.test(cellsAttribute(node, "src") || ""));
+assert(dockScript, "Load the branded client navigation");
+const dockSource = await readFile(join(root, cellsAttribute(dockScript, "src").slice(manifest.basePath.length + 1)), "utf8");
+let hydratedDockItems;
+function inspectHydratedDock(node, inDock = false) {
+  if (!node || typeof node !== "object") return;
+  const properties = node.type === "ObjectExpression" ? node.properties : [];
+  const property = name => properties.find(item => (item.key?.name || item.key?.value) === name)?.value;
+  if (property("className")?.value?.includes("footer-animation")) inDock = true;
+  if (inDock && property("children")?.type === "ArrayExpression") hydratedDockItems = property("children").elements;
+  for (const value of Object.values(node)) {
+    if (Array.isArray(value)) value.forEach(child => inspectHydratedDock(child, inDock));
+    else if (value && typeof value === "object") inspectHydratedDock(value, inDock);
+  }
+}
+inspectHydratedDock(parseJavaScript(dockSource, { ecmaVersion: "latest" }));
+assert.equal(hydratedDockItems?.length, 6, "The hydrated dock must keep five links and their separator");
+assert(dockSource.slice(hydratedDockItems[4].start, hydratedDockItems[4].end).includes(xiaohongshu), "Insert Xiaohongshu before About without displacing its icon");
 assert.deepEqual(cellsData.props.pageProps.content.frontmatter, cells, "Keep the cells article's title, author and date");
 assert.deepEqual(
   JSON.parse(await readFile(join(root, "_next", "data", cellsData.buildId, `${cells.slug}.json`), "utf8")),
@@ -570,10 +590,16 @@ const renderedCells = compileArticle(cellsData.props.pageProps.content.code).def
 assert.equal(renderedText(renderedCells), nodeText(cellsArticle), "The complete cells article must survive hydration");
 assert.equal(cellsData.props.pageProps.content.headings.at(-1).id, "reference", "End the article with the inspiration credit");
 const cellsFrames = cellsNodes.filter(node => node.tagName === "iframe");
-assert.equal(cellsFrames.length, 1, "The final section needs one live cells experience");
-assert.equal(cellsAttribute(cellsFrames[0], "src"), `${manifest.basePath}/assets/cells/index.html`);
-assert(cellsAttribute(cellsFrames[0], "title"), "Describe the embedded experience for assistive technology");
-assert(cellsFrames[0].attrs.some(attr => attr.name === "allowfullscreen"), "Allow the experience's own fullscreen control");
+assert.equal(cellsFrames.length, 2, "Show an animated count demonstration and a separate live experience");
+assert.equal(cellsAttribute(cellsFrames[0], "src"), `${manifest.basePath}/assets/cells/index.html?v=${cellsVersion}#demo`);
+assert.equal(cellsAttribute(cellsFrames[1], "src"), `${manifest.basePath}/assets/cells/index.html?v=${cellsVersion}`);
+assert(cellsNodes.indexOf(cellsFrames[0]) < cellsNodes.findIndex(node => node.tagName === "figcaption"), "Place the automatic demonstration above the original caption");
+assert(!cellsNodes.some(node => node.tagName === "img" && cellsAttribute(node, "src")?.endsWith("cells-overview.webp")), "Replace the overview screenshot with the live demonstration");
+for (const frame of cellsFrames) {
+  assert(cellsAttribute(frame, "title"), "Describe the embedded experience for assistive technology");
+  assert(frame.attrs.some(attr => attr.name === "allowfullscreen"), "Allow the experience's own fullscreen control");
+  assert(frame.attrs.some(attr => attr.name === "data-cells-playback"), "Pause offscreen article renderers");
+}
 const renderedFrame = [];
 function inspectRenderedCells(node) {
   if (typeof node === "string") return;
@@ -595,7 +621,7 @@ function inspectCover(node) {
 }
 cellsCoverFrame.forEach(inspectCover);
 assert.equal(previewFrames.length, 1, "The cells cover needs one live animation preview");
-assert.equal(cellsAttribute(previewFrames[0], "data-cells-preview-src"), `${manifest.basePath}/assets/cells/index.html#cover`);
+assert.equal(cellsAttribute(previewFrames[0], "data-cells-preview-src"), `${manifest.basePath}/assets/cells/index.html?v=${cellsVersion}#cover`);
 assert.equal(cellsAttribute(previewFrames[0], "tabindex"), "-1", "The cover's article link should own keyboard navigation");
 assert.equal(cellsAttribute(previewFrames[0], "aria-hidden"), "true", "The decorative animation should not duplicate the article link");
 const cellsExperience = await readFile(join(root, "assets", "cells", "index.html"));

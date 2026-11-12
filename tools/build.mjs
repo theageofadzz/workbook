@@ -104,7 +104,7 @@ async function brandClientHeader() {
       branded = branded.replace(homeComponent, (_, factory) =>
         `${factory}("img",{src:${JSON.stringify(logoSrc)},alt:"","aria-hidden":!0,className:${JSON.stringify(homeLogoClasses)}})`
       );
-      branded = useStandaloneNavigation(branded, base);
+      branded = useStandaloneNavigation(branded, base, xiaohongshu);
     }
     if (source.includes("fixed hidden 74:flex")) {
       branded = branded.replace(sidebarComponent, (_, factory) =>

@@ -4,6 +4,7 @@ import { parse, parseFragment, serialize, serializeOuter } from "parse5";
 import { parse as parseJavaScript } from "acorn";
 import { cursorMarkup } from "./cursor.mjs";
 import { writeWeatherFrames } from "./weather-frames.mjs";
+import { buildCells } from "./cells.mjs";
 
 function walk(node, visit) {
   visit(node);
@@ -100,6 +101,7 @@ export async function personalizePortfolio({ root, out, base, footer, scrollExpa
   }
   await writeWeatherFrames({ root, out });
   await mkdir(join(out, "assets", "cells"), { recursive: true });
+  const cellsVersion = await buildCells(root);
   await copyFile(join(root, "src", "cells", "index.html"), join(out, "assets", "cells", "index.html"));
   for (const file of [
     "cells-cover.webp", "cells-overview.webp", "cells-counts.webp",
@@ -140,7 +142,7 @@ export async function personalizePortfolio({ root, out, base, footer, scrollExpa
       templateSlug: "blueprint-design-skill"
     }
   ]) {
-    const result = await personalizeArticle({ contentRoot, out, base, logoStudy, footer, scrollExpandVersion, ...entry });
+    const result = await personalizeArticle({ contentRoot, out, base, logoStudy, footer, scrollExpandVersion, cellsVersion, ...entry });
     retiredContent.push(...result.retiredContent);
     compiledArticles.push(result.compiled);
   }
@@ -185,6 +187,7 @@ async function personalizeArticle({
   footer,
   logoStudy,
   scrollExpandVersion,
+  cellsVersion,
   name,
   cover: coverName,
   articleCover: articleCoverName = coverName,
@@ -193,14 +196,16 @@ async function personalizeArticle({
 }) {
   const frontmatter = JSON.parse(await readFile(join(contentRoot, `${name}.json`), "utf8"));
   const coverHTML = (await readFile(join(contentRoot, `${coverName}.html`), "utf8"))
-    .replaceAll("{{base}}", base).replaceAll("{{cursor}}", cursorMarkup).trim();
+    .replaceAll("{{base}}", base).replaceAll("{{cellsVersion}}", cellsVersion).replaceAll("{{cursor}}", cursorMarkup).trim();
   const articleCoverHTML = (await readFile(join(contentRoot, `${articleCoverName}.html`), "utf8"))
     .replaceAll("{{base}}", base)
+    .replaceAll("{{cellsVersion}}", cellsVersion)
     .replaceAll("{{cursor}}", cursorMarkup)
     .trim();
   let articleHTML = (await readFile(join(contentRoot, `${name}.html`), "utf8"))
     .replaceAll("{{footer}}", footer)
     .replaceAll("{{base}}", base)
+    .replaceAll("{{cellsVersion}}", cellsVersion)
     .replaceAll("{{logoStudy}}", logoStudy)
     .replaceAll("{{cursor}}", cursorMarkup)
     .replaceAll("{{description}}", frontmatter.description)

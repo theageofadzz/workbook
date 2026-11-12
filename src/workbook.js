@@ -302,6 +302,13 @@
   document.addEventListener("visibilitychange", refreshWeatherStudies);
 
   const cellsPreviews = new Map();
+  const cellsPlaybackFrames = new WeakSet();
+  const cellsPlaybackViewport = new IntersectionObserver(entries => {
+    for (const { target, isIntersecting } of entries) {
+      target.dataset.cellsInView = String(isIntersecting);
+      target.contentWindow?.postMessage({ type: "cells-visibility", visible: isIntersecting && !document.hidden }, location.origin);
+    }
+  }, { threshold: .05 });
   function syncCellsPreview(frame, state) {
     if (state.inView && !document.hidden && !reducedMotion.matches) {
       if (!frame.hasAttribute("src")) frame.src = frame.dataset.cellsPreviewSrc;
@@ -319,6 +326,14 @@
     }
   }, { rootMargin: "120px", threshold: .01 });
   function initializeCellsPreviews() {
+    document.querySelectorAll("iframe[data-cells-playback]").forEach(frame => {
+      if (cellsPlaybackFrames.has(frame)) return;
+      cellsPlaybackFrames.add(frame);
+      frame.addEventListener("load", () => {
+        frame.contentWindow?.postMessage({ type: "cells-visibility", visible: frame.dataset.cellsInView === "true" && !document.hidden }, location.origin);
+      });
+      cellsPlaybackViewport.observe(frame);
+    });
     for (const [frame] of cellsPreviews) {
       if (frame.isConnected) continue;
       cellsPreviewViewport.unobserve(frame);
@@ -335,6 +350,9 @@
   }
   function refreshCellsPreviews() {
     for (const [frame, state] of cellsPreviews) syncCellsPreview(frame, state);
+    document.querySelectorAll("iframe[data-cells-playback]").forEach(frame => {
+      frame.contentWindow?.postMessage({ type: "cells-visibility", visible: frame.dataset.cellsInView === "true" && !document.hidden }, location.origin);
+    });
   }
   reducedMotion.addEventListener("change", refreshCellsPreviews);
   document.addEventListener("visibilitychange", refreshCellsPreviews);
@@ -496,8 +514,13 @@
     });
     const footer = [...document.querySelectorAll('[data-role="footer-item"]')];
     const labels = ["首页", "作品", "GitHub 个人主页", "小红书", `关于 ${config.title}`];
+    const route = location.pathname.replace(/\/$/, "");
+    const activeFooterIndex = route === base ? 0 : route === `${base}/github` ? 2 : route === `${base}/about` ? 4 : 1;
     footer.forEach((anchor, index) => {
       if (!labels[index]) return;
+      if (index === activeFooterIndex) {
+        if (anchor.getAttribute("aria-current") !== "page") anchor.setAttribute("aria-current", "page");
+      } else if (anchor.hasAttribute("aria-current")) anchor.removeAttribute("aria-current");
       anchor.dataset.tooltip = labels[index];
       if (anchor.getAttribute("aria-label") !== labels[index]) anchor.setAttribute("aria-label", labels[index]);
       if (index === 0) {
