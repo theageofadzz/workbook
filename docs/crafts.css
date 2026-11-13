@@ -163,11 +163,11 @@ html.reading-open { overflow: hidden; }
 .work-reader-media > :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
 .work-reader-media > iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: inherit; background: #080707; }
 @media (prefers-reduced-motion: no-preference) {
-  .reading-window[open] .reading-sheet { animation: reading-enter 300ms cubic-bezier(.22, 1, .36, 1) both; }
+  .reading-window[open] .reading-sheet { animation: reading-enter 480ms cubic-bezier(.16, 1, .3, 1) both; }
   .reading-window[open]::backdrop { animation: reading-shade-in 240ms ease both; }
   .reading-window.is-closing .reading-sheet { animation: reading-leave 160ms ease both; }
   .reading-window.is-closing::backdrop { animation: reading-shade-out 160ms ease both; }
-  .work-window[open] { animation: work-reader-enter 360ms cubic-bezier(.22, 1, .36, 1) both; }
+  .work-window[open] { animation: work-reader-enter 520ms cubic-bezier(.16, 1, .3, 1) both; }
   .work-window[open]::backdrop { animation: reading-shade-in 260ms ease both; }
   .work-window.is-closing { animation: work-reader-leave 180ms ease both; }
   .work-window.is-closing::backdrop { animation: reading-shade-out 180ms ease both; }
@@ -182,7 +182,7 @@ html.reading-open { overflow: hidden; }
 @keyframes reading-shade-in { from { opacity: 0; } }
 @keyframes reading-shade-out { to { opacity: 0; } }
 @keyframes work-reader-enter {
-  from { opacity: 0; transform: translateY(18px) scale(.92); }
+  from { opacity: 0; transform: translateY(18px) scale(.975); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes work-reader-leave {

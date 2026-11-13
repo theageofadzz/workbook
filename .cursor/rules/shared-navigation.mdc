@@ -10,5 +10,6 @@ alwaysApply: true
 - Only the GitHub section uses the dark dock palette; other pages use the shared light palette.
 - Preserve the original circular About icon and an internal link to `/workbook/about/`.
 - Articles belong to Home and must keep the Home icon active. Only the independent `/workbook/crafts/` page selects Works, including its preview dialogs.
+- Keep page changes soft and continuous, with a stationary dock and interruptible motion. Honor reduced motion and preserve anchors, native link behavior and history scroll restoration.
 - Check the dock after React hydration and after navigating into an article. Static HTML checks alone missed a four-item legacy renderer that displaced About.
 - Implement navigation changes in both the build output and client renderer. Run `npm run check` and verify browser navigation before publishing.

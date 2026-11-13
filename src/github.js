@@ -109,7 +109,7 @@
       render(true);
       window.scrollTo({ top: 0, behavior: "instant" });
     };
-    if (window.WorkbookMotion) window.WorkbookMotion.change(update, document.querySelector(".github-content"));
+    if (window.WorkbookMotion) window.WorkbookMotion.change(update, document.querySelector(".github-content"), url.searchParams.has("repo") ? "forward" : "back");
     else update();
   }
 
@@ -124,7 +124,7 @@
   });
   document.querySelector("[data-back]").addEventListener("click", () => navigate(new URL("?tab=overview", baseURL)));
   window.addEventListener("popstate", () => {
-    if (window.WorkbookMotion) window.WorkbookMotion.change(() => render(true), document.querySelector(".github-content"));
+    if (window.WorkbookMotion) window.WorkbookMotion.change(() => render(true), document.querySelector(".github-content"), new URLSearchParams(location.search).has("repo") ? "forward" : "back");
     else render(true);
   });
   render();

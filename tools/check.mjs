@@ -229,6 +229,10 @@ assert(
 for (const page of [...manifest.pages.map(page => page.file), "about/index.html", "github/index.html", "404.html"]) {
   const document = parse(await readFile(join(root, page), "utf8"));
   assert.match(await readFile(join(root, page), "utf8"), /href="\/workbook\/cursor\.css\?v=[a-f0-9]{8}"/, `Expected the shared preview cursor styles on ${page}`);
+  for (const file of ["page-transitions.css", "page-transitions.js"]) {
+    const version = createHash("sha256").update(await readFile(join(root, file))).digest("hex").slice(0, 8);
+    assert((await readFile(join(root, page), "utf8")).includes(`${manifest.basePath}/${file}?v=${version}`), `Expected the current shared page motion on ${page}`);
+  }
   let title = "";
   let icon;
   let homeLink;
