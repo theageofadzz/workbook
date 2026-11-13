@@ -13,6 +13,47 @@
   const weatherStudies = new WeakMap();
   const copyResets = new WeakMap();
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  let activeColor;
+  function hideColorTooltip() {
+    activeColor?.classList.remove("is-open");
+    activeColor = null;
+  }
+  function showColorTooltip(color) {
+    if (!color) return;
+    if (activeColor !== color) hideColorTooltip();
+    activeColor = color;
+    color.style.setProperty("--cells-tooltip-shift", "0px");
+    const bounds = color.querySelector(".cells-color-tooltip").getBoundingClientRect();
+    let shift = Math.min(0, document.documentElement.clientWidth - 12 - bounds.right);
+    shift += Math.max(0, 12 - bounds.left - shift);
+    color.style.setProperty("--cells-tooltip-shift", `${shift}px`);
+    color.classList.add("is-open");
+  }
+  document.addEventListener("pointerover", event => {
+    if (event.pointerType === "touch") return;
+    const color = event.target instanceof Element && event.target.closest(".cells-color");
+    if (color && !color.contains(event.relatedTarget)) showColorTooltip(color);
+  });
+  document.addEventListener("pointerout", event => {
+    if (activeColor?.contains(event.target) && !activeColor.contains(event.relatedTarget)) hideColorTooltip();
+  });
+  document.addEventListener("focusin", event => {
+    const color = event.target instanceof Element && event.target.closest(".cells-color");
+    if (color) showColorTooltip(color);
+  });
+  document.addEventListener("focusout", event => {
+    if (activeColor?.contains(event.target) && !activeColor.contains(event.relatedTarget)) hideColorTooltip();
+  });
+  document.addEventListener("click", event => {
+    const term = event.target instanceof Element && event.target.closest(".cells-color-term");
+    if (term) showColorTooltip(term.closest(".cells-color"));
+    else hideColorTooltip();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") hideColorTooltip();
+  });
+  window.addEventListener("scroll", hideColorTooltip, { passive: true });
+  window.addEventListener("resize", hideColorTooltip);
   const splitTextViewport = new IntersectionObserver(entries => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;

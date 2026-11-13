@@ -210,6 +210,12 @@ async function personalizeArticle({
     .replaceAll("{{cursor}}", cursorMarkup)
     .replaceAll("{{description}}", frontmatter.description)
     .replaceAll("{{cover}}", articleCoverHTML).trim();
+  let colorIndex = 0;
+  articleHTML = articleHTML.replace(/\{\{color:([^{}|<>]+)\|(#[\da-f]{6}(?:[\da-f]{2})?)\}\}/gi, (_, label, value) => {
+    const color = value.toUpperCase();
+    const id = `${frontmatter.slug}-color-${++colorIndex}`;
+    return `<span class="cells-color" style="--cells-color: ${color}"><button class="cells-color-term" type="button" aria-describedby="${id}">${label}</button><span class="cells-color-tooltip" id="${id}" role="tooltip"><span class="cells-color-swatch" aria-hidden="true"></span><code>${color}</code></span></span>`;
+  });
   for (const [, icon] of articleHTML.matchAll(/\{\{icon:([a-z-]+)\}\}/g)) {
     const svg = await readFile(new URL(`../node_modules/lucide-static/icons/${icon}.svg`, import.meta.url), "utf8");
     articleHTML = articleHTML.replaceAll(`{{icon:${icon}}}`, svg.replace("<svg", '<svg aria-hidden="true"'));

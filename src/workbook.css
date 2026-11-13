@@ -649,6 +649,15 @@ figure:not(.gamestation-code, .weather-conversation) > figcaption { text-align: 
 .cells-essay .cells-reference-link:hover { color: #525252; text-decoration: none; }
 .cells-essay .cells-reference-link > span { align-items: center; justify-content: center; width: 16px; height: 16px; flex: 0 0 16px; }
 .cells-essay .cells-reference-link svg { display: block; width: 14px; height: 14px; color: currentColor; stroke-width: 1.75; }
+.cells-color { position: relative; display: inline-block; white-space: nowrap; }
+.cells-essay .cells-color-term { display: inline; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: #1764cf; font: inherit; font-weight: 600; line-height: inherit; text-decoration: none; cursor: pointer; }
+.cells-essay .cells-color-term:hover { color: #104a9d; }
+.cells-color-term:focus-visible { outline: 2px solid #1764cf; outline-offset: 3px; }
+.cells-color-tooltip { position: absolute; z-index: 50; left: 50%; bottom: calc(100% + 7px); display: flex; align-items: center; gap: 8px; width: max-content; padding: 7px 10px; border: 1px solid #ffffff29; border-radius: 4px; background: #303030; color: #f5f5f5; box-shadow: 0 4px 12px #00000026; line-height: 1.4; white-space: nowrap; transform: translateX(calc(-50% + var(--cells-tooltip-shift, 0px))); opacity: 0; visibility: hidden; pointer-events: none; }
+.cells-color-tooltip::after { position: absolute; right: 0; bottom: -8px; left: 0; height: 8px; content: ""; }
+.cells-color.is-open .cells-color-tooltip { opacity: 1; visibility: visible; pointer-events: auto; }
+.cells-color-swatch { display: block; flex: 0 0 14px; width: 14px; height: 14px; border: 1px solid #ffffff59; border-radius: 2px; background-color: #b9b9b9; background-image: linear-gradient(var(--cells-color), var(--cells-color)); }
+.cells-essay .cells-color-tooltip code { margin: 0; padding: 0; border: 0; background: transparent; color: inherit; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 .cells-experiences { margin-top: 20px; }
 .cells-study-stage { position: relative; width: 100%; aspect-ratio: 8 / 5; overflow: hidden; border-radius: 4px; background: #080707; }
 .cells-study-stage iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; }
