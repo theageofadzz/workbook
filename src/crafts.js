@@ -370,17 +370,12 @@
       const frame = document.createElement("iframe");
       const source = new URL(work.media, assetBase);
       source.searchParams.set("v", mediaVersions[work.slug]);
-      source.hash = "demo";
+      source.hash = "showcase";
       frame.src = source.href;
-      frame.title = `${work.title} · 可增加或减少细胞数量`;
-      frame.allow = "autoplay; fullscreen";
-      frame.allowFullscreen = true;
+      frame.title = `${work.title} · 细胞自动增减与呼吸动画`;
+      frame.tabIndex = -1;
+      frame.inert = true;
       frame.addEventListener("load", () => {
-        frame.contentWindow?.addEventListener("keydown", event => {
-          if (event.key !== "Escape") return;
-          event.preventDefault();
-          closeWork();
-        });
         refreshMotion();
       });
       container.append(frame);

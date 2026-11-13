@@ -158,10 +158,11 @@ html.reading-open { overflow: hidden; }
   overflow: visible;
 }
 .work-window[open] { display: block; }
+.work-window[data-media-type="interactive"] { outline: none; }
 .work-window::backdrop { background: #3939392e; backdrop-filter: blur(5px); }
 .work-reader-media { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 3px; background: #d5f1f3; }
 .work-reader-media > :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
-.work-reader-media > iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: inherit; background: #080707; }
+.work-reader-media > iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: inherit; background: #080707; pointer-events: none; }
 @media (prefers-reduced-motion: no-preference) {
   .reading-window[open] .reading-sheet { animation: reading-enter 480ms cubic-bezier(.16, 1, .3, 1) both; }
   .reading-window[open]::backdrop { animation: reading-shade-in 240ms ease both; }

@@ -7,7 +7,12 @@ const labelLayer = document.querySelector(".labels");
 const loading = document.querySelector(".loading");
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const coverMode = location.hash === "#cover";
-let demoPlaying = (coverMode || location.hash === "#demo") && !reducedMotion;
+const presentationMode = coverMode || location.hash === "#showcase";
+if (presentationMode) {
+  document.body.inert = true;
+  canvas.setAttribute("aria-label", "细胞数量自动增减与轻微呼吸动画");
+}
+let demoPlaying = (presentationMode || location.hash === "#demo") && !reducedMotion;
 let demoTime = 0;
 let demoButton;
 let demoButtonUntil = 0;
@@ -370,8 +375,10 @@ function stopDemo() {
   demoButton = null;
   controls.count.setAttribute("aria-live", "polite");
 }
-document.addEventListener("pointerdown", stopDemo, { capture: true });
-document.addEventListener("keydown", stopDemo, { capture: true });
+if (!presentationMode) {
+  document.addEventListener("pointerdown", stopDemo, { capture: true });
+  document.addEventListener("keydown", stopDemo, { capture: true });
+}
 
 function nearestSurvivor(point, count, skipIndex = -1) {
   let closest;
@@ -517,53 +524,55 @@ function playNote(index) {
   oscillator.stop(at + 2.7);
   oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
 }
-controls.sound.addEventListener("click", toggleSound);
+if (!presentationMode) {
+  controls.sound.addEventListener("click", toggleSound);
 
-canvas.addEventListener("pointerdown", event => {
-  pointer.set(event.clientX / width * 2 - 1, 1 - event.clientY / height * 2);
-  dragging = true;
-  dragDistance = 0;
-  pointerDown = { x: event.clientX, y: event.clientY, yaw: targetYaw, pitch: targetPitch };
-  canvas.setPointerCapture(event.pointerId);
-  lastInteraction = performance.now();
-});
-canvas.addEventListener("pointermove", event => {
-  pointer.set(event.clientX / width * 2 - 1, 1 - event.clientY / height * 2);
-  if (!dragging) return;
-  const dx = event.clientX - pointerDown.x;
-  const dy = event.clientY - pointerDown.y;
-  dragDistance = Math.hypot(dx, dy);
-  targetYaw = pointerDown.yaw + dx * .0035;
-  targetPitch = THREE.MathUtils.clamp(pointerDown.pitch + dy * .0025, -.55, .55);
-  lastInteraction = performance.now();
-});
-canvas.addEventListener("pointerup", event => {
-  dragging = false;
-  if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-  if (dragDistance < 7) {
-    pulse = 1;
-    raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(cells.filter(cell => cell.mesh.visible).map(cell => cell.mesh))[0];
-    playNote(hit ? hit.object.userData.index : 0);
-  }
-  pointerDown = null;
-  lastInteraction = performance.now();
-});
-canvas.addEventListener("pointercancel", () => { dragging = false; pointerDown = null; });
-canvas.addEventListener("pointerleave", () => { if (!dragging) pointer.set(-10, -10); });
-canvas.addEventListener("wheel", event => {
-  event.preventDefault();
-  targetZoom = THREE.MathUtils.clamp(targetZoom - event.deltaY * .0005, .72, 1.24);
-  lastInteraction = performance.now();
-}, { passive: false });
-addEventListener("keydown", event => {
-  if (event.target instanceof HTMLButtonElement) return;
-  if (event.code === "Space") { event.preventDefault(); togglePause(); }
-  if (event.key.toLowerCase() === "m") toggleSound();
-  if (event.key.toLowerCase() === "r") controls.reset.click();
-  if (event.key === "+" || event.key === "=") setCellCount(targetCount + 1);
-  if (event.key === "-") setCellCount(targetCount - 1);
-});
+  canvas.addEventListener("pointerdown", event => {
+    pointer.set(event.clientX / width * 2 - 1, 1 - event.clientY / height * 2);
+    dragging = true;
+    dragDistance = 0;
+    pointerDown = { x: event.clientX, y: event.clientY, yaw: targetYaw, pitch: targetPitch };
+    canvas.setPointerCapture(event.pointerId);
+    lastInteraction = performance.now();
+  });
+  canvas.addEventListener("pointermove", event => {
+    pointer.set(event.clientX / width * 2 - 1, 1 - event.clientY / height * 2);
+    if (!dragging) return;
+    const dx = event.clientX - pointerDown.x;
+    const dy = event.clientY - pointerDown.y;
+    dragDistance = Math.hypot(dx, dy);
+    targetYaw = pointerDown.yaw + dx * .0035;
+    targetPitch = THREE.MathUtils.clamp(pointerDown.pitch + dy * .0025, -.55, .55);
+    lastInteraction = performance.now();
+  });
+  canvas.addEventListener("pointerup", event => {
+    dragging = false;
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    if (dragDistance < 7) {
+      pulse = 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObjects(cells.filter(cell => cell.mesh.visible).map(cell => cell.mesh))[0];
+      playNote(hit ? hit.object.userData.index : 0);
+    }
+    pointerDown = null;
+    lastInteraction = performance.now();
+  });
+  canvas.addEventListener("pointercancel", () => { dragging = false; pointerDown = null; });
+  canvas.addEventListener("pointerleave", () => { if (!dragging) pointer.set(-10, -10); });
+  canvas.addEventListener("wheel", event => {
+    event.preventDefault();
+    targetZoom = THREE.MathUtils.clamp(targetZoom - event.deltaY * .0005, .72, 1.24);
+    lastInteraction = performance.now();
+  }, { passive: false });
+  addEventListener("keydown", event => {
+    if (event.target instanceof HTMLButtonElement) return;
+    if (event.code === "Space") { event.preventDefault(); togglePause(); }
+    if (event.key.toLowerCase() === "m") toggleSound();
+    if (event.key.toLowerCase() === "r") controls.reset.click();
+    if (event.key === "+" || event.key === "=") setCellCount(targetCount + 1);
+    if (event.key === "-") setCellCount(targetCount - 1);
+  });
+}
 
 let firstFrame = true;
 let frame = 0;
@@ -605,7 +614,7 @@ function renderFrame() {
   group.position.y = Math.sin(time * .46) * .045;
   camera.position.z = reducedMotion ? cameraTarget : advanceSpring(cameraDistance, cameraTarget, dt, 32, 11);
   updateCells(time, dt);
-  if (frame++ % 3 === 0) {
+  if (!presentationMode && frame++ % 3 === 0) {
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObjects(cells.filter(cell => cell.mesh.visible).map(cell => cell.mesh))[0];
     selected = hit ? hit.object.userData.index : -1;
