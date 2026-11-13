@@ -144,7 +144,7 @@ html.reading-open { overflow: hidden; }
 .work-window {
   position: fixed;
   --work-view-ratio: var(--work-ratio, 1);
-  width: min(640px, calc(100vw - 32px), calc((100dvh - 48px) * var(--work-view-ratio)));
+  width: min(var(--work-max-width, 640px), calc(100vw - 32px), calc((100dvh - 48px) * var(--work-view-ratio)));
   aspect-ratio: var(--work-view-ratio);
   max-width: none;
   max-height: none;
@@ -158,7 +158,7 @@ html.reading-open { overflow: hidden; }
   overflow: visible;
 }
 .work-window[open] { display: block; }
-.work-window[data-media-type="interactive"] { outline: none; }
+.work-window[data-media-type="interactive"] { --work-max-width: 1120px; outline: none; }
 .work-window::backdrop { background: #3939392e; backdrop-filter: blur(5px); }
 .work-reader-media { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 3px; background: #d5f1f3; }
 .work-reader-media > :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
