@@ -1,6 +1,17 @@
 {
   "works": [
     {
+      "slug": "cicada-cells",
+      "title": "Cicada Cells",
+      "publishedAt": "2026-11-12",
+      "category": "动效",
+      "mediaType": "interactive",
+      "media": "assets/cells/index.html",
+      "poster": "assets/articles/cells-overview.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
       "slug": "blueprint-drone",
       "title": "无人机蓝图",
       "publishedAt": "2026-11-11",

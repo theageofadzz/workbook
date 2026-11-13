@@ -18,9 +18,11 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
   const document = parse(html);
   const urls = [];
   const videos = [];
+  const workPreviews = [];
   let writingData;
   function visit(node) {
     if (node.tagName === "video") videos.push(node);
+    if (node.attrs?.some(attr => attr.name === "class" && attr.value.split(/\s+/).includes("work-preview"))) workPreviews.push(node);
     for (const attr of node.attrs || []) {
       if (["src", "href", "poster"].includes(attr.name) && attr.value.startsWith(`${manifest.basePath}/`)) urls.push(attr.value);
     }
@@ -52,11 +54,16 @@ for (const page of [...manifest.pages, { route: "/about", file: "about/index.htm
     const imported = JSON.parse(await readFile(new URL("../src/content/writing/manifest.json", import.meta.url), "utf8"));
     const { works } = JSON.parse(await readFile(new URL("../src/content/works.json", import.meta.url), "utf8"));
     assert.deepEqual(writingData.works, works, "Every work and its date must be available");
-    assert.equal((html.match(/class="work-preview"/g) || []).length, works.length, "Every work needs a media preview");
+    assert.equal(workPreviews.length, works.length, "Every work needs a media preview");
     for (const work of works) {
       assert.match(html, new RegExp(`<h2>${work.title}</h2>`), `Missing work title: ${work.slug}`);
       assert(html.includes(`<time datetime="${work.publishedAt}">${work.publishedAt}</time>`), `Missing work date: ${work.slug}`);
-      if (work.mediaType === "video") {
+      if (work.mediaType === "interactive") {
+        const version = createHash("sha256").update(await readFile(join(root, work.media))).digest("hex").slice(0, 8);
+        assert.equal(writingData.mediaVersions[work.slug], version, "Use the same current renderer as the article");
+        assert(html.includes(`data-work-preview-src="${manifest.basePath}/${work.media}?v=${version}#cover"`), "Show the live count animation in the works gallery");
+        assert(html.includes('tabindex="-1" aria-hidden="true"'), "Keep the decorative preview out of keyboard navigation");
+      } else if (work.mediaType === "video") {
         const video = videos.find(node => node.attrs.some(attr =>
           attr.name === "src" && attr.value === `${manifest.basePath}/${work.media}`));
         assert(video, `Expected a video preview: ${work.slug}`);
@@ -273,7 +280,7 @@ for (const page of [...manifest.pages.map(page => page.file), "about/index.html"
       : page === "github/index.html" ? 2
       : page === "about/index.html" ? 4
       : page === "404.html" ? -1
-      : 1;
+      : 0;
     assert.deepEqual(currentFooterIndices, [expectedCurrentIndex], `Expected the current-page marker on the matching dock link in ${page}`);
     assert(aboutLink && aboutIcon, `Expected the original About dock icon in ${page}`);
     assert.match(

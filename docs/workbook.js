@@ -556,7 +556,7 @@
     const footer = [...document.querySelectorAll('[data-role="footer-item"]')];
     const labels = ["首页", "作品", "GitHub 个人主页", "小红书", `关于 ${config.title}`];
     const route = location.pathname.replace(/\/$/, "");
-    const activeFooterIndex = route === base ? 0 : route === `${base}/github` ? 2 : route === `${base}/about` ? 4 : 1;
+    const activeFooterIndex = route === `${base}/crafts` ? 1 : route === `${base}/github` ? 2 : route === `${base}/about` ? 4 : 0;
     footer.forEach((anchor, index) => {
       if (!labels[index]) return;
       if (index === activeFooterIndex) {

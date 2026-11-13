@@ -155,7 +155,7 @@ async function refreshRuntimeLinks(files) {
       : file === "github/index.html" ? 2
       : file === "about/index.html" ? 4
       : file === "404.html" ? -1
-      : 1;
+      : 0;
     const footerItems = [];
     walk(document, node => {
       if (node.tagName === "a" && node.attrs?.some(attr => attr.name === "data-role" && attr.value === "footer-item")) {

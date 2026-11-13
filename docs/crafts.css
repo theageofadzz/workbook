@@ -58,6 +58,9 @@ html.reading-open { overflow: hidden; }
 .writing-link:hover { border-color: #bcbcbc; }
 .work-preview { display: block; aspect-ratio: 1; overflow: hidden; border-radius: 4px; background: #d5f1f3; }
 .work-preview :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; }
+.work-interactive-preview { position: relative; background: #080707; }
+.work-interactive-preview iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; opacity: 0; pointer-events: none; }
+.work-interactive-preview iframe.is-ready { opacity: 1; }
 .work-preview .work-video-poster { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .work-preview video { display: none; }
@@ -140,8 +143,9 @@ html.reading-open { overflow: hidden; }
 .paper-snapshot { pointer-events: none; }
 .work-window {
   position: fixed;
-  width: min(640px, calc(100vw - 32px), calc((100dvh - 48px) * var(--work-ratio, 1)));
-  aspect-ratio: var(--work-ratio, 1);
+  --work-view-ratio: var(--work-ratio, 1);
+  width: min(640px, calc(100vw - 32px), calc((100dvh - 48px) * var(--work-view-ratio)));
+  aspect-ratio: var(--work-view-ratio);
   max-width: none;
   max-height: none;
   margin: auto;
@@ -157,6 +161,7 @@ html.reading-open { overflow: hidden; }
 .work-window::backdrop { background: #3939392e; backdrop-filter: blur(5px); }
 .work-reader-media { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 3px; background: #d5f1f3; }
 .work-reader-media > :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+.work-reader-media > iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: inherit; background: #080707; }
 @media (prefers-reduced-motion: no-preference) {
   .reading-window[open] .reading-sheet { animation: reading-enter 300ms cubic-bezier(.22, 1, .36, 1) both; }
   .reading-window[open]::backdrop { animation: reading-shade-in 240ms ease both; }
@@ -199,6 +204,7 @@ html.reading-open { overflow: hidden; }
 .reading-body iframe { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; margin: 30px 0; border: 1px solid #e0e0e0; border-radius: 4px; background: #f1f1f1; }
 .reading-body blockquote { margin: 25px 0; padding-left: 22px; border-left: 2px solid #d1d1d1; color: #858585; }
 @media (max-width: 767px) {
+  .work-window[data-media-type="interactive"] { --work-view-ratio: .75; }
   .writing-main { padding-right: 16px; padding-left: 16px; }
   .writing-heading { margin: 96px 0 48px; }
   .writing-heading h1 { font-size: 40px; }

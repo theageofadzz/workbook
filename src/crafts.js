@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const { articles, works } = JSON.parse(document.querySelector("#crafts-content").textContent);
+  const { articles, works, mediaVersions } = JSON.parse(document.querySelector("#crafts-content").textContent);
   const displayArticles = [...articles];
   for (let index = displayArticles.length - 1; index > 0; index--) {
     const other = Math.floor(Math.random() * (index + 1));
@@ -69,6 +69,21 @@
   });
   const previews = new Map();
   const workPreviewVideos = [...document.querySelectorAll("[data-work-preview-video]")];
+  const workPreviewFrames = new Map();
+  const readyWorkFrames = new WeakSet();
+  const workFrameViewport = new IntersectionObserver(entries => {
+    for (const { target, isIntersecting } of entries) workPreviewFrames.set(target, isIntersecting);
+    refreshMotion();
+  }, { rootMargin: "120px", threshold: .01 });
+  for (const frame of document.querySelectorAll("[data-work-preview-src]")) {
+    workPreviewFrames.set(frame, false);
+    frame.addEventListener("load", () => {
+      if (!frame.hasAttribute("src")) return;
+      readyWorkFrames.add(frame);
+      refreshMotion();
+    });
+    workFrameViewport.observe(frame);
+  }
   let workReturnFocus = null;
   function initializeSplitText() {
     const heading = document.querySelector("[data-split-text]");
@@ -110,6 +125,15 @@
 
   function refreshMotion() {
     const playing = !document.hidden && !dialog.open && !workDialog.open && !reducedMotion.matches;
+    for (const [frame, inView] of workPreviewFrames) {
+      const visible = playing && inView;
+      if (visible && !frame.hasAttribute("src")) frame.src = frame.dataset.workPreviewSrc;
+      frame.classList.toggle("is-ready", readyWorkFrames.has(frame) && !reducedMotion.matches);
+      frame.contentWindow?.postMessage({ type: "cells-visibility", visible }, location.origin);
+    }
+    workDialog.querySelector("iframe")?.contentWindow?.postMessage({
+      type: "cells-visibility", visible: workDialog.open && !document.hidden
+    }, location.origin);
     for (const video of workPreviewVideos) {
       if (playing) {
         if (video.paused) video.play().catch(() => {});
@@ -342,7 +366,25 @@
     const image = document.createElement("img");
     image.alt = work.title;
     image.decoding = "async";
-    if (work.mediaType === "video") {
+    if (work.mediaType === "interactive") {
+      const frame = document.createElement("iframe");
+      const source = new URL(work.media, assetBase);
+      source.searchParams.set("v", mediaVersions[work.slug]);
+      source.hash = "demo";
+      frame.src = source.href;
+      frame.title = `${work.title} · 可增加或减少细胞数量`;
+      frame.allow = "autoplay; fullscreen";
+      frame.allowFullscreen = true;
+      frame.addEventListener("load", () => {
+        frame.contentWindow?.addEventListener("keydown", event => {
+          if (event.key !== "Escape") return;
+          event.preventDefault();
+          closeWork();
+        });
+        refreshMotion();
+      });
+      container.append(frame);
+    } else if (work.mediaType === "video") {
       image.src = new URL(work.poster, assetBase).href;
       image.dataset.workReaderPoster = "";
       image.hidden = !reducedMotion.matches;
@@ -362,6 +404,7 @@
       image.src = new URL(work.media, assetBase).href;
       container.append(image);
     }
+    workDialog.dataset.mediaType = work.mediaType;
     workDialog.style.setProperty("--work-ratio", work.width / work.height);
     workDialog.setAttribute("aria-label", `${work.title} · 作品预览`);
     document.title = `${work.title} · theageofadzz`;

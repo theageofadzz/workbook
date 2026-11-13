@@ -69,6 +69,10 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
   const css = await readFile(join(root, "src", "crafts.css"), "utf8");
   const js = await readFile(join(root, "src", "crafts.js"), "utf8");
   const hash = source => createHash("sha256").update(source).digest("hex").slice(0, 8);
+  const mediaVersions = {};
+  for (const work of works.filter(work => work.mediaType === "interactive")) {
+    mediaVersions[work.slug] = hash(await readFile(join(out, work.media)));
+  }
   async function bundle(file, define = {}) {
     const result = await build({
       entryPoints: [join(root, "src", file)], bundle: true, write: false, minify: true,
@@ -97,6 +101,11 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
     return paragraphs.join("");
   }
   function workPreview(work) {
+    if (work.mediaType === "interactive") return `
+          <div class="work-preview work-interactive-preview" style="aspect-ratio: ${work.width} / ${work.height}">
+            <img src="${base}/${escape(work.poster)}" alt="${escape(work.title)}" width="${work.width}" height="${work.height}" decoding="async">
+            <iframe data-work-preview-src="${base}/${escape(work.media)}?v=${mediaVersions[work.slug]}#cover" title="${escape(work.title)} 自动增减细胞预览" width="${work.width}" height="${work.height}" tabindex="-1" aria-hidden="true"></iframe>
+          </div>`;
     if (work.mediaType === "video") return `
           <div class="work-preview" style="aspect-ratio: ${work.width} / ${work.height}">
             <video data-work-preview-video src="${base}/${escape(work.media)}" poster="${base}/${escape(work.poster)}" width="${work.width}" height="${work.height}" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-label="${escape(work.title)}"></video>
@@ -146,7 +155,7 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
           <div class="crafts-caption"><h2>${escape(article.title)}</h2><div class="crafts-caption-meta"><time datetime="${article.publishedAt}">${article.publishedAt}</time><span class="crafts-category">${escape(article.category)}</span></div></div>
         </a>
       </article>`).join(""),
-    data: JSON.stringify({ articles, works }).replaceAll("<", "\\u003c")
+    data: JSON.stringify({ articles, works, mediaVersions }).replaceAll("<", "\\u003c")
   };
   let html = await readFile(join(root, "src", "content", "crafts.html"), "utf8");
   for (const [name, value] of Object.entries(replacements)) html = html.replaceAll(`{{${name}}}`, value);
@@ -162,7 +171,8 @@ export async function writeCraftsPage({ root, out, base, browserTitle, faviconSr
   }
   await mkdir(join(out, "assets", "works"), { recursive: true });
   for (const work of works) {
-    for (const asset of [work.media, work.poster]) {
+    const assets = work.mediaType === "interactive" ? [work.poster] : [work.media, work.poster];
+    for (const asset of assets) {
       await mkdir(dirname(join(out, asset)), { recursive: true });
       await copyFile(join(root, "src", asset), join(out, asset));
     }
